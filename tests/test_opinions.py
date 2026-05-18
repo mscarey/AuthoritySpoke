@@ -44,8 +44,8 @@ class TestOpinions:
             == "TOBRINER, J."
         )
 
-    def test_opinion_holding_list(self, make_opinion_with_holding_python_feist, real_holding):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_opinion_holding_list(self, make_opinion_with_holding, real_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         h3_specific = real_holding["h3"]
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
@@ -94,8 +94,8 @@ class TestOpinionText:
             + "impractical and, in any event, unnecessary"
         ) in make_opinion["feist_majority"].text
 
-    def test_opinion_text_anchor(self, make_opinion_with_holding_python_feist):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_opinion_text_anchor(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
         assert any(
             "ideas" in factor.anchors.quotes[0].exact
             for factor in feist.anchored_factors
@@ -131,43 +131,43 @@ class TestOpinionText:
 
 
 class TestOpinionHoldings:
-    def test_positing_non_rule_error(self, make_opinion_with_holding_python_feist, make_procedure):
+    def test_positing_non_rule_error(self, make_opinion_with_holding, make_procedure):
         with pytest.raises(TypeError):
-            make_opinion_with_holding_python_feist["watt_majority"].posit(make_procedure["c1"])
+            make_opinion_with_holding["watt_majority"].posit(make_procedure["c1"])
 
-    def test_error_posit_with_no_rule_source(self, make_opinion_with_holding_python_feist):
+    def test_error_posit_with_no_rule_source(self, make_opinion_with_holding):
         with pytest.raises(TypeError):
-            make_opinion_with_holding_python_feist["watt_majority"].posit()
+            make_opinion_with_holding["watt_majority"].posit()
 
-    def test_posit_rule(self, make_opinion_with_holding_python_feist, make_rule, make_holding):
+    def test_posit_rule(self, make_opinion_with_holding, make_rule, make_holding):
         """
         "Positing" a Rule causes the Rule to be converted to a Holding first.
         So the Opinion implies the corresponding Holding.
         """
 
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         watt.posit(make_rule["h1"])
         assert watt.implies(make_holding["h1"])
 
     def test_new_context_wrong_number_of_changes(
-        self, make_opinion_with_holding_python_feist, make_holding
+        self, make_opinion_with_holding, make_holding
     ):
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         with pytest.raises(ValueError):
             brad.posit(
                 make_holding["h1"], context=[Entity(name="House on Haunted Hill")]
             )
 
     def test_new_context_naming_nonexistent_factor(
-        self, make_opinion_with_holding_python_feist, make_holding
+        self, make_opinion_with_holding, make_holding
     ):
         """
         The context here (a Factor outside an iterable) only changes the first
         generic factor of the Rule being posited, which may not be what the user
         expects.
         """
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         brad.clear_holdings()
         with pytest.raises(ValueError):
             brad.posit(
@@ -176,10 +176,10 @@ class TestOpinionHoldings:
             )
 
     def test_new_context_creates_equal_rule(
-        self, make_opinion_with_holding_python_feist, make_response
+        self, make_opinion_with_holding, make_response
     ):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
@@ -200,11 +200,11 @@ class TestOpinionHoldings:
         assert watt.holdings[-1].means(brad.holdings[0])
 
     def test_getting_factors_from_opinion(
-        self, make_opinion_with_holding_python_feist, make_response
+        self, make_opinion_with_holding, make_response
     ):
         client = FakeClient(responses=make_response)
 
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.yaml")
         holdings_to_posit = readers.read_holdings(watt_raw, client=client)
@@ -213,13 +213,13 @@ class TestOpinionHoldings:
         assert "proof of Wattenburg's guilt" in factors.keys()
 
     def test_new_context_inferring_factors_to_change(
-        self, make_opinion_with_holding_python_feist, make_response
+        self, make_opinion_with_holding, make_response
     ):
         """
         This changes watt's holdings; may break tests below.
         """
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
 
         client = FakeClient(responses=make_response)
 
@@ -241,8 +241,8 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context=context_items)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_getting_factors_from_new_holding(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_getting_factors_from_new_holding(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         elephants = Fact(
             predicate="$animal was an elephant", terms=Entity(name="the elephant")
@@ -261,14 +261,14 @@ class TestOpinionHoldings:
 
 
 class TestOpinionFactors:
-    def test_only_one_factor_with_same_content(self, make_opinion_with_holding_python_feist):
+    def test_only_one_factor_with_same_content(self, make_opinion_with_holding):
         """
         Tests that a particular Factor appears only once, and that all
         three of the text anchors for that Factor appear in the value
         for the Factor in Opinion.factors.
         """
 
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
         scenes_a_faire = [
             factor
             for factor in oracle.factors()
@@ -297,22 +297,22 @@ class TestOpinionFactors:
         assert len(index.named_anchors) == 1
         assert index.named_anchors[0].anchors.quotes == [quote_selector]
 
-    def test_get_factor_from_opinion(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
+    def test_get_factor_from_opinion(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
         company = oracle.get_factor_by_name("the Java API")
         assert isinstance(company, Entity)
 
-    def test_factors_by_name(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
+    def test_factors_by_name(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
         factors = oracle.factors_by_name()
         factor = factors["false the Java API was an original work"]
         assert factor.terms[0].name == "the Java API"
 
 
 class TestImplication:
-    def test_opinion_implies_holding_group(self, make_opinion_with_holding_python_feist):
+    def test_opinion_implies_holding_group(self, make_opinion_with_holding):
         """Can be affected by order of tests."""
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
         holdings = watt.holdings[:2]
         assert isinstance(holdings, HoldingGroup)
         assert watt.implies(holdings)
@@ -320,26 +320,26 @@ class TestImplication:
         assert len(explanation.reasons) == 2
 
     def test_opinion_implied_by_rule(
-        self, make_opinion_with_holding_python_feist, make_holding, make_rule
+        self, make_opinion_with_holding, make_holding, make_rule
     ):
         """Can be affected by order of tests."""
-        watt = make_opinion_with_holding_python_feist["oracle_majority"]
+        watt = make_opinion_with_holding["oracle_majority"]
         watt.clear_holdings()
         watt.posit(make_holding["h2"])
         assert watt.implied_by(make_rule["h2_despite_due_process"])
         assert not watt.implies(make_rule["h2_despite_due_process"])
 
-    def test_no_implication(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+    def test_no_implication(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         assert not watt >= brad
         assert not watt.implies(brad.holdings)
 
     def test_posit_list_of_holdings_and_imply(
-        self, make_opinion_with_holding_python_feist, make_response
+        self, make_opinion_with_holding, make_response
     ):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         watt.clear_holdings()
         brad.clear_holdings()
         client = FakeClient(responses=make_response)
@@ -352,39 +352,39 @@ class TestImplication:
         assert watt > brad
         assert not brad >= watt
 
-    def test_error_to_compare_to_str(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_error_to_compare_to_str(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         with pytest.raises(TypeError):
             watt.implies("this")
 
-    def test_error_to_check_contradiction_of_str(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_error_to_check_contradiction_of_str(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         with pytest.raises(TypeError):
             watt.contradicts("this")
 
-    def test_opinion_implies_None(self, make_opinion_with_holding_python_feist, make_holding):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_opinion_implies_None(self, make_opinion_with_holding, make_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         assert watt.implies(None)
 
-    def test_opinion_implies_holding(self, make_opinion_with_holding_python_feist, make_holding):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_opinion_implies_holding(self, make_opinion_with_holding, make_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         watt.posit(make_holding["h2_invalid_undecided"])
         assert watt >= make_holding["h2_undecided"]
         assert watt > make_holding["h2_undecided"]
 
     def test_opinion_does_not_imply_holding(
-        self, make_opinion_with_holding_python_feist, make_holding
+        self, make_opinion_with_holding, make_holding
     ):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         watt.posit(make_holding["h2_irrelevant_inputs_undecided"])
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
 
-    def test_opinion_does_not_imply_holding_group(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
-        holdings = make_opinion_with_holding_python_feist["oracle_majority"].holdings
+    def test_opinion_does_not_imply_holding_group(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        holdings = make_opinion_with_holding["oracle_majority"].holdings
         assert isinstance(holdings, HoldingGroup)
         assert not watt.implies(holdings)
         explanation = watt.explain_implication(holdings)
@@ -400,10 +400,10 @@ class TestImplication:
 
 
 class TestContradiction:
-    def test_opinion_contradicts_opinion(self, make_opinion_with_holding_python_feist):
+    def test_opinion_contradicts_opinion(self, make_opinion_with_holding):
         """Return the only contradictory pair of Holdings between these two Opinions."""
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
 
         left = OpinionReading(
             opinion_type="majority", opinion_author=oracle.opinion_author
@@ -419,45 +419,45 @@ class TestContradiction:
         assert isinstance(explanation.reasons[0].right, Holding)
 
     def test_contradiction_of_holding(
-        self, make_opinion_with_holding_python_feist, e_search_clause, make_holding
+        self, make_opinion_with_holding, e_search_clause, make_holding
     ):
-        assert make_opinion_with_holding_python_feist["watt_majority"].contradicts(
+        assert make_opinion_with_holding["watt_majority"].contradicts(
             make_holding["h2_output_false_ALL_MUST"] + e_search_clause
         )
 
-    def test_explain_opinion_contradicting_holding(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_explain_opinion_contradicting_holding(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         explanation = oracle.explain_contradiction(lotus.holdings[6])
         assert (
             "<the java api> is like <the lotus menu command hierarchy>"
             in str(explanation).lower()
         )
 
-    def test_explain_opinion_contradicting_rule(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_explain_opinion_contradicting_rule(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         explanation = oracle.explain_contradiction(lotus.holdings[6].rule)
         expected = "<the java api> is like <the lotus menu command hierarchy>"
         assert expected in str(explanation).lower()
 
     def test_contradiction_of_decision(
-        self, make_opinion_with_holding_python_feist, make_decision_with_holding
+        self, make_opinion_with_holding, make_decision_with_holding
     ):
-        assert make_opinion_with_holding_python_feist["oracle_majority"].contradicts(
+        assert make_opinion_with_holding["oracle_majority"].contradicts(
             make_decision_with_holding["lotus"]
         )
 
     def test_explain_opinion_contradicting_decision(
-        self, make_opinion_with_holding_python_feist, make_decision_with_holding
+        self, make_opinion_with_holding, make_decision_with_holding
     ):
-        oracle_majority = make_opinion_with_holding_python_feist["oracle_majority"]
+        oracle_majority = make_opinion_with_holding["oracle_majority"]
         lotus = make_decision_with_holding["lotus"]
         explanation = oracle_majority.explain_contradiction(lotus)
         assert "contradicts" in str(explanation).lower()
 
-    def test_no_explanation_of_contradiction(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_no_explanation_of_contradiction(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         holdings = watt.holdings[:2]
         assert isinstance(holdings, HoldingGroup)
         assert watt.implies(holdings)
@@ -465,7 +465,7 @@ class TestContradiction:
         assert explanation is None
 
     def test_error_contradiction_with_procedure(
-        self, make_opinion_with_holding_python_feist, make_procedure
+        self, make_opinion_with_holding, make_procedure
     ):
         with pytest.raises(TypeError):
-            make_opinion_with_holding_python_feist["watt_majority"].contradicts(make_procedure["c1"])
+            make_opinion_with_holding["watt_majority"].contradicts(make_procedure["c1"])

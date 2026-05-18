@@ -33,27 +33,27 @@ class TestHolding:
         string = " ".join(x.strip() for x in str(holding).splitlines())
         assert "is relevant to show the fact that <Alice>" in string.replace("/n", " ")
 
-    def test_string_indentation(self, make_opinion_with_holding_python_feist):
+    def test_string_indentation(self, make_opinion_with_holding):
         """
         Test that the text of an Evidence string is indented even
         when it appears in a Holding.
         """
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         assert "    OF:\n" in str(lotus.holdings[2])
 
     def test_repr(self, make_holding):
         assert "rule=Rule(" in repr(make_holding["h1"])
 
-    def test_line_break_in_fact_within_holding(self, make_opinion_with_holding_python_feist):
+    def test_line_break_in_fact_within_holding(self, make_opinion_with_holding):
         """
         Test that holding uses the Fact string method with line breaks.
         """
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         assert "registered a copyright" in str(lotus.holdings[2])
         assert "\n" in str(lotus.holdings[2])
 
-    def test_case_class_name_for_fact_within_holding(self, make_opinion_with_holding_python_feist):
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_case_class_name_for_fact_within_holding(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
         assert "the Fact that <Lotus" not in str(lotus.holdings[2])
         assert "the fact that <Lotus" in str(lotus.holdings[2])
 
@@ -86,12 +86,12 @@ class TestHolding:
                 exclusive=True,
             )
 
-    def test_infer_from_exclusive(self, make_opinion_with_holding_python_feist):
+    def test_infer_from_exclusive(self, make_opinion_with_holding):
         """
         Test that the correct inference is made from a Holding being marked
         the "exclusive" way to reach the output "{} infringed the copyright in {}"
         """
-        exclusive_holding = make_opinion_with_holding_python_feist["lotus_majority"].holdings[0]
+        exclusive_holding = make_opinion_with_holding["lotus_majority"].holdings[0]
         inferred = exclusive_holding.inferred_from_exclusive[0]
         lower = "absence of the fact that <Borland International> infringed the copyright in <the Lotus menu command hierarchy>".lower()
         assert inferred.outputs[0].short_string.lower() == lower
@@ -106,15 +106,15 @@ class TestHolding:
     def test_type_of_terms(self, make_holding):
         assert isinstance(make_holding["h1"].terms, TermSequence)
 
-    def test_get_evidence_by_name_from_holding(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_get_evidence_by_name_from_holding(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         holding = watt.holdings[4]
         assert holding.outputs[0].absent.exhibit.name == "proof of Wattenburg's guilt"
         factor = holding.get_factor_by_name("proof of Wattenburg's guilt")
         assert factor.name == "proof of Wattenburg's guilt"
 
-    def test_enactment_text_in_holding_str(self, make_opinion_with_holding_python_feist):
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_enactment_text_in_holding_str(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
         holding = lotus.holdings[2]
         assert holding.enactments[0].enactment.content.startswith("In any judicial")
         assert "In any judicial" in holding.enactments[0].selected_text()
@@ -244,11 +244,11 @@ class TestImplication:
         assert not make_holding["h2_undecided"] >= make_procedure["c2"]
 
     def test_holding_implies_opinion_with_no_holdings(
-        self, make_opinion_with_holding_python_feist, make_opinion
+        self, make_opinion_with_holding, make_opinion
     ):
         lotus = make_opinion["lotus_majority"]
         reading = OpinionReading()
-        holding = make_opinion_with_holding_python_feist["oracle_majority"].holdings[0]
+        holding = make_opinion_with_holding["oracle_majority"].holdings[0]
         context = ContextRegister()
         context.insert_pair(
             Entity(name="the Java API"), Entity(name="the Lotus menu command hierarchy")
@@ -428,14 +428,14 @@ class TestContradiction:
         assert make_holding["h2_ALL_MUST"].contradicts(make_holding["h2_ALL_invalid"])
         assert make_holding["h2_ALL_invalid"].contradicts(make_holding["h2_ALL_MUST"])
 
-    def test_contradiction_with_distance(self, make_opinion_with_holding_python_feist, make_holding):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_contradiction_with_distance(self, make_opinion_with_holding, make_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         must_not_rule = make_holding["h2_output_false_ALL_MUST"]
         assert list(watt.holdings)[1].contradicts(must_not_rule)
 
-    def test_holding_contradicts_opinion(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_holding_contradicts_opinion(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         context = ContextRegister()
         context.insert_pair(
             Entity(name="the Lotus menu command hierarchy"), Entity(name="the Java API")
@@ -445,17 +445,17 @@ class TestContradiction:
             context=context,
         )
 
-    def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle)
         assert (
             "<the java api> is like <the lotus menu command hierarchy>"
             in str(explanation).lower()
         )
 
-    def test_no_holding_contradiction_explanations(self, make_opinion_with_holding_python_feist):
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_no_holding_contradiction_explanations(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[1].explain_contradiction(lotus.holdings[2])
         assert explanation is None
 
@@ -585,18 +585,18 @@ class TestContradiction:
 
 
 class TestAddition:
-    def test_adding_same_ALL_holdings_results_in_same(self, make_opinion_with_holding_python_feist):
-        brad = make_opinion_with_holding_python_feist["brad_majority"]
+    def test_adding_same_ALL_holdings_results_in_same(self, make_opinion_with_holding):
+        brad = make_opinion_with_holding["brad_majority"]
         new = brad.holdings[0] + brad.holdings[0]
         assert new.means(brad.holdings[0])
 
-    def test_adding_same_SOME_holdings_results_in_None(self, make_opinion_with_holding_python_feist):
-        watt = make_opinion_with_holding_python_feist["watt_majority"]
+    def test_adding_same_SOME_holdings_results_in_None(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         assert watt.holdings[0] + watt.holdings[0] is None
 
-    def test_add_rule_to_holding(self, make_opinion_with_holding_python_feist):
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
+    def test_add_rule_to_holding(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
         rule_from_lotus = lotus.holdings[0].inferred_from_exclusive[0].rule
         new_holding = oracle.holdings[0] + rule_from_lotus
         output_strings = (
@@ -607,13 +607,13 @@ class TestAddition:
         for output in new_holding.outputs:
             assert output.short_string in output_strings
 
-    def test_add_exclusive_holding(self, make_opinion_with_holding_python_feist):
+    def test_add_exclusive_holding(self, make_opinion_with_holding):
         """
         The Rule will be interpreted as a Holding and will be added to
         one of the nonexclusive Holdings that can be inferred from the
         exclusive Holding.
         """
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
         new_holding = feist.holdings[10] + feist.holdings[3]
         output_strings = (
             "the fact it was false that <Rural's telephone listings> were an original work",
@@ -642,39 +642,39 @@ class TestAddition:
 
 
 class TestUnion:
-    def test_union_neither_universal(self, make_opinion_with_holding_python_feist):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_union_neither_universal(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
         holdings = list(feist.holdings)
         assert (holdings[9] | holdings[7]) is None
 
-    def test_union_and_addition_different(self, make_opinion_with_holding_python_feist):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_union_and_addition_different(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
         result_of_adding = feist.holdings[10] + feist.holdings[3]
         result_of_union = feist.holdings[10] | feist.holdings[3]
         assert not result_of_adding.means(result_of_union)
 
-    def test_union_with_exclusive_flag(self, make_opinion_with_holding_python_feist):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_union_with_exclusive_flag(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
         result_of_union = feist.holdings[10] | feist.holdings[3]
         assert isinstance(result_of_union, Holding)
         assert result_of_union.universal is False
 
     def test_union_of_mandatory_and_mandatory_is_mandatory(
-        self, make_opinion_with_holding_python_feist
+        self, make_opinion_with_holding
     ):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
         result_of_union = feist.holdings[0] | feist.holdings[2]
         assert result_of_union.mandatory
         assert result_of_union.universal
 
-    def test_no_union_with_opinion(self, make_holding, make_opinion_with_holding_python_feist):
+    def test_no_union_with_opinion(self, make_holding, make_opinion_with_holding):
         holding = make_holding["h1"]
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
         with pytest.raises(TypeError):
             _ = holding | feist
 
-    def test_union_with_rule(self, make_opinion_with_holding_python_feist):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_union_with_rule(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
         rule = feist.holdings[3].inferred_from_exclusive[0].rule
         new_holding = feist.holdings[10] | rule
         assert isinstance(new_holding, Holding)

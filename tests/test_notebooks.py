@@ -38,11 +38,11 @@ class TestIntroduction:
             == "https://www.courtlistener.com/api/rest/v4/opinions/101754/"
         )
 
-    def test_oracle_20_holdings(self, make_opinion_with_holding_python_feist):
-        assert len(make_opinion_with_holding_python_feist["oracle_majority"].holdings) == 20
+    def test_oracle_20_holdings(self, make_opinion_with_holding):
+        assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20
 
-    def test_replace_generic_factor(self, make_opinion_with_holding_python_feist):
-        lotus_majority = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_replace_generic_factor(self, make_opinion_with_holding):
+        lotus_majority = make_opinion_with_holding["lotus_majority"]
 
         seinfeld_holding = lotus_majority.holdings[0].new_context(
             terms_to_replace=[
@@ -55,21 +55,21 @@ class TestIntroduction:
         assert lotus_majority.holdings[0] != seinfeld_holding
         assert lotus_majority.holdings[0].means(seinfeld_holding)
 
-    def test_inferred_holdings_after_exclusive_holding(self, make_opinion_with_holding_python_feist):
+    def test_inferred_holdings_after_exclusive_holding(self, make_opinion_with_holding):
         """
         Test that when a holding is marked "exclusive" in the JSON input,
         that holding is added first to the Opinion's set of holdings, and
         any other inferred holdings, about the absence of the output from
         the original holding, are added later.
         """
-        lotus_majority = make_opinion_with_holding_python_feist["lotus_majority"]
+        lotus_majority = make_opinion_with_holding["lotus_majority"]
         assert isinstance(lotus_majority.holdings[0].outputs[0], Fact)
         assert isinstance(lotus_majority.holdings[1].outputs[0], AbsenceOfFactor)
 
     def test_change_rule_replacing_enactment(
-        self, fake_usc_client, make_opinion_with_holding_python_feist
+        self, fake_usc_client, make_opinion_with_holding
     ):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
 
         works_of_authorship_passage = (
             "Copyright protection subsists, in accordance with this title, "
@@ -84,18 +84,18 @@ class TestIntroduction:
         assert holding_with_shorter_enactment >= oracle.holdings[0]
         assert not oracle.holdings[0] >= holding_with_shorter_enactment
 
-    def test_opinion_contradiction(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus_majority = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_opinion_contradiction(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus_majority = make_opinion_with_holding["lotus_majority"]
         assert oracle.contradicts(lotus_majority)
         assert lotus_majority.contradicts(oracle)
 
-    def test_opinion_explain_contradiction(self, make_opinion_with_holding_python_feist):
+    def test_opinion_explain_contradiction(self, make_opinion_with_holding):
         """
         The notebook now uses Decisions instead of this.
         """
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle.holdings[10])
         assert (
             explanation.context["<the Lotus menu command hierarchy>"].name
@@ -117,38 +117,38 @@ class TestIntroduction:
             "the Fact it was false that <the Lotus".lower() in str(explanation).lower()
         )
 
-    def test_register_string(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+    def test_register_string(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle.holdings[10])
         string = (
             "ContextRegister(<the Lotus menu command hierarchy> is like <the Java API>)"
         )
         assert str(explanation.context) == string
 
-    def test_specific_holding_contradiction(self, make_opinion_with_holding_python_feist):
+    def test_specific_holding_contradiction(self, make_opinion_with_holding):
         """
         Check the specific Holdings that should be causing a
         contradiction to be found between the Opinions.
         """
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
         assert oracle.holdings[10].contradicts(lotus.holdings[6])
 
-    def test_addition_some_to_some(self, make_opinion_with_holding_python_feist):
+    def test_addition_some_to_some(self, make_opinion_with_holding):
         """
         Demonstrates that adding two SOME Holdings returns None,
         same as two SOME Rules.
         """
 
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
         listings_not_original = feist.holdings[10]
         original_not_copyrightable = oracle.holdings[0]
         assert listings_not_original + original_not_copyrightable is None
 
-    def test_adding_holdings(self, make_opinion_with_holding_python_feist):
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_adding_holdings(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
         listings_not_original = feist.holdings[10]
         unoriginal_not_copyrightable = feist.holdings[3]
         listings_not_copyrightable = (
@@ -163,16 +163,16 @@ class TestIntroduction:
             + "and telephone numbers of telephone subscribers"
         ) in listings_not_copyrightable.inputs[0].short_string
 
-    def test_union_holdings_from_different_cases(self, make_opinion_with_holding_python_feist):
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
-        feist = make_opinion_with_holding_python_feist["feist_majority"]
+    def test_union_holdings_from_different_cases(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
         new = oracle.holdings[1] | feist.holdings[2]
         assert "it was false that <the Java API> was copyrightable" in str(new)
         assert "<the Java API> was an original work" in str(new)
 
-    def test_only_one_explanation_for_contradiction(self, make_opinion_with_holding_python_feist):
-        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
-        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
+    def test_only_one_explanation_for_contradiction(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
 
         gen = lotus.holdings[6].explanations_contradiction(oracle.holdings[10])
         first_explanation = next(gen)

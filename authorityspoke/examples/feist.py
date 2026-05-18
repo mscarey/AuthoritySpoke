@@ -1,6 +1,24 @@
 import copy
 import datetime
 
+import json
+from pathlib import Path
+
+from nettlesome.entities import Entity
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_, UnitRange
+
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Fact,
+    Evidence,
+)
+from authorityspoke.facts import Exhibit
+from authorityspoke.passages import passage_from_quotes
+from authorityspoke.rules import Procedure, Rule
+
+from authorityspoke.io.fake_enactments import FakeClient
+from authorityspoke.holdings import Holding
 from authorityspoke.opinions import AnchoredHoldings
 
 RAW_ANCHORED_HOLDINGS = {

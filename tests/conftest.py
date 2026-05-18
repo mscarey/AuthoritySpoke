@@ -20,6 +20,11 @@ from authorityspoke.decisions import DecisionReading
 from authorityspoke.examples.beard_act import rules as beard_act_rules
 from authorityspoke.examples.beard_act import beard_response
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
+from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
+from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
+from authorityspoke.examples.brad import anchored_holdings as brad_holdings
+from authorityspoke.examples.cardenas import anchored_holdings as cardenas_holdings
+from authorityspoke.examples.watt import anchored_holdings as watt_holdings
 from authorityspoke.facts import (
     AbsenceOfFactor,
     Allegation,
@@ -1601,6 +1606,18 @@ def make_decision():
 
 @pytest.fixture(scope="class")
 def make_anchored_holding(make_response, make_decision):
+    return {
+        "feist": feist_holdings(),
+        "lotus": lotus_holdings(),
+        "oracle": oracle_holdings(),
+        "brad": brad_holdings(),
+        "cardenas": cardenas_holdings(),
+        "watt": watt_holdings(),
+    }
+
+
+@pytest.fixture(scope="class")
+def make_anchored_holding_with_yaml(make_response, make_decision):
     client_without_api_access = FakeClient(responses=make_response)
     holdings = {}
     for name in make_decision.keys():
@@ -1646,20 +1663,6 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     for case in TEST_CASES:
         for reading in make_decision_with_holding[case].opinion_readings:
             opinions[f"{case}_{reading.opinion_type}"] = reading
-    return opinions
-
-
-@pytest.fixture(scope="class")
-def make_opinion_with_holding_python_feist(
-    make_opinion_with_holding, make_decision
-) -> Dict[str, Opinion]:
-    opinions = dict(make_opinion_with_holding)
-    feist_decision = make_decision["feist"]
-    opinions["feist_majority"] = OpinionReading(
-        opinion_type=feist_decision.majority.type,
-        opinion_author=feist_decision.majority.author,
-        anchored_holdings=feist_holdings(),
-    )
     return opinions
 
 
