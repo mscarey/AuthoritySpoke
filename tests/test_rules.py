@@ -18,7 +18,6 @@ from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io.fake_enactments import FakeClient
 
 load_dotenv()
 

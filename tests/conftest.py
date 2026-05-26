@@ -7,13 +7,13 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
-from legislice.enactments import Enactment, EnactmentPassage
+from legislice.enactments import Enactment
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
 from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_, UnitRange
+from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.decisions import DecisionReading
@@ -36,7 +36,6 @@ from authorityspoke.facts import (
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import OpinionReading
-from authorityspoke.passages import passage_from_quotes
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers

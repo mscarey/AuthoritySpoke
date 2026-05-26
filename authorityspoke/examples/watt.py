@@ -2,7 +2,12 @@ import copy
 import datetime
 from decimal import Decimal
 
-from authorityspoke.opinions import AnchoredHoldings
+from authorityspoke import Entity
+from authorityspoke.holdings import HoldingGroup
+from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
+
+HOLDINGS = HoldingGroup(holdings=[])
+ENTITIES: dict[str, Entity] = {}
 
 RAW_ANCHORED_HOLDINGS = {
     "holdings": [
@@ -1753,6 +1758,41 @@ RAW_ANCHORED_HOLDINGS = {
 }
 
 
+def _holdings_from_raw() -> HoldingGroup:
+    parsed = AnchoredHoldings.model_validate(copy.deepcopy(RAW_ANCHORED_HOLDINGS))
+    return HoldingGroup([item.holding for item in parsed.holdings])
+
+
+def _entity_key(name: str) -> str:
+    return "".join(ch.lower() if ch.isalnum() else "_" for ch in name).strip("_")
+
+
+def _build_entities(holdings: HoldingGroup) -> dict[str, Entity]:
+    entities: dict[str, Entity] = {}
+    for holding in holdings:
+        for term in holding.rule.recursive_terms.values():
+            if isinstance(term, Entity):
+                key = _entity_key(term.name)
+                if key not in entities:
+                    entities[key] = copy.deepcopy(term)
+    return entities
+
+
+HOLDINGS = _holdings_from_raw()
+ENTITIES = _build_entities(HOLDINGS)
+
+
 def anchored_holdings() -> AnchoredHoldings:
-    """Build AnchoredHoldings for the Watt case from Python model data."""
-    return AnchoredHoldings.model_validate(copy.deepcopy(RAW_ANCHORED_HOLDINGS))
+    """Build AnchoredHoldings from this module's HOLDINGS collection."""
+    parsed = AnchoredHoldings.model_validate(copy.deepcopy(RAW_ANCHORED_HOLDINGS))
+    return AnchoredHoldings(
+        holdings=[
+            HoldingWithAnchors(
+                holding=copy.deepcopy(holding),
+                anchors=copy.deepcopy(parsed.holdings[index].anchors),
+            )
+            for index, holding in enumerate(HOLDINGS)
+        ],
+        named_anchors=copy.deepcopy(parsed.named_anchors),
+        enactment_anchors=copy.deepcopy(parsed.enactment_anchors),
+    )

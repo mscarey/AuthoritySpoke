@@ -3,7 +3,7 @@ from pathlib import Path
 
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_, UnitRange
+from nettlesome.quantities import Comparison, UnitRange
 
 from authorityspoke.facts import (
     AbsenceOfFactor,
