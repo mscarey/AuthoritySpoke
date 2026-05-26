@@ -15,6 +15,17 @@ class TestDecision:
         decision = make_decision["cardenas"]
         assert str(decision) == "People v. Cardenas, 31 Cal. 3d 897 (1982-07-08)"
 
+    def test_decision_has_anchors(self, make_decision_with_holding):
+        decision = make_decision_with_holding["brad"]
+        assert (
+            "no Warrants shall issue"
+            in decision.opinion_readings[0]
+            .anchored_holdings.holdings[5]
+            .holding.enactments[0]
+            .selection.quotes[0]
+            .suffix
+        )
+
     def test_decision_no_opinions(self):
         decision = Decision(decision_date=date(2000, 2, 2))
         reading = DecisionReading(decision=decision)
