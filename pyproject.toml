@@ -1,6 +1,6 @@
 [project]
 name = "authorityspoke"
-version = "0.1.0"
+version = "0.10.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -24,4 +24,11 @@ dependencies = [
 
 [tool.uv.sources]
 nettlesome = { git = "https://github.com/mscarey/nettlesome.git", rev = "absent-class" }
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=7.1.0",
+    "pytest>=9.0.3",
+    "pytest-recording>=0.13.4",
+]
 
