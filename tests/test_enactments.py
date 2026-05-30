@@ -16,6 +16,7 @@ from nettlesome.predicates import Predicate
 from pydantic import ValidationError
 import pytest
 
+from authorityspoke.examples import oracle
 from authorityspoke.facts import Fact
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
@@ -53,13 +54,11 @@ class TestEnactments:
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
     def test_passage_from_imported_statute(self, fake_usc_client):
-        oracle = loaders.load_decision("oracle_h.json")
-        oracle_decision = Decision(**oracle)
+        oracle_decision = Decision(**loaders.load_decision("oracle_h.json"))
         reading = DecisionReading(decision=oracle_decision)
-        loaded = loaders.load_holdings("holding_oracle.yaml")
-        holdings = readers.read_holdings(loaded, client=fake_usc_client)
+        holdings = oracle.HOLDINGS
         reading.posit(holdings)
-        despite_text = str(list(reading.holdings)[5])
+        despite_text = str(list(reading.holdings)[12])
         assert "In no case does copyright protection " in despite_text
 
     def test_chapeau_and_subsections_from_uslm_code(self, fake_beard_client):

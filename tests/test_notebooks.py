@@ -186,7 +186,7 @@ class TestTemplateStrings:
 
     def test_no_line_break_in_fact_string(self):
         elaine = Entity(name="Elaine", generic=True)
-        tax_rate_over_25 = Comparison(
+        tax_rate_over_25 = Comparison.new(
             content="{taxpayer}'s marginal income tax rate was",
             sign=">",
             expression=0.25,

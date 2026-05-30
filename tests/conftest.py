@@ -35,7 +35,7 @@ from authorityspoke.facts import (
 )
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
-from authorityspoke.opinions import OpinionReading
+from authorityspoke.opinions import OpinionReading, AnchoredHoldings
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
@@ -1618,7 +1618,9 @@ def make_anchored_holding(make_response, make_decision):
 
 
 @pytest.fixture(scope="class")
-def make_anchored_holding_with_yaml(make_response, make_decision):
+def make_anchored_holding_with_yaml(
+    make_response, make_decision
+) -> Dict[str, List[AnchoredHolding]]:
     client_without_api_access = FakeClient(responses=make_response)
     holdings = {}
     for name in make_decision.keys():

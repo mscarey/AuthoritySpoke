@@ -101,7 +101,7 @@ class TestPredicates:
         assert isinstance(make_predicate["p7"].quantity, Quantity)
 
     def test_string_for_date_as_expression(self):
-        copyright_date_range = Comparison(
+        copyright_date_range = Comparison.new(
             content="the date when {work} was created was",
             sign=">=",
             expression=date(1978, 1, 1),
