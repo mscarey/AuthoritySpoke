@@ -138,7 +138,7 @@ contradict one another.
 For instance, if we create a new Rule that’s identical to the first Rule
 in the Beard Tax Act except that it applies to facial hair that’s
 exactly 8 millimeters long instead of “no shorter than 5 millimetres”,
-we can determine that the original “chin rule” 
+we can determine that the original “chin rule”
 :meth:`~authorityspoke.rules.Rule.implies` our new :class:`~authorityspoke.rules.Rule`\.
 
     >>> from authorityspoke.io import readers
@@ -172,7 +172,7 @@ came from the Beard Tax Act.
     >>> long_means_not_beard = changed_holdings[1].rule
     >>> long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
     >>> long_means_not_beard.set_inputs(Fact(
-    ...     content="the length of ${the_suspected_beard} was >= 12 inches",
+    ...     content="the length of {the_suspected_beard} was >= 12 inches",
     ...     terms=[Entity(name="the suspected beard")]))
     >>> long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
     >>> long_means_not_beard.mandatory = True

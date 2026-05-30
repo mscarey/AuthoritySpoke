@@ -81,7 +81,7 @@ _FACT_DIRECTORY_ORIGINAL = Fact(
 )
 _FACT_DIRECTORY_INDEPENDENTLY_CREATED = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} was independently created by ${rural_telephone_service_company}, as opposed to copied from other works"
+        content="${rural_s_telephone_directory} was independently created by {rural_telephone_service_company}, as opposed to copied from other works"
     ),
     terms=[
         ENTITIES["rural_s_telephone_directory"],
@@ -116,7 +116,7 @@ _FACT_FALSE_DIRECTORY_ORIGINAL = Fact(
 )
 _FACT_COMPANY_COMPILER = Fact(
     predicate=Predicate(
-        content="${rural_telephone_service_company} was the compiler of ${rural_s_telephone_directory}"
+        content="${rural_telephone_service_company} was the compiler of {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["rural_telephone_service_company"],
@@ -127,7 +127,7 @@ _FACT_COMPANY_COMPILER = Fact(
 )
 _FACT_COMPANY_CREATIVE_CHOICE_FACTS = Fact(
     predicate=Predicate(
-        content="${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in ${rural_s_telephone_directory}"
+        content="${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["rural_telephone_service_company"],
@@ -138,7 +138,7 @@ _FACT_COMPANY_CREATIVE_CHOICE_FACTS = Fact(
 )
 _FACT_COMPANY_CREATIVE_ARRANGEMENT = Fact(
     predicate=Predicate(
-        content="${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in ${rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers"
+        content="${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in {rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers"
     ),
     terms=[
         ENTITIES["rural_telephone_service_company"],
@@ -158,7 +158,7 @@ _FACT_FALSE_DIRECTORY_PROTECTABLE_EXPRESSION = Fact(
 )
 _FACT_FALSE_FEIST_INFRINGED = Fact(
     predicate=Predicate(
-        content="${feist_publications} infringed the copyright on ${rural_s_telephone_directory}",
+        content="${feist_publications} infringed the copyright on {rural_s_telephone_directory}",
         truth=False,
     ),
     terms=[
@@ -170,7 +170,7 @@ _FACT_FALSE_FEIST_INFRINGED = Fact(
 )
 _FACT_FEIST_DIFFERENT_SELECTION = Fact(
     predicate=Predicate(
-        content="${feist_s_telephone_directory} did not feature the same selection and arrangement of facts as ${rural_s_telephone_directory}"
+        content="${feist_s_telephone_directory} did not feature the same selection and arrangement of facts as {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["feist_s_telephone_directory"],
@@ -181,7 +181,7 @@ _FACT_FEIST_DIFFERENT_SELECTION = Fact(
 )
 _FACT_FEIST_COPIED_FACTS = Fact(
     predicate=Predicate(
-        content="${feist_publications} freely copied the facts contained in ${rural_s_telephone_directory}, in preparing ${feist_s_telephone_directory}"
+        content="${feist_publications} freely copied the facts contained in {rural_s_telephone_directory}, in preparing {feist_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["feist_publications"],
@@ -226,7 +226,7 @@ _FACT_DIRECTORY_IS_TELEPHONE_DIRECTORY = Fact(
 )
 _FACT_ARRANGEMENT_IS_ALPHABETICAL_METHOD = Fact(
     predicate=Predicate(
-        content="${rural_s_arragement_of_its_telephone_listings} was the method of listing subscribers alphabetically by surname in ${rural_s_telephone_directory}"
+        content="${rural_s_arragement_of_its_telephone_listings} was the method of listing subscribers alphabetically by surname in {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["rural_s_arragement_of_its_telephone_listings"],

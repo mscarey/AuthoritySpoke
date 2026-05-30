@@ -101,7 +101,7 @@ class TestFactorLoad:
         assert hasattr(fact.predicate.quantity, "dimensionality")
         data = {
             "type": "fact",
-            "content": "the distance between ${place1} and ${place2} was",
+            "content": "the distance between {place1} and {place2} was",
             "sign": "<",
             "expression": "5 miles",
             "terms": [

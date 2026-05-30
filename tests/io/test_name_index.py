@@ -67,7 +67,7 @@ class TestCollectMentioned:
         content = "{} sent a message to {Bob's friend}"
         terms = [{"type": "Entity", "name": "Bob"}]
         new_content, terms = text_expansion.get_references_from_string(content, terms)
-        assert new_content == "{} sent a message to ${bob_s_friend}"
+        assert new_content == "{} sent a message to {bob_s_friend}"
         assert len(terms) == 2
 
     def test_assign_name(self, raw_factor):
@@ -177,7 +177,7 @@ class TestCollectMentioned:
             obj=raw_fact, mentioned=old_mentioned
         )
         found_content = obj["predicate"]["content"].lower()
-        assert found_content == "${bradley} lived at ${bradley_s_house}"
+        assert found_content == "${bradley} lived at {bradley_s_house}"
         # Check that terms match the order of the sentence
         assert obj["terms"][0]["name"] == "Bradley"
         assert obj["terms"][1]["name"] == "Bradley's house"
@@ -217,13 +217,13 @@ class TestRetrieveMentioned:
         )
         assert (
             fact["predicate"]["content"]
-            == "{moe} threw a pie at ${larry} but it hit {curly}"
+            == "{moe} threw a pie at {larry} but it hit {curly}"
         )
         assert fact["terms"][1]["name"] == "Larry"
 
     def test_add_found_context_included_in_placeholder_name(self):
         content = (
-            "$the_Amazon has slower Amazon deliveries because of ${the_Amazon}'s size"
+            "$the_Amazon has slower Amazon deliveries because of {the_Amazon}'s size"
         )
         terms = [{"type": "Entity", "name": "the Amazon"}]
         new_content, new_terms = text_expansion.add_found_context(
@@ -231,7 +231,9 @@ class TestRetrieveMentioned:
             terms=terms,
             factor={"type": "Entity", "name": "Amazon"},
         )
-        expected = "$the_Amazon has slower ${amazon} deliveries because of ${the_Amazon}'s size"
+        expected = (
+            "$the_Amazon has slower {amazon} deliveries because of {the_Amazon}'s size"
+        )
         assert new_content == expected
         assert len(new_terms) == 2
         assert new_terms[1]["name"] == "Amazon"

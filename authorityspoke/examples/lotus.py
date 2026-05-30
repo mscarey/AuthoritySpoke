@@ -50,7 +50,7 @@ _FACT_HIERARCHY_COPYRIGHTABLE = Fact(
 )
 _FACT_COPIED_CONSTITUENT_ORIGINAL = Fact(
     predicate=Predicate(
-        content="${borland_international} copied constituent elements of ${the_lotus_menu_command_hierarchy} that were original"
+        content="${borland_international} copied constituent elements of {the_lotus_menu_command_hierarchy} that were original"
     ),
     terms=[
         ENTITIES["borland_international"],
@@ -61,7 +61,7 @@ _FACT_COPIED_CONSTITUENT_ORIGINAL = Fact(
 )
 _FACT_INFRINGED_COPYRIGHT = Fact(
     predicate=Predicate(
-        content="${borland_international} infringed the copyright in ${the_lotus_menu_command_hierarchy}"
+        content="${borland_international} infringed the copyright in {the_lotus_menu_command_hierarchy}"
     ),
     terms=[
         ENTITIES["borland_international"],
@@ -88,7 +88,7 @@ _FACT_FALSE_HIERARCHY_COPYRIGHTABLE = Fact(
 )
 _FACT_REGISTERED_COPYRIGHT = Fact(
     predicate=Predicate(
-        content="${lotus_development_corporation} registered a copyright covering ${the_lotus_menu_command_hierarchy}"
+        content="${lotus_development_corporation} registered a copyright covering {the_lotus_menu_command_hierarchy}"
     ),
     terms=[
         ENTITIES["lotus_development_corporation"],
@@ -99,7 +99,7 @@ _FACT_REGISTERED_COPYRIGHT = Fact(
 )
 _FACT_COPIED_IN_CREATING_QUATTRO_INTERFACE = Fact(
     predicate=Predicate(
-        content="${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface"
+        content="${borland_international} copied {the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface"
     ),
     terms=[
         ENTITIES["borland_international"],
@@ -110,7 +110,7 @@ _FACT_COPIED_IN_CREATING_QUATTRO_INTERFACE = Fact(
 )
 _FACT_HAD_ACCESS_TO_HIERARCHY = Fact(
     predicate=Predicate(
-        content="${borland_international} had access to ${the_lotus_menu_command_hierarchy}"
+        content="${borland_international} had access to {the_lotus_menu_command_hierarchy}"
     ),
     terms=[
         ENTITIES["borland_international"],
@@ -121,7 +121,7 @@ _FACT_HAD_ACCESS_TO_HIERARCHY = Fact(
 )
 _FACT_PUBLISHED_QUATTRO_INTERFACE = Fact(
     predicate=Predicate(
-        content="${borland_international} published ${quattro_s_lotus_emulation_interface}"
+        content="${borland_international} published {quattro_s_lotus_emulation_interface}"
     ),
     terms=[
         ENTITIES["borland_international"],
@@ -132,7 +132,7 @@ _FACT_PUBLISHED_QUATTRO_INTERFACE = Fact(
 )
 _FACT_QUATTRO_VERY_SIMILAR_TO_HIERARCHY = Fact(
     predicate=Predicate(
-        content="${quattro_s_lotus_emulation_interface} was very similar to ${the_lotus_menu_command_hierarchy}"
+        content="${quattro_s_lotus_emulation_interface} was very similar to {the_lotus_menu_command_hierarchy}"
     ),
     terms=[
         ENTITIES["quattro_s_lotus_emulation_interface"],
@@ -143,7 +143,7 @@ _FACT_QUATTRO_VERY_SIMILAR_TO_HIERARCHY = Fact(
 )
 _FACT_COPYING_EXTENSIVE_SIMILAR = Fact(
     predicate=Predicate(
-        content="the copying of ${quattro_s_lotus_emulation_interface} in ${the_lotus_menu_command_hierarchy} was so extensive that it rendered them substantially similar"
+        content="the copying of {quattro_s_lotus_emulation_interface} in {the_lotus_menu_command_hierarchy} was so extensive that it rendered them substantially similar"
     ),
     terms=[
         ENTITIES["quattro_s_lotus_emulation_interface"],
@@ -161,7 +161,7 @@ _FACT_HIERARCHY_METHOD_OF_OPERATION = Fact(
     generic=False,
 )
 _FACT_TEXT_DESCRIBED_HIERARCHY = Fact(
-    predicate=Predicate(content="a text described ${the_lotus_menu_command_hierarchy}"),
+    predicate=Predicate(content="a text described {the_lotus_menu_command_hierarchy}"),
     terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
     name="a text described the Lotus menu command hierarchy",
     generic=False,
@@ -174,7 +174,7 @@ _FACT_LOTUS_PROGRAM = Fact(
 )
 _FACT_HIERARCHY_PROVIDED_MEANS = Fact(
     predicate=Predicate(
-        content="${the_lotus_menu_command_hierarchy} provided the means by which users controlled and operated ${lotus_1_2_3}"
+        content="${the_lotus_menu_command_hierarchy} provided the means by which users controlled and operated {lotus_1_2_3}"
     ),
     terms=[ENTITIES["the_lotus_menu_command_hierarchy"], ENTITIES["lotus_1_2_3"]],
     name="the Lotus menu command hierarchy provided the means by which users controlled and operated Lotus 1-2-3",
@@ -182,7 +182,7 @@ _FACT_HIERARCHY_PROVIDED_MEANS = Fact(
 )
 _FACT_WITHOUT_HIERARCHY_NO_ACCESS = Fact(
     predicate=Predicate(
-        content="without ${the_lotus_menu_command_hierarchy}, users would not have been able to access and control, or indeed make use of, ${lotus_1_2_3}’s functional capabilities"
+        content="without {the_lotus_menu_command_hierarchy}, users would not have been able to access and control, or indeed make use of, {lotus_1_2_3}’s functional capabilities"
     ),
     terms=[ENTITIES["the_lotus_menu_command_hierarchy"], ENTITIES["lotus_1_2_3"]],
     name="without the Lotus menu command hierarchy, users would not have been able to access and control, or indeed make use of, Lotus 1-2-3’s functional capabilities",
@@ -190,7 +190,7 @@ _FACT_WITHOUT_HIERARCHY_NO_ACCESS = Fact(
 )
 _FACT_OTHER_PROGRAM_WOULD_HAVE_TO_COPY = Fact(
     predicate=Predicate(
-        content="for another computer program to be operated in substantially the same way as ${lotus_1_2_3}, the other program would have to copy ${the_lotus_menu_command_hierarchy}"
+        content="for another computer program to be operated in substantially the same way as {lotus_1_2_3}, the other program would have to copy {the_lotus_menu_command_hierarchy}"
     ),
     terms=[ENTITIES["lotus_1_2_3"], ENTITIES["the_lotus_menu_command_hierarchy"]],
     name="for another computer program to be operated in substantially the same way as Lotus 1-2-3, the other program would have to copy the Lotus menu command hierarchy",
@@ -198,7 +198,7 @@ _FACT_OTHER_PROGRAM_WOULD_HAVE_TO_COPY = Fact(
 )
 _FACT_DEVS_MADE_EXPRESSIVE_CHOICES = Fact(
     predicate=Predicate(
-        content="the developers of ${lotus_1_2_3} made some expressive choices in choosing and arranging the terms in ${the_lotus_menu_command_hierarchy}"
+        content="the developers of {lotus_1_2_3} made some expressive choices in choosing and arranging the terms in {the_lotus_menu_command_hierarchy}"
     ),
     terms=[ENTITIES["lotus_1_2_3"], ENTITIES["the_lotus_menu_command_hierarchy"]],
     name="the developers of Lotus 1-2-3 made some expressive choices in choosing and arranging the terms in the Lotus menu command hierarchy",
@@ -206,7 +206,7 @@ _FACT_DEVS_MADE_EXPRESSIVE_CHOICES = Fact(
 )
 _FACT_HIERARCHY_MEANS_BY_WHICH_PERSON_OPERATED = Fact(
     predicate=Predicate(
-        content="${the_lotus_menu_command_hierarchy} was the means by which a person operated ${lotus_1_2_3}"
+        content="${the_lotus_menu_command_hierarchy} was the means by which a person operated {lotus_1_2_3}"
     ),
     terms=[ENTITIES["the_lotus_menu_command_hierarchy"], ENTITIES["lotus_1_2_3"]],
     name="the Lotus menu command hierarchy was the means by which a person operated Lotus 1-2-3",
@@ -222,7 +222,7 @@ _FACT_FALSE_HIERARCHY_ABSTRACTION = Fact(
 )
 _FACT_FALSE_PRECISE_FORMULATION_NECESSARY = Fact(
     predicate=Predicate(
-        content="the precise formulation of ${lotus_1_2_3}'s code was necessary for ${lotus_1_2_3} to work",
+        content="the precise formulation of {lotus_1_2_3}'s code was necessary for {lotus_1_2_3} to work",
         truth=False,
     ),
     terms=[ENTITIES["lotus_1_2_3"]],
@@ -231,7 +231,7 @@ _FACT_FALSE_PRECISE_FORMULATION_NECESSARY = Fact(
 )
 _FACT_COMPUTER_CODE_NECESSARY = Fact(
     predicate=Predicate(
-        content="computer code was necessary for ${lotus_1_2_3} to work"
+        content="computer code was necessary for {lotus_1_2_3} to work"
     ),
     terms=[ENTITIES["lotus_1_2_3"]],
     name="computer code was necessary for Lotus 1-2-3 to work",

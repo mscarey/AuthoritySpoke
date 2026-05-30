@@ -259,8 +259,8 @@ def make_predicate() -> Dict[str, Predicate]:
         "p2_false": Predicate(
             content="{person} operated and lived at {place}", truth=False
         ),
-        "p3": Predicate(content="{place} was ${person}’s abode"),
-        "p3_false": Predicate(content="{place} was ${person}’s abode", truth=False),
+        "p3": Predicate(content="{place} was {person}’s abode"),
+        "p3_false": Predicate(content="{place} was {person}’s abode", truth=False),
         "p4": Predicate(content="{thing} was on the premises of {place}"),
         "p5": Predicate(content="{thing} was a stockpile of Christmas trees"),
         "p6": Predicate(content="{thing} was among some standing trees"),

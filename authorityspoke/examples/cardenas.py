@@ -57,7 +57,7 @@ _OFFICER_TESTIMONY = Exhibit(
 )
 _FACT_PROBATIVE_VALUE_WITH_DEFENDANT = Fact(
     predicate=Predicate(
-        content="the probative value of ${officer_s_testimony_that_the_defendant_was_addicted_to_heroin}, in showing ${fact_that_the_defendant_committed_an_attempted_robbery}, was outweighed by unfair prejudice to ${the_defendant}"
+        content="the probative value of {officer_s_testimony_that_the_defendant_was_addicted_to_heroin}, in showing {fact_that_the_defendant_committed_an_attempted_robbery}, was outweighed by unfair prejudice to {the_defendant}"
     ),
     terms=[
         _OFFICER_TESTIMONY,
@@ -69,7 +69,7 @@ _FACT_PROBATIVE_VALUE_WITH_DEFENDANT = Fact(
 )
 _FACT_RELEVANT_MOTIVE = Fact(
     predicate=Predicate(
-        content="${officer_s_testimony_that_the_defendant_was_addicted_to_heroin} was relevant to show ${the_defendant} had a motive to commit an attempted robbery"
+        content="${officer_s_testimony_that_the_defendant_was_addicted_to_heroin} was relevant to show {the_defendant} had a motive to commit an attempted robbery"
     ),
     terms=[_OFFICER_TESTIMONY, ENTITIES["the_defendant"]],
     name="officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
@@ -77,7 +77,7 @@ _FACT_RELEVANT_MOTIVE = Fact(
 )
 _FACT_PROBATIVE_VALUE_TO_DEFENDANT = Fact(
     predicate=Predicate(
-        content="the probative value of ${officer_s_testimony_that_the_defendant_was_addicted_to_heroin}, in showing ${fact_that_the_defendant_committed_an_attempted_robbery}, was outweighed by unfair prejudice to defendant"
+        content="the probative value of {officer_s_testimony_that_the_defendant_was_addicted_to_heroin}, in showing {fact_that_the_defendant_committed_an_attempted_robbery}, was outweighed by unfair prejudice to defendant"
     ),
     terms=[_OFFICER_TESTIMONY, _FACT_ATTEMPTED_ROBBERY],
     name="the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",

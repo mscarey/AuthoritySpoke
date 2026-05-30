@@ -47,7 +47,7 @@ def rules() -> list[Rule]:
     )
     fact_length = Fact(
         predicate=Comparison(
-            content="the length of ${the_suspected_beard} was",
+            content="the length of {the_suspected_beard} was",
             quantity_range=UnitRange(
                 sign=">=", quantity_magnitude=5, quantity_units="millimetres"
             ),
@@ -78,7 +78,7 @@ def rules() -> list[Rule]:
     fact_no_exemption = Fact(
         predicate=Predicate(
             content=(
-                "the office of ${the_Department_of_Beards} granted an exemption "
+                "the office of {the_Department_of_Beards} granted an exemption "
                 "authorizing the defendant's act of wearing the suspected beard"
             ),
             truth=False,
@@ -127,7 +127,7 @@ def rules() -> list[Rule]:
         predicate=Predicate(
             content=(
                 "${the_beardcoin_transaction} was a transfer of beardcoin between "
-                "${the_defendant} and ${the_counterparty}"
+                "${the_defendant} and {the_counterparty}"
             )
         ),
         terms=[transaction, defendant, counterparty],
@@ -136,8 +136,8 @@ def rules() -> list[Rule]:
     purchase_transfer = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was ${the_defendant}'s purchase of any "
-                "beardcoin from ${the_counterparty}"
+                "${the_beardcoin_transaction} was {the_defendant}'s purchase of any "
+                "beardcoin from {the_counterparty}"
             )
         ),
         terms=[transaction, defendant, counterparty],
@@ -228,8 +228,8 @@ def rules() -> list[Rule]:
     barber_purchase = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was ${the_barber}'s purchase of any "
-                "beardcoin from ${the_customer}"
+                "${the_beardcoin_transaction} was {the_barber}'s purchase of any "
+                "beardcoin from {the_customer}"
             )
         ),
         terms=[transaction, barber, customer],

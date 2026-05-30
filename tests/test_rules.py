@@ -1015,7 +1015,7 @@ class TestStatuteRules:
                 longer_hair_rule.inputs[0],
                 Fact(
                     predicate=Comparison(
-                        content="the length of ${the_suspected_beard} was",
+                        content="the length of {the_suspected_beard} was",
                         quantity_range=UnitRange(
                             sign="==",
                             quantity_magnitude=8,
@@ -1036,7 +1036,7 @@ class TestStatuteRules:
         long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
         fact = Fact(
             predicate=Comparison(
-                content="the length of ${the_suspected_beard} was",
+                content="the length of {the_suspected_beard} was",
                 quantity_range=UnitRange(
                     sign=">=", quantity_magnitude=12, quantity_units="inches"
                 ),
@@ -1055,7 +1055,7 @@ class TestStatuteRules:
                 long_hair_is_not_a_beard.inputs[0],
                 Fact(
                     predicate=Comparison(
-                        content="the length of ${the_suspected_beard} was",
+                        content="the length of {the_suspected_beard} was",
                         quantity_range=UnitRange(
                             sign=">=", quantity_magnitude=12, quantity_units="inches"
                         ),

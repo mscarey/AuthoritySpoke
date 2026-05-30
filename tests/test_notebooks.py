@@ -197,7 +197,7 @@ class TestTemplateStrings:
     def test_changing_order_of_concrete_terms_changes_meaning(self):
         ann = Entity(name="Ann", generic=False)
         bob = Entity(name="Bob", generic=False)
-        parent_sentence = Predicate(content="{mother} was ${child}'s parent")
+        parent_sentence = Predicate(content="{mother} was {child}'s parent")
         ann_parent = Fact(predicate=parent_sentence, terms=(ann, bob))
         bob_parent = Fact(predicate=parent_sentence, terms=(bob, ann))
         assert str(ann_parent).lower() == "the fact that Ann was Bob's parent".lower()

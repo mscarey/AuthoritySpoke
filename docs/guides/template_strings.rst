@@ -30,7 +30,7 @@ a :class:`~nettlesome.predicates.Predicate` object
 in AuthoritySpoke version 0.5:
 
     >>> from authorityspoke import Predicate
-    >>> parent_sentence = Predicate(content="{mother} was ${child}'s parent")
+    >>> parent_sentence = Predicate(content="{mother} was {child}'s parent")
 
 The phrase that we passed to
 the :class:`~nettlesome.predicates.Predicate` constructor is used to create
@@ -69,7 +69,7 @@ that the :meth:`~nettlesome.predicates.Predicate.means` method can still
 consider Predicates to have the same meaning even if they use different
 identifiers for their placeholders.
 
-    >>> another_parent_sentence = Predicate(content="{adult} was ${kid}'s parent")
+    >>> another_parent_sentence = Predicate(content="{adult} was {kid}'s parent")
     >>> parent_sentence.template == another_parent_sentence.template
     False
 
@@ -83,9 +83,9 @@ relationships between the truth values of different Predicates
 with the same template text. If you omit a ``truth`` parameter when
 creating a Predicate, the default value is ``True``.
 
-    >>> not_parent_sentence = Predicate(content="{adult} was ${kid}'s parent", truth=False)
+    >>> not_parent_sentence = Predicate(content="{adult} was {kid}'s parent", truth=False)
     >>> str(not_parent_sentence)
-    "it was false that {adult} was ${kid}'s parent"
+    "it was false that {adult} was {kid}'s parent"
 
     >>> parent_sentence.means(not_parent_sentence)
     False
@@ -207,11 +207,11 @@ describes. The template string will still need to end with the word
 floating point number, not a string to be parsed.
 
     >>> three_children = Comparison(
-    ...     content="the number of children in ${taxpayer}'s household was",
+    ...     content="the number of children in {taxpayer}'s household was",
     ...     sign="=",
     ...     expression=3)
     >>> str(three_children)
-    "that the number of children in ${taxpayer}'s household was exactly equal to 3"
+    "that the number of children in {taxpayer}'s household was exactly equal to 3"
 
 The numeric expression will still be available for comparison methods
 like :meth:`~nettlesome.predicates.Comparison.implies`
@@ -219,7 +219,7 @@ or :meth:`~nettlesome.predicates.Comparison.contradicts`\,
 but no unit conversion will be available.
 
     >>> at_least_two_children = Comparison(
-    ...     content="the number of children in ${taxpayer}'s household was",
+    ...     content="the number of children in {taxpayer}'s household was",
     ...     sign=">=",
     ...     expression=2)
     >>> three_children.implies(at_least_two_children)
@@ -380,7 +380,7 @@ that don’t fit the pattern of being identical
 except for a final digit, then transposing two non-generic terms will
 change the meaning of the Fact.
 
-    >>> parent_sentence = Predicate(content="{mother} was ${child}'s parent")
+    >>> parent_sentence = Predicate(content="{mother} was {child}'s parent")
     >>> ann_is_parent = Fact(predicate=parent_sentence, terms = (ann, bob))
     >>> bob_is_parent = Fact(predicate=parent_sentence, terms = (bob, ann))
     >>> str(ann_is_parent)

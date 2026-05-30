@@ -204,7 +204,7 @@ class TestStatements:
     def test_repeated_placeholder_in_fact(self):
         predicate = Predicate(
             content="the precise formulation "
-            "of ${program}'s code was necessary for {program} to work",
+            "of {program}'s code was necessary for {program} to work",
             truth=False,
         )
         fact = Fact(predicate=predicate, terms=Entity(name="Lotus 1-2-3"))

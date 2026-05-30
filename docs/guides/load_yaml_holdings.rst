@@ -83,7 +83,7 @@ something about how one factual finding can lead to another.
 
     >>> from authorityspoke import Entity, Fact, Holding
     >>> new_york_offense = Fact(
-    ...     predicate="{defendant} used ${defendant}'s business {business} to commit the New York offense "
+    ...     predicate="{defendant} used {defendant}'s business {business} to commit the New York offense "
     ...     "of engaging in the business of receiving money "
     ...     "for transmission or transmitting the same, without a license therefor",
     ...     terms=[Entity(name="Mazza-Alaluf"), Entity(name="Turismo Costa Brava")])
