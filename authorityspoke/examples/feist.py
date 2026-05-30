@@ -270,8 +270,6 @@ FACTS: list[Fact] = [
 ]
 
 
-
-
 def _build_holdings() -> HoldingGroup:
     facts = {fact.name: fact for fact in FACTS}
 

@@ -1,2949 +1,605 @@
 import copy
 import datetime
 
-from authorityspoke import Entity
+from anchorpoint.textselectors import TextQuoteSelector
+from authorityspoke.examples.legislation import (
+    COPYRIGHTABILITY_REQUIREMENT,
+    COPYRIGHT_REGISTRATION_EVIDENCE_RULE,
+    IDEA_EXPRESSION_RULE,
+)
+from authorityspoke.opinions import (
+    AnchoredHoldings,
+    HoldingWithAnchors,
+    TextPositionSet,
+)
+
+
+from legislice.groups import EnactmentGroup
+from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.holdings import HoldingGroup
-from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Evidence,
+    Exhibit,
+)
+from authorityspoke.procedures import Procedure
 
 HOLDINGS = HoldingGroup(holdings=[])
-ENTITIES: dict[str, Entity] = {}
-
-RAW_ANCHORED_HOLDINGS = {
-    "holdings": [
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "infringed "
-                                    "the "
-                                    "copyright "
-                                    "in "
-                                    "${the_lotus_menu_command_hierarchy}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "infringed the copyright in "
-                                "the Lotus menu command "
-                                "hierarchy",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was "
-                                    "copyrightable",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was copyrightable",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "copied "
-                                    "constituent "
-                                    "elements "
-                                    "of "
-                                    "${the_lotus_menu_command_hierarchy} "
-                                    "that were "
-                                    "original",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "copied constituent elements "
-                                "of the Lotus menu command "
-                                "hierarchy that were "
-                                "original",
-                                "standard_of_proof": None,
-                            },
-                        ],
-                        "despite": [],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "Copyright "
-                                        "protection "
-                                        "subsists, "
-                                        "in "
-                                        "accordance "
-                                        "with "
-                                        "this "
-                                        "title, "
-                                        "in "
-                                        "original "
-                                        "works "
-                                        "of "
-                                        "authorship "
-                                        "fixed "
-                                        "in "
-                                        "any "
-                                        "tangible "
-                                        "medium "
-                                        "of "
-                                        "expression, "
-                                        "now "
-                                        "known "
-                                        "or "
-                                        "later "
-                                        "developed, "
-                                        "from "
-                                        "which "
-                                        "they "
-                                        "can "
-                                        "be "
-                                        "perceived, "
-                                        "reproduced, "
-                                        "or "
-                                        "otherwise "
-                                        "communicated, "
-                                        "either "
-                                        "directly "
-                                        "or "
-                                        "with "
-                                        "the "
-                                        "aid "
-                                        "of "
-                                        "a "
-                                        "machine "
-                                        "or "
-                                        "device. "
-                                        "Works "
-                                        "of "
-                                        "authorship "
-                                        "include "
-                                        "the "
-                                        "following "
-                                        "categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes "
-                                                "and "
-                                                "choreographic "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, "
-                                                "graphic, "
-                                                "and "
-                                                "sculptural "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion "
-                                                "pictures "
-                                                "and "
-                                                "other "
-                                                "audiovisual "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                    ],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "Works of authorship include",
-                                        }
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": True,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "absent": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${the_lotus_menu_command_hierarchy} "
-                                        "was "
-                                        "copyrightable",
-                                        "truth": True,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        }
-                                    ],
-                                    "name": "the Lotus menu "
-                                    "command "
-                                    "hierarchy was "
-                                    "copyrightable",
-                                    "standard_of_proof": None,
-                                },
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "absent": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${the_lotus_menu_command_hierarchy} "
-                                        "was "
-                                        "an "
-                                        "original "
-                                        "work",
-                                        "truth": True,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        }
-                                    ],
-                                    "name": "the Lotus menu "
-                                    "command "
-                                    "hierarchy was an "
-                                    "original work",
-                                    "standard_of_proof": None,
-                                },
-                            }
-                        ],
-                        "despite": [],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "Copyright "
-                                        "protection "
-                                        "subsists, "
-                                        "in "
-                                        "accordance "
-                                        "with "
-                                        "this "
-                                        "title, "
-                                        "in "
-                                        "original "
-                                        "works "
-                                        "of "
-                                        "authorship "
-                                        "fixed "
-                                        "in "
-                                        "any "
-                                        "tangible "
-                                        "medium "
-                                        "of "
-                                        "expression, "
-                                        "now "
-                                        "known "
-                                        "or "
-                                        "later "
-                                        "developed, "
-                                        "from "
-                                        "which "
-                                        "they "
-                                        "can "
-                                        "be "
-                                        "perceived, "
-                                        "reproduced, "
-                                        "or "
-                                        "otherwise "
-                                        "communicated, "
-                                        "either "
-                                        "directly "
-                                        "or "
-                                        "with "
-                                        "the "
-                                        "aid "
-                                        "of "
-                                        "a "
-                                        "machine "
-                                        "or "
-                                        "device. "
-                                        "Works "
-                                        "of "
-                                        "authorship "
-                                        "include "
-                                        "the "
-                                        "following "
-                                        "categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes "
-                                                "and "
-                                                "choreographic "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, "
-                                                "graphic, "
-                                                "and "
-                                                "sculptural "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion "
-                                                "pictures "
-                                                "and "
-                                                "other "
-                                                "audiovisual "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                    ],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "Works of authorship include",
-                                        }
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": True,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was "
-                                    "copyrightable",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was "
-                                "copyrightable",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "exhibit": {
-                                    "generic": False,
-                                    "offered_by": {
-                                        "generic": True,
-                                        "name": "Lotus Development Corporation",
-                                        "plural": False,
-                                    },
-                                    "form": "certificate of copyright registration",
-                                    "statement": None,
-                                    "statement_attribution": None,
-                                    "name": "Lotus's copyright registration",
-                                },
-                                "to_effect": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${lotus_development_corporation} "
-                                        "registered "
-                                        "a "
-                                        "copyright "
-                                        "covering "
-                                        "${the_lotus_menu_command_hierarchy}",
-                                        "truth": True,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "Lotus Development Corporation",
-                                            "plural": False,
-                                        },
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        },
-                                    ],
-                                    "name": "Lotus "
-                                    "Development "
-                                    "Corporation "
-                                    "registered a "
-                                    "copyright "
-                                    "covering the "
-                                    "Lotus menu "
-                                    "command "
-                                    "hierarchy",
-                                    "standard_of_proof": None,
-                                },
-                                "name": "evidence of Lotus's copyright registration",
-                            },
-                            {
-                                "generic": False,
-                                "absent": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${the_lotus_menu_command_hierarchy} "
-                                        "was "
-                                        "copyrightable",
-                                        "truth": False,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        }
-                                    ],
-                                    "name": "false the Lotus "
-                                    "menu command "
-                                    "hierarchy was "
-                                    "copyrightable",
-                                    "standard_of_proof": None,
-                                },
-                            },
-                        ],
-                        "despite": [],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s410/c",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "In "
-                                        "any "
-                                        "judicial "
-                                        "proceedings "
-                                        "the "
-                                        "certificate "
-                                        "of "
-                                        "a "
-                                        "registration "
-                                        "made "
-                                        "before "
-                                        "or "
-                                        "within "
-                                        "five "
-                                        "years "
-                                        "after "
-                                        "first "
-                                        "publication "
-                                        "of "
-                                        "the "
-                                        "work "
-                                        "shall "
-                                        "constitute "
-                                        "prima "
-                                        "facie "
-                                        "evidence "
-                                        "of "
-                                        "the "
-                                        "validity "
-                                        "of "
-                                        "the "
-                                        "copyright "
-                                        "and "
-                                        "of "
-                                        "the "
-                                        "facts "
-                                        "stated "
-                                        "in "
-                                        "the "
-                                        "certificate. "
-                                        "The "
-                                        "evidentiary "
-                                        "weight "
-                                        "to "
-                                        "be "
-                                        "accorded "
-                                        "the "
-                                        "certificate "
-                                        "of "
-                                        "a "
-                                        "registration "
-                                        "made "
-                                        "thereafter "
-                                        "shall "
-                                        "be "
-                                        "within "
-                                        "the "
-                                        "discretion "
-                                        "of "
-                                        "the "
-                                        "court.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1031576/",
-                                        "id": 1031576,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s410/c",
-                                    "children": [],
-                                },
-                                "selection": {
-                                    "positions": [{"start": 0, "end": None}],
-                                    "quotes": [],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "copied "
-                                    "${the_lotus_menu_command_hierarchy} "
-                                    "in "
-                                    "creating "
-                                    "Quattro's "
-                                    "Lotus "
-                                    "Emulation "
-                                    "Interface",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "copied the Lotus menu "
-                                "command hierarchy in "
-                                "creating Quattro's Lotus "
-                                "Emulation Interface",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "exhibit": {
-                                    "generic": False,
-                                    "offered_by": {
-                                        "generic": True,
-                                        "name": "Lotus Development Corporation",
-                                        "plural": False,
-                                    },
-                                    "form": None,
-                                    "statement": None,
-                                    "statement_attribution": None,
-                                    "name": "{'offered_by': "
-                                    "'Lotus "
-                                    "Development "
-                                    "Corporation'}",
-                                },
-                                "to_effect": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${borland_international} "
-                                        "copied "
-                                        "${the_lotus_menu_command_hierarchy} "
-                                        "in "
-                                        "creating "
-                                        "Quattro's "
-                                        "Lotus "
-                                        "Emulation "
-                                        "Interface",
-                                        "truth": True,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "Borland International",
-                                            "plural": False,
-                                        },
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        },
-                                    ],
-                                    "name": "Borland "
-                                    "International "
-                                    "copied the "
-                                    "Lotus menu "
-                                    "command "
-                                    "hierarchy in "
-                                    "creating "
-                                    "Quattro's "
-                                    "Lotus "
-                                    "Emulation "
-                                    "Interface",
-                                    "standard_of_proof": None,
-                                },
-                                "name": "evidence of {'offered_by': "
-                                "'Lotus Development "
-                                "Corporation'} to the effect "
-                                "that Borland International "
-                                "copied the Lotus menu "
-                                "command hierarchy in "
-                                "creating Quattro's Lotus "
-                                "Emulation Interface",
-                            }
-                        ],
-                        "despite": [],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "Copyright "
-                                        "protection "
-                                        "subsists, "
-                                        "in "
-                                        "accordance "
-                                        "with "
-                                        "this "
-                                        "title, "
-                                        "in "
-                                        "original "
-                                        "works "
-                                        "of "
-                                        "authorship "
-                                        "fixed "
-                                        "in "
-                                        "any "
-                                        "tangible "
-                                        "medium "
-                                        "of "
-                                        "expression, "
-                                        "now "
-                                        "known "
-                                        "or "
-                                        "later "
-                                        "developed, "
-                                        "from "
-                                        "which "
-                                        "they "
-                                        "can "
-                                        "be "
-                                        "perceived, "
-                                        "reproduced, "
-                                        "or "
-                                        "otherwise "
-                                        "communicated, "
-                                        "either "
-                                        "directly "
-                                        "or "
-                                        "with "
-                                        "the "
-                                        "aid "
-                                        "of "
-                                        "a "
-                                        "machine "
-                                        "or "
-                                        "device. "
-                                        "Works "
-                                        "of "
-                                        "authorship "
-                                        "include "
-                                        "the "
-                                        "following "
-                                        "categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes "
-                                                "and "
-                                                "choreographic "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, "
-                                                "graphic, "
-                                                "and "
-                                                "sculptural "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion "
-                                                "pictures "
-                                                "and "
-                                                "other "
-                                                "audiovisual "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                    ],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "Works of authorship include",
-                                        }
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "copied "
-                                    "${the_lotus_menu_command_hierarchy} "
-                                    "in "
-                                    "creating "
-                                    "Quattro's "
-                                    "Lotus "
-                                    "Emulation "
-                                    "Interface",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "copied the Lotus menu "
-                                "command hierarchy in "
-                                "creating Quattro's Lotus "
-                                "Emulation Interface",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "exhibit": {
-                                    "generic": False,
-                                    "offered_by": {
-                                        "generic": True,
-                                        "name": "Lotus Development Corporation",
-                                        "plural": False,
-                                    },
-                                    "form": None,
-                                    "statement": None,
-                                    "statement_attribution": None,
-                                    "name": "{'offered_by': "
-                                    "'Lotus "
-                                    "Development "
-                                    "Corporation'}",
-                                },
-                                "to_effect": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${borland_international} "
-                                        "had "
-                                        "access "
-                                        "to "
-                                        "${the_lotus_menu_command_hierarchy}",
-                                        "truth": True,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "Borland International",
-                                            "plural": False,
-                                        },
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        },
-                                    ],
-                                    "name": "Borland "
-                                    "International "
-                                    "had access to "
-                                    "the Lotus "
-                                    "menu command "
-                                    "hierarchy",
-                                    "standard_of_proof": None,
-                                },
-                                "name": "evidence of {'offered_by': "
-                                "'Lotus Development "
-                                "Corporation'} to the effect "
-                                "that Borland International "
-                                "had access to the Lotus "
-                                "menu command hierarchy",
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "published "
-                                    "${quattro_s_lotus_emulation_interface}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "Quattro's Lotus Emulation Interface",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "published Quattro's Lotus "
-                                "Emulation Interface",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "exhibit": {
-                                    "generic": False,
-                                    "offered_by": {
-                                        "generic": True,
-                                        "name": "Lotus Development Corporation",
-                                        "plural": False,
-                                    },
-                                    "form": None,
-                                    "statement": None,
-                                    "statement_attribution": None,
-                                    "name": "{'offered_by': "
-                                    "'Lotus "
-                                    "Development "
-                                    "Corporation'}",
-                                },
-                                "to_effect": {
-                                    "generic": False,
-                                    "predicate": {
-                                        "content": "${quattro_s_lotus_emulation_interface} "
-                                        "was "
-                                        "very "
-                                        "similar "
-                                        "to "
-                                        "${the_lotus_menu_command_hierarchy}",
-                                        "truth": True,
-                                    },
-                                    "terms": [
-                                        {
-                                            "generic": True,
-                                            "name": "Quattro's "
-                                            "Lotus "
-                                            "Emulation "
-                                            "Interface",
-                                            "plural": False,
-                                        },
-                                        {
-                                            "generic": True,
-                                            "name": "the Lotus menu command hierarchy",
-                                            "plural": False,
-                                        },
-                                    ],
-                                    "name": "Quattro's "
-                                    "Lotus "
-                                    "Emulation "
-                                    "Interface was "
-                                    "very similar "
-                                    "to the Lotus "
-                                    "menu command "
-                                    "hierarchy",
-                                    "standard_of_proof": None,
-                                },
-                                "name": "evidence of {'offered_by': "
-                                "'Lotus Development "
-                                "Corporation'} to the effect "
-                                "that Quattro's Lotus "
-                                "Emulation Interface was "
-                                "very similar to the Lotus "
-                                "menu command hierarchy",
-                            },
-                        ],
-                        "despite": [],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "Copyright "
-                                        "protection "
-                                        "subsists, "
-                                        "in "
-                                        "accordance "
-                                        "with "
-                                        "this "
-                                        "title, "
-                                        "in "
-                                        "original "
-                                        "works "
-                                        "of "
-                                        "authorship "
-                                        "fixed "
-                                        "in "
-                                        "any "
-                                        "tangible "
-                                        "medium "
-                                        "of "
-                                        "expression, "
-                                        "now "
-                                        "known "
-                                        "or "
-                                        "later "
-                                        "developed, "
-                                        "from "
-                                        "which "
-                                        "they "
-                                        "can "
-                                        "be "
-                                        "perceived, "
-                                        "reproduced, "
-                                        "or "
-                                        "otherwise "
-                                        "communicated, "
-                                        "either "
-                                        "directly "
-                                        "or "
-                                        "with "
-                                        "the "
-                                        "aid "
-                                        "of "
-                                        "a "
-                                        "machine "
-                                        "or "
-                                        "device. "
-                                        "Works "
-                                        "of "
-                                        "authorship "
-                                        "include "
-                                        "the "
-                                        "following "
-                                        "categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes "
-                                                "and "
-                                                "choreographic "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, "
-                                                "graphic, "
-                                                "and "
-                                                "sculptural "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion "
-                                                "pictures "
-                                                "and "
-                                                "other "
-                                                "audiovisual "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                    ],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "Works of authorship include",
-                                        }
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "copied "
-                                    "constituent "
-                                    "elements "
-                                    "of "
-                                    "${the_lotus_menu_command_hierarchy} "
-                                    "that were "
-                                    "original",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "copied constituent "
-                                "elements of the Lotus menu "
-                                "command hierarchy that "
-                                "were original",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${borland_international} "
-                                    "copied "
-                                    "${the_lotus_menu_command_hierarchy} "
-                                    "in "
-                                    "creating "
-                                    "Quattro's "
-                                    "Lotus "
-                                    "Emulation "
-                                    "Interface",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Borland International",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "Borland International "
-                                "copied the Lotus menu "
-                                "command hierarchy in "
-                                "creating Quattro's Lotus "
-                                "Emulation Interface",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "the "
-                                    "copying of "
-                                    "${quattro_s_lotus_emulation_interface} "
-                                    "in "
-                                    "${the_lotus_menu_command_hierarchy} "
-                                    "was so "
-                                    "extensive "
-                                    "that it "
-                                    "rendered "
-                                    "them "
-                                    "substantially "
-                                    "similar",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Quattro's Lotus Emulation Interface",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "the copying of Quattro's "
-                                "Lotus Emulation Interface "
-                                "in the Lotus menu command "
-                                "hierarchy was so extensive "
-                                "that it rendered them "
-                                "substantially similar",
-                                "standard_of_proof": None,
-                            },
-                        ],
-                        "despite": [],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "Copyright "
-                                        "protection "
-                                        "subsists, "
-                                        "in "
-                                        "accordance "
-                                        "with "
-                                        "this "
-                                        "title, "
-                                        "in "
-                                        "original "
-                                        "works "
-                                        "of "
-                                        "authorship "
-                                        "fixed "
-                                        "in "
-                                        "any "
-                                        "tangible "
-                                        "medium "
-                                        "of "
-                                        "expression, "
-                                        "now "
-                                        "known "
-                                        "or "
-                                        "later "
-                                        "developed, "
-                                        "from "
-                                        "which "
-                                        "they "
-                                        "can "
-                                        "be "
-                                        "perceived, "
-                                        "reproduced, "
-                                        "or "
-                                        "otherwise "
-                                        "communicated, "
-                                        "either "
-                                        "directly "
-                                        "or "
-                                        "with "
-                                        "the "
-                                        "aid "
-                                        "of "
-                                        "a "
-                                        "machine "
-                                        "or "
-                                        "device. "
-                                        "Works "
-                                        "of "
-                                        "authorship "
-                                        "include "
-                                        "the "
-                                        "following "
-                                        "categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic "
-                                                "works, "
-                                                "including "
-                                                "any "
-                                                "accompanying "
-                                                "music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes "
-                                                "and "
-                                                "choreographic "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, "
-                                                "graphic, "
-                                                "and "
-                                                "sculptural "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion "
-                                                "pictures "
-                                                "and "
-                                                "other "
-                                                "audiovisual "
-                                                "works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": datetime.date(2013, 7, 18),
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578,
-                                            },
-                                            "end_date": None,
-                                            "first_published": None,
-                                            "earliest_in_db": None,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": [],
-                                        },
-                                    ],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "Works of authorship include",
-                                        }
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was "
-                                    "copyrightable",
-                                    "truth": False,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "false the Lotus menu "
-                                "command hierarchy was "
-                                "copyrightable",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was a "
-                                    "method of "
-                                    "operation",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was a method of "
-                                "operation",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "despite": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "a text "
-                                    "described "
-                                    "${the_lotus_menu_command_hierarchy}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "a text described the Lotus "
-                                "menu command hierarchy",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was an "
-                                    "original "
-                                    "work",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was an original "
-                                "work",
-                                "standard_of_proof": None,
-                            },
-                        ],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/b",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "In "
-                                        "no "
-                                        "case "
-                                        "does "
-                                        "copyright "
-                                        "protection "
-                                        "for "
-                                        "an "
-                                        "original "
-                                        "work "
-                                        "of "
-                                        "authorship "
-                                        "extend "
-                                        "to "
-                                        "any "
-                                        "idea, "
-                                        "procedure, "
-                                        "process, "
-                                        "system, "
-                                        "method "
-                                        "of "
-                                        "operation, "
-                                        "concept, "
-                                        "principle, "
-                                        "or "
-                                        "discovery, "
-                                        "regardless "
-                                        "of "
-                                        "the "
-                                        "form "
-                                        "in "
-                                        "which "
-                                        "it "
-                                        "is "
-                                        "described, "
-                                        "explained, "
-                                        "illustrated, "
-                                        "or "
-                                        "embodied "
-                                        "in "
-                                        "such "
-                                        "work.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
-                                        "id": 1030580,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/b",
-                                    "children": [],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "idea, procedure, process",
-                                        },
-                                        {
-                                            "exact": "method of operation",
-                                            "prefix": "",
-                                            "suffix": "",
-                                        },
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": True,
-                    "universal": True,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was a "
-                                    "method of "
-                                    "operation",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was a method of "
-                                "operation",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${lotus_1_2_3} was a computer program",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "Lotus 1-2-3 was a computer program",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "provided "
-                                    "the means "
-                                    "by which "
-                                    "users "
-                                    "controlled "
-                                    "and "
-                                    "operated "
-                                    "${lotus_1_2_3}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy provided the "
-                                "means by which users "
-                                "controlled and operated "
-                                "Lotus 1-2-3",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "without "
-                                    "${the_lotus_menu_command_hierarchy}, "
-                                    "users "
-                                    "would not "
-                                    "have been "
-                                    "able to "
-                                    "access and "
-                                    "control, "
-                                    "or indeed "
-                                    "make use "
-                                    "of, "
-                                    "${lotus_1_2_3}’s "
-                                    "functional "
-                                    "capabilities",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "without the Lotus menu "
-                                "command hierarchy, users "
-                                "would not have been able to "
-                                "access and control, or "
-                                "indeed make use of, Lotus "
-                                "1-2-3’s functional "
-                                "capabilities",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "for "
-                                    "another "
-                                    "computer "
-                                    "program to "
-                                    "be "
-                                    "operated "
-                                    "in "
-                                    "substantially "
-                                    "the same "
-                                    "way as "
-                                    "${lotus_1_2_3}, "
-                                    "the other "
-                                    "program "
-                                    "would have "
-                                    "to copy "
-                                    "${the_lotus_menu_command_hierarchy}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "for another computer "
-                                "program to be operated in "
-                                "substantially the same way "
-                                "as Lotus 1-2-3, the other "
-                                "program would have to copy "
-                                "the Lotus menu command "
-                                "hierarchy",
-                                "standard_of_proof": None,
-                            },
-                        ],
-                        "despite": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "the "
-                                    "developers "
-                                    "of "
-                                    "${lotus_1_2_3} "
-                                    "made some "
-                                    "expressive "
-                                    "choices "
-                                    "in "
-                                    "choosing "
-                                    "and "
-                                    "arranging "
-                                    "the terms "
-                                    "in "
-                                    "${the_lotus_menu_command_hierarchy}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "the developers of Lotus "
-                                "1-2-3 made some expressive "
-                                "choices in choosing and "
-                                "arranging the terms in the "
-                                "Lotus menu command "
-                                "hierarchy",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/b",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "In "
-                                        "no "
-                                        "case "
-                                        "does "
-                                        "copyright "
-                                        "protection "
-                                        "for "
-                                        "an "
-                                        "original "
-                                        "work "
-                                        "of "
-                                        "authorship "
-                                        "extend "
-                                        "to "
-                                        "any "
-                                        "idea, "
-                                        "procedure, "
-                                        "process, "
-                                        "system, "
-                                        "method "
-                                        "of "
-                                        "operation, "
-                                        "concept, "
-                                        "principle, "
-                                        "or "
-                                        "discovery, "
-                                        "regardless "
-                                        "of "
-                                        "the "
-                                        "form "
-                                        "in "
-                                        "which "
-                                        "it "
-                                        "is "
-                                        "described, "
-                                        "explained, "
-                                        "illustrated, "
-                                        "or "
-                                        "embodied "
-                                        "in "
-                                        "such "
-                                        "work.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
-                                        "id": 1030580,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/b",
-                                    "children": [],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "idea, procedure, process",
-                                        },
-                                        {
-                                            "exact": "method of operation",
-                                            "prefix": "",
-                                            "suffix": "",
-                                        },
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was a "
-                                    "method of "
-                                    "operation",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was a method of "
-                                "operation",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was the "
-                                    "means by "
-                                    "which a "
-                                    "person "
-                                    "operated "
-                                    "${lotus_1_2_3}",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    },
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    },
-                                ],
-                                "name": "the Lotus menu command "
-                                "hierarchy was the means by "
-                                "which a person operated "
-                                "Lotus 1-2-3",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "despite": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${the_lotus_menu_command_hierarchy} "
-                                    "was an "
-                                    "abstraction",
-                                    "truth": False,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "the Lotus menu command hierarchy",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "false the Lotus menu "
-                                "command hierarchy was an "
-                                "abstraction",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/b",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "In "
-                                        "no "
-                                        "case "
-                                        "does "
-                                        "copyright "
-                                        "protection "
-                                        "for "
-                                        "an "
-                                        "original "
-                                        "work "
-                                        "of "
-                                        "authorship "
-                                        "extend "
-                                        "to "
-                                        "any "
-                                        "idea, "
-                                        "procedure, "
-                                        "process, "
-                                        "system, "
-                                        "method "
-                                        "of "
-                                        "operation, "
-                                        "concept, "
-                                        "principle, "
-                                        "or "
-                                        "discovery, "
-                                        "regardless "
-                                        "of "
-                                        "the "
-                                        "form "
-                                        "in "
-                                        "which "
-                                        "it "
-                                        "is "
-                                        "described, "
-                                        "explained, "
-                                        "illustrated, "
-                                        "or "
-                                        "embodied "
-                                        "in "
-                                        "such "
-                                        "work.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
-                                        "id": 1030580,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/b",
-                                    "children": [],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "idea, procedure, process",
-                                        },
-                                        {
-                                            "exact": "method of operation",
-                                            "prefix": "",
-                                            "suffix": "",
-                                        },
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-        {
-            "holding": {
-                "generic": False,
-                "rule": {
-                    "generic": False,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${lotus_1_2_3} "
-                                    "was a "
-                                    "method of "
-                                    "operation",
-                                    "truth": False,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "false Lotus 1-2-3 was a method of operation",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "${lotus_1_2_3} was a computer program",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "Lotus 1-2-3 was a computer program",
-                                "standard_of_proof": None,
-                            },
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "the "
-                                    "precise "
-                                    "formulation "
-                                    "of "
-                                    "${lotus_1_2_3}'s "
-                                    "code was "
-                                    "necessary "
-                                    "for "
-                                    "${lotus_1_2_3} "
-                                    "to work",
-                                    "truth": False,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "false the precise "
-                                "formulation of Lotus "
-                                "1-2-3's code was necessary "
-                                "for Lotus 1-2-3 to work",
-                                "standard_of_proof": None,
-                            },
-                        ],
-                        "despite": [
-                            {
-                                "generic": False,
-                                "predicate": {
-                                    "content": "computer "
-                                    "code was "
-                                    "necessary "
-                                    "for "
-                                    "${lotus_1_2_3} "
-                                    "to work",
-                                    "truth": True,
-                                },
-                                "terms": [
-                                    {
-                                        "generic": True,
-                                        "name": "Lotus 1-2-3",
-                                        "plural": False,
-                                    }
-                                ],
-                                "name": "computer code was "
-                                "necessary for Lotus 1-2-3 "
-                                "to work",
-                                "standard_of_proof": None,
-                            }
-                        ],
-                        "name": "",
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/b",
-                                    "start_date": datetime.date(2013, 7, 18),
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "In "
-                                        "no "
-                                        "case "
-                                        "does "
-                                        "copyright "
-                                        "protection "
-                                        "for "
-                                        "an "
-                                        "original "
-                                        "work "
-                                        "of "
-                                        "authorship "
-                                        "extend "
-                                        "to "
-                                        "any "
-                                        "idea, "
-                                        "procedure, "
-                                        "process, "
-                                        "system, "
-                                        "method "
-                                        "of "
-                                        "operation, "
-                                        "concept, "
-                                        "principle, "
-                                        "or "
-                                        "discovery, "
-                                        "regardless "
-                                        "of "
-                                        "the "
-                                        "form "
-                                        "in "
-                                        "which "
-                                        "it "
-                                        "is "
-                                        "described, "
-                                        "explained, "
-                                        "illustrated, "
-                                        "or "
-                                        "embodied "
-                                        "in "
-                                        "such "
-                                        "work.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
-                                        "id": 1030580,
-                                    },
-                                    "end_date": None,
-                                    "first_published": None,
-                                    "earliest_in_db": None,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/b",
-                                    "children": [],
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "idea, procedure, process",
-                                        },
-                                        {
-                                            "exact": "method of operation",
-                                            "prefix": "",
-                                            "suffix": "",
-                                        },
-                                    ],
-                                },
-                            }
-                        ]
-                    },
-                    "enactments_despite": {"passages": []},
-                    "mandatory": False,
-                    "universal": False,
-                    "name": None,
-                },
-                "rule_valid": True,
-                "decided": True,
-                "exclusive": False,
-            },
-            "anchors": {"positions": [], "quotes": []},
-        },
-    ],
-    "named_anchors": [],
-    "enactment_anchors": [],
+ENTITIES: dict[str, Entity] = {
+    "borland_international": Entity(
+        name="Borland International", generic=True, plural=False
+    ),
+    "the_lotus_menu_command_hierarchy": Entity(
+        name="the Lotus menu command hierarchy", generic=True, plural=False
+    ),
+    "lotus_development_corporation": Entity(
+        name="Lotus Development Corporation", generic=True, plural=False
+    ),
+    "quattro_s_lotus_emulation_interface": Entity(
+        name="Quattro's Lotus Emulation Interface", generic=True, plural=False
+    ),
+    "lotus_1_2_3": Entity(name="Lotus 1-2-3", generic=True, plural=False),
 }
 
+_FACT_HIERARCHY_COPYRIGHTABLE = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} was copyrightable"
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="the Lotus menu command hierarchy was copyrightable",
+    generic=False,
+)
+_FACT_COPIED_CONSTITUENT_ORIGINAL = Fact(
+    predicate=Predicate(
+        content="${borland_international} copied constituent elements of ${the_lotus_menu_command_hierarchy} that were original"
+    ),
+    terms=[
+        ENTITIES["borland_international"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="Borland International copied constituent elements of the Lotus menu command hierarchy that were original",
+    generic=False,
+)
+_FACT_INFRINGED_COPYRIGHT = Fact(
+    predicate=Predicate(
+        content="${borland_international} infringed the copyright in ${the_lotus_menu_command_hierarchy}"
+    ),
+    terms=[
+        ENTITIES["borland_international"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="Borland International infringed the copyright in the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_HIERARCHY_ORIGINAL = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} was an original work"
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="the Lotus menu command hierarchy was an original work",
+    generic=False,
+)
+_FACT_FALSE_HIERARCHY_COPYRIGHTABLE = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} was copyrightable", truth=False
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="false the Lotus menu command hierarchy was copyrightable",
+    generic=False,
+)
+_FACT_REGISTERED_COPYRIGHT = Fact(
+    predicate=Predicate(
+        content="${lotus_development_corporation} registered a copyright covering ${the_lotus_menu_command_hierarchy}"
+    ),
+    terms=[
+        ENTITIES["lotus_development_corporation"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="Lotus Development Corporation registered a copyright covering the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_COPIED_IN_CREATING_QUATTRO_INTERFACE = Fact(
+    predicate=Predicate(
+        content="${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface"
+    ),
+    terms=[
+        ENTITIES["borland_international"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface",
+    generic=False,
+)
+_FACT_HAD_ACCESS_TO_HIERARCHY = Fact(
+    predicate=Predicate(
+        content="${borland_international} had access to ${the_lotus_menu_command_hierarchy}"
+    ),
+    terms=[
+        ENTITIES["borland_international"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="Borland International had access to the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_PUBLISHED_QUATTRO_INTERFACE = Fact(
+    predicate=Predicate(
+        content="${borland_international} published ${quattro_s_lotus_emulation_interface}"
+    ),
+    terms=[
+        ENTITIES["borland_international"],
+        ENTITIES["quattro_s_lotus_emulation_interface"],
+    ],
+    name="Borland International published Quattro's Lotus Emulation Interface",
+    generic=False,
+)
+_FACT_QUATTRO_VERY_SIMILAR_TO_HIERARCHY = Fact(
+    predicate=Predicate(
+        content="${quattro_s_lotus_emulation_interface} was very similar to ${the_lotus_menu_command_hierarchy}"
+    ),
+    terms=[
+        ENTITIES["quattro_s_lotus_emulation_interface"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="Quattro's Lotus Emulation Interface was very similar to the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_COPYING_EXTENSIVE_SIMILAR = Fact(
+    predicate=Predicate(
+        content="the copying of ${quattro_s_lotus_emulation_interface} in ${the_lotus_menu_command_hierarchy} was so extensive that it rendered them substantially similar"
+    ),
+    terms=[
+        ENTITIES["quattro_s_lotus_emulation_interface"],
+        ENTITIES["the_lotus_menu_command_hierarchy"],
+    ],
+    name="the copying of Quattro's Lotus Emulation Interface in the Lotus menu command hierarchy was so extensive that it rendered them substantially similar",
+    generic=False,
+)
+_FACT_HIERARCHY_METHOD_OF_OPERATION = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} was a method of operation"
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="the Lotus menu command hierarchy was a method of operation",
+    generic=False,
+)
+_FACT_TEXT_DESCRIBED_HIERARCHY = Fact(
+    predicate=Predicate(content="a text described ${the_lotus_menu_command_hierarchy}"),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="a text described the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_LOTUS_PROGRAM = Fact(
+    predicate=Predicate(content="${lotus_1_2_3} was a computer program"),
+    terms=[ENTITIES["lotus_1_2_3"]],
+    name="Lotus 1-2-3 was a computer program",
+    generic=False,
+)
+_FACT_HIERARCHY_PROVIDED_MEANS = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} provided the means by which users controlled and operated ${lotus_1_2_3}"
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"], ENTITIES["lotus_1_2_3"]],
+    name="the Lotus menu command hierarchy provided the means by which users controlled and operated Lotus 1-2-3",
+    generic=False,
+)
+_FACT_WITHOUT_HIERARCHY_NO_ACCESS = Fact(
+    predicate=Predicate(
+        content="without ${the_lotus_menu_command_hierarchy}, users would not have been able to access and control, or indeed make use of, ${lotus_1_2_3}’s functional capabilities"
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"], ENTITIES["lotus_1_2_3"]],
+    name="without the Lotus menu command hierarchy, users would not have been able to access and control, or indeed make use of, Lotus 1-2-3’s functional capabilities",
+    generic=False,
+)
+_FACT_OTHER_PROGRAM_WOULD_HAVE_TO_COPY = Fact(
+    predicate=Predicate(
+        content="for another computer program to be operated in substantially the same way as ${lotus_1_2_3}, the other program would have to copy ${the_lotus_menu_command_hierarchy}"
+    ),
+    terms=[ENTITIES["lotus_1_2_3"], ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="for another computer program to be operated in substantially the same way as Lotus 1-2-3, the other program would have to copy the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_DEVS_MADE_EXPRESSIVE_CHOICES = Fact(
+    predicate=Predicate(
+        content="the developers of ${lotus_1_2_3} made some expressive choices in choosing and arranging the terms in ${the_lotus_menu_command_hierarchy}"
+    ),
+    terms=[ENTITIES["lotus_1_2_3"], ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="the developers of Lotus 1-2-3 made some expressive choices in choosing and arranging the terms in the Lotus menu command hierarchy",
+    generic=False,
+)
+_FACT_HIERARCHY_MEANS_BY_WHICH_PERSON_OPERATED = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} was the means by which a person operated ${lotus_1_2_3}"
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"], ENTITIES["lotus_1_2_3"]],
+    name="the Lotus menu command hierarchy was the means by which a person operated Lotus 1-2-3",
+    generic=False,
+)
+_FACT_FALSE_HIERARCHY_ABSTRACTION = Fact(
+    predicate=Predicate(
+        content="${the_lotus_menu_command_hierarchy} was an abstraction", truth=False
+    ),
+    terms=[ENTITIES["the_lotus_menu_command_hierarchy"]],
+    name="false the Lotus menu command hierarchy was an abstraction",
+    generic=False,
+)
+_FACT_FALSE_PRECISE_FORMULATION_NECESSARY = Fact(
+    predicate=Predicate(
+        content="the precise formulation of ${lotus_1_2_3}'s code was necessary for ${lotus_1_2_3} to work",
+        truth=False,
+    ),
+    terms=[ENTITIES["lotus_1_2_3"]],
+    name="false the precise formulation of Lotus 1-2-3's code was necessary for Lotus 1-2-3 to work",
+    generic=False,
+)
+_FACT_COMPUTER_CODE_NECESSARY = Fact(
+    predicate=Predicate(
+        content="computer code was necessary for ${lotus_1_2_3} to work"
+    ),
+    terms=[ENTITIES["lotus_1_2_3"]],
+    name="computer code was necessary for Lotus 1-2-3 to work",
+    generic=False,
+)
+_FACT_FALSE_PROGRAM_METHOD_OF_OPERATION = Fact(
+    predicate=Predicate(
+        content="${lotus_1_2_3} was a method of operation", truth=False
+    ),
+    terms=[ENTITIES["lotus_1_2_3"]],
+    name="false Lotus 1-2-3 was a method of operation",
+    generic=False,
+)
 
-def _holdings_from_raw() -> HoldingGroup:
-    parsed = AnchoredHoldings.model_validate(copy.deepcopy(RAW_ANCHORED_HOLDINGS))
-    return HoldingGroup([item.holding for item in parsed.holdings])
+FACTS: list[Fact] = [
+    _FACT_HIERARCHY_COPYRIGHTABLE,
+    _FACT_COPIED_CONSTITUENT_ORIGINAL,
+    _FACT_INFRINGED_COPYRIGHT,
+    _FACT_HIERARCHY_ORIGINAL,
+    _FACT_FALSE_HIERARCHY_COPYRIGHTABLE,
+    _FACT_REGISTERED_COPYRIGHT,
+    _FACT_COPIED_IN_CREATING_QUATTRO_INTERFACE,
+    _FACT_HAD_ACCESS_TO_HIERARCHY,
+    _FACT_PUBLISHED_QUATTRO_INTERFACE,
+    _FACT_QUATTRO_VERY_SIMILAR_TO_HIERARCHY,
+    _FACT_COPYING_EXTENSIVE_SIMILAR,
+    _FACT_HIERARCHY_METHOD_OF_OPERATION,
+    _FACT_TEXT_DESCRIBED_HIERARCHY,
+    _FACT_LOTUS_PROGRAM,
+    _FACT_HIERARCHY_PROVIDED_MEANS,
+    _FACT_WITHOUT_HIERARCHY_NO_ACCESS,
+    _FACT_OTHER_PROGRAM_WOULD_HAVE_TO_COPY,
+    _FACT_DEVS_MADE_EXPRESSIVE_CHOICES,
+    _FACT_HIERARCHY_MEANS_BY_WHICH_PERSON_OPERATED,
+    _FACT_FALSE_HIERARCHY_ABSTRACTION,
+    _FACT_FALSE_PRECISE_FORMULATION_NECESSARY,
+    _FACT_COMPUTER_CODE_NECESSARY,
+    _FACT_FALSE_PROGRAM_METHOD_OF_OPERATION,
+]
 
 
-def _entity_key(name: str) -> str:
-    return "".join(ch.lower() if ch.isalnum() else "_" for ch in name).strip("_")
+def _build_holdings() -> HoldingGroup:
+    facts = {fact.name: fact for fact in FACTS}
+
+    lotus_copyrightability_requirement = copy.deepcopy(COPYRIGHTABILITY_REQUIREMENT)
+    lotus_copyrightability_requirement.selection = TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact="",
+                prefix="",
+                suffix="Works of authorship include",
+            )
+        ]
+    )
+
+    lotus_idea_expression_rule = copy.deepcopy(IDEA_EXPRESSION_RULE)
+    lotus_idea_expression_rule.selection = TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact="",
+                prefix="",
+                suffix="idea, procedure, process",
+            ),
+            TextQuoteSelector(
+                exact="method of operation",
+                prefix="",
+                suffix="",
+            ),
+        ]
+    )
+
+    exhibit_offered_by_lotus = Exhibit(
+        offered_by=ENTITIES["lotus_development_corporation"],
+        name="{'offered_by': 'Lotus Development Corporation'}",
+        generic=False,
+    )
+    lotus_registration = Exhibit(
+        offered_by=ENTITIES["lotus_development_corporation"],
+        form="certificate of copyright registration",
+        name="Lotus's copyright registration",
+        generic=False,
+    )
+
+    absence_hierarchy_original = AbsenceOfFactor(
+        absent=facts["the Lotus menu command hierarchy was an original work"],
+        generic=False,
+    )
+    absence_hierarchy_copyrightable = AbsenceOfFactor(
+        absent=facts["the Lotus menu command hierarchy was copyrightable"],
+        generic=False,
+    )
+    absence_false_hierarchy_copyrightable = AbsenceOfFactor(
+        absent=facts["false the Lotus menu command hierarchy was copyrightable"],
+        generic=False,
+    )
+
+    evidence_lotus_registration = Evidence(
+        exhibit=lotus_registration,
+        to_effect=facts[
+            "Lotus Development Corporation registered a copyright covering the Lotus menu command hierarchy"
+        ],
+        name="evidence of Lotus's copyright registration",
+        generic=False,
+    )
+    evidence_copied_in_creating_interface = Evidence(
+        exhibit=exhibit_offered_by_lotus,
+        to_effect=facts[
+            "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
+        ],
+        name="evidence of {'offered_by': 'Lotus Development Corporation'} to the effect that Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface",
+        generic=False,
+    )
+    evidence_had_access_to_hierarchy = Evidence(
+        exhibit=exhibit_offered_by_lotus,
+        to_effect=facts[
+            "Borland International had access to the Lotus menu command hierarchy"
+        ],
+        name="evidence of {'offered_by': 'Lotus Development Corporation'} to the effect that Borland International had access to the Lotus menu command hierarchy",
+        generic=False,
+    )
+    evidence_quattro_very_similar = Evidence(
+        exhibit=exhibit_offered_by_lotus,
+        to_effect=facts[
+            "Quattro's Lotus Emulation Interface was very similar to the Lotus menu command hierarchy"
+        ],
+        name="evidence of {'offered_by': 'Lotus Development Corporation'} to the effect that Quattro's Lotus Emulation Interface was very similar to the Lotus menu command hierarchy",
+        generic=False,
+    )
+
+    def enactments(*passages):
+        return EnactmentGroup(passages=[copy.deepcopy(passage) for passage in passages])
+
+    holdings = [
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        facts["the Lotus menu command hierarchy was copyrightable"],
+                        facts[
+                            "Borland International copied constituent elements of the Lotus menu command hierarchy that were original"
+                        ],
+                    ],
+                    outputs=[
+                        facts[
+                            "Borland International infringed the copyright in the Lotus menu command hierarchy"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_copyrightability_requirement),
+                mandatory=False,
+                universal=False,
+            ),
+            exclusive=True,
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[absence_hierarchy_original],
+                    outputs=[absence_hierarchy_copyrightable],
+                ),
+                enactments=enactments(lotus_copyrightability_requirement),
+                mandatory=False,
+                universal=True,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        evidence_lotus_registration,
+                        absence_false_hierarchy_copyrightable,
+                    ],
+                    outputs=[
+                        facts["the Lotus menu command hierarchy was copyrightable"]
+                    ],
+                ),
+                enactments=enactments(COPYRIGHT_REGISTRATION_EVIDENCE_RULE),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[evidence_copied_in_creating_interface],
+                    outputs=[
+                        facts[
+                            "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_copyrightability_requirement),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        evidence_had_access_to_hierarchy,
+                        facts[
+                            "Borland International published Quattro's Lotus Emulation Interface"
+                        ],
+                        evidence_quattro_very_similar,
+                    ],
+                    outputs=[
+                        facts[
+                            "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_copyrightability_requirement),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        facts[
+                            "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
+                        ],
+                        facts[
+                            "the copying of Quattro's Lotus Emulation Interface in the Lotus menu command hierarchy was so extensive that it rendered them substantially similar"
+                        ],
+                    ],
+                    outputs=[
+                        facts[
+                            "Borland International copied constituent elements of the Lotus menu command hierarchy that were original"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_copyrightability_requirement),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        facts[
+                            "the Lotus menu command hierarchy was a method of operation"
+                        ]
+                    ],
+                    despite=[
+                        facts["a text described the Lotus menu command hierarchy"],
+                        facts["the Lotus menu command hierarchy was an original work"],
+                    ],
+                    outputs=[
+                        facts[
+                            "false the Lotus menu command hierarchy was copyrightable"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_idea_expression_rule),
+                mandatory=True,
+                universal=True,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        facts["Lotus 1-2-3 was a computer program"],
+                        facts[
+                            "the Lotus menu command hierarchy provided the means by which users controlled and operated Lotus 1-2-3"
+                        ],
+                        facts[
+                            "without the Lotus menu command hierarchy, users would not have been able to access and control, or indeed make use of, Lotus 1-2-3’s functional capabilities"
+                        ],
+                        facts[
+                            "for another computer program to be operated in substantially the same way as Lotus 1-2-3, the other program would have to copy the Lotus menu command hierarchy"
+                        ],
+                    ],
+                    despite=[
+                        facts[
+                            "the developers of Lotus 1-2-3 made some expressive choices in choosing and arranging the terms in the Lotus menu command hierarchy"
+                        ]
+                    ],
+                    outputs=[
+                        facts[
+                            "the Lotus menu command hierarchy was a method of operation"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_idea_expression_rule),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        facts[
+                            "the Lotus menu command hierarchy was the means by which a person operated Lotus 1-2-3"
+                        ]
+                    ],
+                    despite=[
+                        facts[
+                            "false the Lotus menu command hierarchy was an abstraction"
+                        ]
+                    ],
+                    outputs=[
+                        facts[
+                            "the Lotus menu command hierarchy was a method of operation"
+                        ]
+                    ],
+                ),
+                enactments=enactments(lotus_idea_expression_rule),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+        Holding(
+            rule=Rule(
+                procedure=Procedure(
+                    inputs=[
+                        facts["Lotus 1-2-3 was a computer program"],
+                        facts[
+                            "false the precise formulation of Lotus 1-2-3's code was necessary for Lotus 1-2-3 to work"
+                        ],
+                    ],
+                    despite=[
+                        facts["computer code was necessary for Lotus 1-2-3 to work"]
+                    ],
+                    outputs=[facts["false Lotus 1-2-3 was a method of operation"]],
+                ),
+                enactments=enactments(lotus_idea_expression_rule),
+                mandatory=False,
+                universal=False,
+            )
+        ),
+    ]
+
+    return HoldingGroup(holdings)
 
 
-def _build_entities(holdings: HoldingGroup) -> dict[str, Entity]:
-    entities: dict[str, Entity] = {}
-    for holding in holdings:
-        for term in holding.rule.recursive_terms.values():
-            if isinstance(term, Entity):
-                key = _entity_key(term.name)
-                if key not in entities:
-                    entities[key] = copy.deepcopy(term)
-    return entities
+HOLDINGS = _build_holdings()
 
-
-HOLDINGS = _holdings_from_raw()
-ENTITIES = _build_entities(HOLDINGS)
+ANCHORS: list[TextPositionSet] = [
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+    TextPositionSet(positions=[], quotes=[]),
+]
 
 
 def anchored_holdings() -> AnchoredHoldings:
     """Build AnchoredHoldings from this module's HOLDINGS collection."""
-    parsed = AnchoredHoldings.model_validate(copy.deepcopy(RAW_ANCHORED_HOLDINGS))
     return AnchoredHoldings(
         holdings=[
             HoldingWithAnchors(
                 holding=copy.deepcopy(holding),
-                anchors=copy.deepcopy(parsed.holdings[index].anchors),
+                anchors=copy.deepcopy(ANCHORS[index]),
             )
             for index, holding in enumerate(HOLDINGS)
         ],
-        named_anchors=copy.deepcopy(parsed.named_anchors),
-        enactment_anchors=copy.deepcopy(parsed.enactment_anchors),
+        named_anchors=[],
+        enactment_anchors=[],
     )
