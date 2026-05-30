@@ -1,22 +1,17 @@
 import pytest
 
-from pydantic import ValidationError
-
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 
 from authorityspoke.facts import Fact
-from authorityspoke.io import readers
+from authorityspoke.examples.watt import ENTITIES as WATT_ENTITIES
 
 
 class TestMakeEntities:
-    def test_make_entity_from_str_without_mentioned(self):
-        """
-        This fails because it needs to look up the string factor_records
-        in a "mentioned" list, but no "mentioned" parameter is given.
-        """
-        with pytest.raises(ValidationError):
-            readers.read_holdings(record=[{"outputs": ["Bradley"]}])
+    def test_entity_from_examples_module(self):
+        entity = WATT_ENTITIES["wattenburg"]
+        assert entity.name == "Wattenburg"
+        assert entity.generic is True
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity

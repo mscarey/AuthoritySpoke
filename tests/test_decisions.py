@@ -7,7 +7,6 @@ from pydantic import ValidationError
 import pytest
 
 from authorityspoke.decisions import Decision, DecisionReading, Opinion
-from authorityspoke.io.loaders import read_anchored_holdings_from_file
 
 
 class TestDecision:
@@ -81,19 +80,15 @@ class TestDecision:
         assert reading.opinion_readings[0].opinion_author.lower() == hamley
         assert reading.opinion_readings[0].holdings[0].means(make_holding["h1"])
 
-    def test_decision_posits_holding(self, fake_usc_client, make_decision):
-        lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
-        )
+    def test_decision_posits_holding(self, make_decision, make_anchored_holding):
+        lotus_analysis = make_anchored_holding["lotus"]
         lotus_reading = DecisionReading(decision=make_decision["lotus"])
         lotus_reading.posit(lotus_analysis)
         assert len(lotus_reading.majority.holdings) == len(lotus_analysis.holdings)
         assert str(lotus_reading).startswith("Reading for Lotus Development Corp.")
 
-    def test_decision_with_opinion_reading_posits_holding(self, fake_usc_client):
-        lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
-        )
+    def test_decision_with_opinion_reading_posits_holding(self, make_anchored_holding):
+        lotus_analysis = make_anchored_holding["lotus"]
         decision_reading = DecisionReading(
             decision=Decision(decision_date=date(2000, 2, 2)),
             opinion_readings=[OpinionReading(opinion_type="plurality")],
@@ -101,10 +96,8 @@ class TestDecision:
         decision_reading.posit(lotus_analysis)
         assert len(decision_reading.holdings) == len(lotus_analysis.holdings)
 
-    def test_error_decision_with_no_majority_posits_holding(self, fake_usc_client):
-        lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
-        )
+    def test_error_decision_with_no_majority_posits_holding(self, make_anchored_holding):
+        lotus_analysis = make_anchored_holding["lotus"]
         reading1 = OpinionReading(opinion_type="plurality")
         reading2 = OpinionReading(opinion_type="concurring")
         decision_reading = DecisionReading(

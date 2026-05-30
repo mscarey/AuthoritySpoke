@@ -5,29 +5,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from authorityspoke import Decision
-from authorityspoke.io.fake_enactments import FakeClient
-
-from authorityspoke.io.loaders import (
-    load_decision,
-    read_holdings_from_file,
-    read_anchored_holdings_from_file,
-)
+from authorityspoke.examples import lotus as lotus_example
+from authorityspoke.examples import oracle as oracle_example
+from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
+from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
 
 
 class TestReadme:
-    def test_posit_anchored_holdings(self, make_response):
-        client = FakeClient(responses=make_response)
+    def test_posit_anchored_holdings(self, make_decision):
+        oracle = make_decision["oracle"]
+        lotus = make_decision["lotus"]
 
-        oracle_dict = load_decision("oracle_h.json")
-        lotus_dict = load_decision("lotus_h.json")
-        oracle = Decision(**oracle_dict)
-        lotus = Decision(**lotus_dict)
-
-        oracle_ah = read_anchored_holdings_from_file(
-            "holding_oracle.yaml", client=client
-        )
-        lotus_ah = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
+        oracle_ah = oracle_holdings()
+        lotus_ah = lotus_holdings()
 
         oracle_reading = DecisionReading(decision=oracle)
         lotus_reading = DecisionReading(decision=lotus)
@@ -45,16 +35,12 @@ class TestReadme:
 
         assert lotus_reading.contradicts(oracle_reading)
 
-    def test_posit_holdings(self, make_response):
-        client = FakeClient(responses=make_response)
+    def test_posit_holdings(self, make_decision):
+        oracle = make_decision["oracle"]
+        lotus = make_decision["lotus"]
 
-        oracle_dict = load_decision("oracle_h.json")
-        lotus_dict = load_decision("lotus_h.json")
-        oracle = Decision(**oracle_dict)
-        lotus = Decision(**lotus_dict)
-
-        oracle_h = read_holdings_from_file("holding_oracle.yaml", client=client)
-        lotus_h = read_holdings_from_file("holding_lotus.yaml", client=client)
+        oracle_h = oracle_example.HOLDINGS
+        lotus_h = lotus_example.HOLDINGS
 
         oracle_reading = DecisionReading(decision=oracle)
         lotus_reading = DecisionReading(decision=lotus)

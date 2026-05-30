@@ -17,6 +17,7 @@ from pydantic import ValidationError
 import pytest
 
 from authorityspoke.examples import oracle
+from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.facts import Fact
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
@@ -320,8 +321,5 @@ class TestTextSelection:
             "|may|possess the requisite originality"
             ]
         """
-        client = FakeClient.from_file("usc.json")
-        holdings = loaders.read_anchored_holdings_from_file(
-            "holding_feist.yaml", client=client
-        )
+        holdings = feist_holdings()
         assert len(holdings.holdings[6].anchors.quotes) == 2
