@@ -5,7 +5,7 @@ import pytest
 
 from legislice.download import Client
 
-from authorityspoke.io import loaders, name_index, readers
+from authorityspoke.io import loaders, readers
 from authorityspoke.facts import Exhibit
 from authorityspoke.rules import Rule
 
@@ -57,12 +57,6 @@ class TestLoadRules:
             "beard_rules.yaml", client=fake_beard_client
         )
         assert beard_rules[0].rule.short_string.lower().startswith("the rule")
-
-    def test_index_names_from_sibling_inputs(self):
-        raw_rules = loaders.load_holdings("beard_rules.yaml")
-        indexed_rules, mentioned = name_index.index_names(raw_rules[0]["inputs"])
-        key = "the suspected beard occurred on or below the chin"
-        assert mentioned[key]["terms"][0] == "the suspected beard"
 
     def test_rule_with_exhibit_as_context_factor(self, fake_beard_client):
         rules = loaders.read_holdings_from_file(

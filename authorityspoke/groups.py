@@ -231,20 +231,21 @@ class FactorGroup(Comparable):
         nettlesome finds only two Explanations for how a contradiction can exist.
 
             >>> from nettlesome import Statement, Entity, Predicate
+            >>> from nettlesome.terms import TermSequence
             >>> nafta = FactorGroup([
             ... Statement(predicate=Predicate("{country1} signed a treaty with {country2}"),
-            ...     terms=[Entity(name="Mexico"), Entity(name="USA")]),
+            ...     terms=TermSequence([Entity(name="Mexico"), Entity(name="USA")])),
             ... Statement(predicate=Predicate("{country2} signed a treaty with {country3}"),
-            ...     terms=[Entity(name="USA"), Entity(name="Canada")]),
+            ...     terms=TermSequence([Entity(name="USA"), Entity(name="Canada")])),
             ... Statement(predicate=Predicate("{country3} signed a treaty with {country1}"),
-            ...    terms=[Entity(name="USA"), Entity(name="Canada")])])
+            ...    terms=TermSequence([Entity(name="USA"), Entity(name="Canada")]))])
             >>> brexit = FactorGroup([
             ... Statement(predicate=Predicate("{country1} signed a treaty with {country2}"),
-            ...     terms=[Entity(name="UK"), Entity(name="European Union")]),
+            ...     terms=TermSequence([Entity(name="UK"), Entity(name="European Union")])),
             ... Statement(predicate=Predicate("{country2} signed a treaty with {country3}"),
-            ...     terms=[Entity(name="European Union"), Entity(name="Germany")]),
+            ...     terms=TermSequence([Entity(name="European Union"), Entity(name="Germany")])),
             ... Statement(predicate=Predicate("{country3} signed a treaty with {country1}"),
-            ...     terms=[Entity(name="Germany"), Entity(name="UK")], truth=False)])
+            ...     terms=TermSequence([Entity(name="Germany"), Entity(name="UK")], truth=False)]))
             >>> explanations_usa_like_uk = nafta.explanations_contradiction(
             ...     brexit,
             ...     context=([Entity(name="USA")], [Entity(name="UK")]))

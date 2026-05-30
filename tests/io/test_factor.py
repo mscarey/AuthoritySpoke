@@ -10,7 +10,6 @@ from nettlesome.quantities import Comparison
 import pytest
 
 from authorityspoke.facts import Fact, Exhibit, Evidence
-from authorityspoke.io.name_index import index_names
 from authorityspoke.io import readers
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths

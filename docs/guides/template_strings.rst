@@ -136,7 +136,7 @@ To use a measurement as a Comparison’s ``expression``, pass the measurement as
 a string when constructing the Comparison object, and it will be converted to a :class:`pint.Quantity`\.
 
     >>> from authorityspoke import Comparison
-    >>> drug_comparison = Comparison(
+    >>> drug_comparison = Comparison.new(
     ...     content="the weight of marijuana that {defendant} possessed was",
     ...     sign=">=",
     ...     expression="0.5 kilograms")
@@ -152,7 +152,7 @@ possible for AuthoritySpoke to consider quantities when checking whether
 one Comparison :meth:`~nettlesome.predicates.Comparison.implies` or
 :meth:`~nettlesome.predicates.Comparison.contradicts` another.
 
-    >>> smaller_drug_comparison = Comparison(
+    >>> smaller_drug_comparison = Comparison.new(
     ...     content="the weight of marijuana that {defendant} possessed was",
     ...     sign=">=",
     ...     expression="250 grams")
@@ -173,7 +173,7 @@ user’s input indicates that it’s false that the weight of the marijuana
 was more than 10 grams. AuthoritySpoke interprets this to mean it’s true
 that the weight was no more than 10 grams.
 
-    >>> drug_comparison_with_upper_bound = Comparison(
+    >>> drug_comparison_with_upper_bound = Comparison.new(
     ...     content="the weight of marijuana that {defendant} possessed was",
     ...     sign=">",
     ...     expression="10 grams",

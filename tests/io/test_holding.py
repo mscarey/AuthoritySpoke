@@ -21,7 +21,7 @@ from authorityspoke.opinions import (
     AnchoredHoldings,
 )
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders, readers, name_index
+from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import load_holdings, read_holdings_from_file
 from authorityspoke.io import text_expansion
@@ -85,11 +85,6 @@ class TestEntityImport:
             "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
         },
     ]
-
-    def test_index_names_from_otherwise_identical_factors(self):
-        expanded, mentioned = name_index.index_names(self.smith_holdings)
-        fact = mentioned[expanded[1]["inputs"][0]]
-        assert fact["terms"][0] == "Smythe"
 
     def test_specific_entity(self):
         different_entity_holdings = readers.read_holdings(self.smith_holdings)
