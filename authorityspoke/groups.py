@@ -230,20 +230,20 @@ class FactorGroup(Comparable):
         discovers analogies between the Entity objects. The result is that
         nettlesome finds only two Explanations for how a contradiction can exist.
 
-            >>> from nettlesome import Statement, Entity
+            >>> from nettlesome import Statement, Entity, Predicate
             >>> nafta = FactorGroup([
-            ... Statement(predicate="{country1} signed a treaty with {country2}",
+            ... Statement(predicate=Predicate("{country1} signed a treaty with {country2}"),
             ...     terms=[Entity(name="Mexico"), Entity(name="USA")]),
-            ... Statement(predicate="{country2} signed a treaty with {country3}",
+            ... Statement(predicate=Predicate("{country2} signed a treaty with {country3}"),
             ...     terms=[Entity(name="USA"), Entity(name="Canada")]),
-            ... Statement(predicate="{country3} signed a treaty with {country1}",
+            ... Statement(predicate=Predicate("{country3} signed a treaty with {country1}"),
             ...    terms=[Entity(name="USA"), Entity(name="Canada")])])
             >>> brexit = FactorGroup([
-            ... Statement(predicate="{country1} signed a treaty with {country2}",
+            ... Statement(predicate=Predicate("{country1} signed a treaty with {country2}"),
             ...     terms=[Entity(name="UK"), Entity(name="European Union")]),
-            ... Statement(predicate="{country2} signed a treaty with {country3}",
+            ... Statement(predicate=Predicate("{country2} signed a treaty with {country3}"),
             ...     terms=[Entity(name="European Union"), Entity(name="Germany")]),
-            ... Statement(predicate="{country3} signed a treaty with {country1}",
+            ... Statement(predicate=Predicate("{country3} signed a treaty with {country1}"),
             ...     terms=[Entity(name="Germany"), Entity(name="UK")], truth=False)])
             >>> explanations_usa_like_uk = nafta.explanations_contradiction(
             ...     brexit,

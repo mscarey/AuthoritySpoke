@@ -441,7 +441,7 @@ class TestImplication:
         assert not concrete > Entity(name="Tim")
 
     def test_statement_does_not_imply_comparison(self):
-        phrase = Comparison(
+        phrase = Comparison.new(
             content="the distance north from {south} to {north} was",
             sign=">",
             expression="180 miles",
@@ -455,7 +455,7 @@ class TestImplication:
 
     def test_statement_implies_because_of_quantity(self):
         statement = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance north from {south} to {north} was",
                 sign=">",
                 expression="180 miles",
@@ -463,7 +463,7 @@ class TestImplication:
             terms=[Entity(name="Austin"), Entity(name="Dallas")],
         )
         statement_meters = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance north from {south} to {north} was",
                 sign=">",
                 expression="180 meters",
@@ -475,7 +475,7 @@ class TestImplication:
 
     def test_statement_implies_with_int_and_float(self):
         statement = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance north from {south} to {north} was",
                 sign=">",
                 expression=180,
@@ -483,7 +483,7 @@ class TestImplication:
             terms=[Entity(name="Austin"), Entity(name="Dallas")],
         )
         statement_float = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance north from {south} to {north} was",
                 sign=">",
                 expression=170.22,
@@ -495,7 +495,7 @@ class TestImplication:
 
     def test_statement_implies_with_ints(self):
         statement_higher = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance north from {south} to {north} was",
                 sign=">",
                 expression=180,
@@ -503,7 +503,7 @@ class TestImplication:
             terms=[Entity(name="Austin"), Entity(name="Dallas")],
         )
         statement_lower = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance north from {south} to {north} was",
                 sign=">",
                 expression=170,
@@ -527,14 +527,14 @@ class TestImplication:
 
     def test_comparison_implies_no_truth_value(self):
         fact = Fact(
-            predicate=Comparison(
-                content="${person}'s weight was", sign=">", expression="150 pounds"
+            predicate=Comparison.new(
+                content="{person}'s weight was", sign=">", expression="150 pounds"
             ),
             terms=Entity(name="Alice"),
         )
         whether = Fact(
-            predicate=Comparison(
-                content="${person}'s weight was",
+            predicate=Comparison.new(
+                content="{person}'s weight was",
                 sign=">",
                 expression="150 pounds",
                 truth=None,
@@ -547,14 +547,14 @@ class TestImplication:
 
     def test_factor_implies_because_of_exact_quantity(self):
         fact_exact = Fact(
-            predicate=Comparison(
-                content="${person}'s height was", sign="=", expression="66 inches"
+            predicate=Comparison.new(
+                content="{person}'s height was", sign="=", expression="66 inches"
             ),
             terms=Entity(name="Alice"),
         )
         fact_greater = Fact(
-            predicate=Comparison(
-                content="${person}'s height was", sign=">", expression="60 inches"
+            predicate=Comparison.new(
+                content="{person}'s height was", sign=">", expression="60 inches"
             ),
             terms=Entity(name="Alice"),
         )
@@ -564,14 +564,14 @@ class TestImplication:
 
     def test_no_implication_pint_quantity_and_int(self):
         fact_exact = Fact(
-            predicate=Comparison(
-                content="${person}'s height was", sign="=", expression=66
+            predicate=Comparison.new(
+                content="{person}'s height was", sign="=", expression=66
             ),
             terms=Entity(name="Alice"),
         )
         fact_greater = Fact(
-            predicate=Comparison(
-                content="${person}'s height was", sign=">", expression="60 inches"
+            predicate=Comparison.new(
+                content="{person}'s height was", sign=">", expression="60 inches"
             ),
             terms=Entity(name="Alice"),
         )
@@ -583,7 +583,7 @@ class TestImplication:
     ):
         absent_broader = AbsenceOfFactor(
             absent=Fact(
-                predicate=Comparison(
+                predicate=Comparison.new(
                     content="the distance north from {south} to {north} was",
                     sign="<",
                     expression="200 miles",
@@ -593,7 +593,7 @@ class TestImplication:
         )
         absent_narrower = AbsenceOfFactor(
             absent=Fact(
-                predicate=Comparison(
+                predicate=Comparison.new(
                     content="the distance north from {south} to {north} was",
                     sign="<",
                     expression="50 miles",
@@ -681,12 +681,12 @@ class TestImplication:
 
 class TestContradiction:
     def test_factor_different_predicate_truth_contradicts(self):
-        predicate = Comparison(
+        predicate = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("30 miles"),
         )
-        predicate_opposite = Comparison(
+        predicate_opposite = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign="<",
             expression=Q_("30 miles"),
@@ -728,12 +728,12 @@ class TestContradiction:
         assert absent_fact.contradicts(fact)
 
     def test_absences_of_contradictory_facts_consistent(self):
-        predicate = Comparison(
+        predicate = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("30 miles"),
         )
-        predicate_opposite = Comparison(
+        predicate_opposite = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign="<",
             expression=Q_("30 miles"),
@@ -760,13 +760,13 @@ class TestContradiction:
         assert not fact_no_truth.contradicts(fact)
 
     def test_broader_absent_factor_contradicts_quantity_statement(self):
-        predicate_less = Comparison(
-            content="${vehicle}'s speed was",
+        predicate_less = Comparison.new(
+            content="{vehicle}'s speed was",
             sign=">",
             expression=Q_("30 miles per hour"),
         )
-        predicate_more = Comparison(
-            content="${vehicle}'s speed was",
+        predicate_more = Comparison.new(
+            content="{vehicle}'s speed was",
             sign=">",
             expression=Q_("60 miles per hour"),
         )
@@ -780,13 +780,13 @@ class TestContradiction:
         assert specific_fact.contradicts(absent_general_fact)
 
     def test_less_specific_absent_contradicts_more_specific(self):
-        predicate_less = Comparison(
-            content="${vehicle}'s speed was",
+        predicate_less = Comparison.new(
+            content="{vehicle}'s speed was",
             sign="<",
             expression=Q_("30 miles per hour"),
         )
-        predicate_more = Comparison(
-            content="${vehicle}'s speed was",
+        predicate_more = Comparison.new(
+            content="{vehicle}'s speed was",
             sign="<",
             expression=Q_("60 miles per hour"),
         )
@@ -800,13 +800,13 @@ class TestContradiction:
         assert specific_fact.contradicts(absent_general_fact)
 
     def test_no_contradiction_with_more_specific_absent(self):
-        predicate_less = Comparison(
-            content="${vehicle}'s speed was",
+        predicate_less = Comparison.new(
+            content="{vehicle}'s speed was",
             sign="<",
             expression=Q_("30 miles per hour"),
         )
-        predicate_more = Comparison(
-            content="${vehicle}'s speed was",
+        predicate_more = Comparison.new(
+            content="{vehicle}'s speed was",
             sign="<",
             expression=Q_("60 miles per hour"),
         )
@@ -907,7 +907,7 @@ class TestContradiction:
         absent_fact = AbsenceOfFactor(
             absent=Fact(
                 predicate=Predicate(
-                    content="${rural_s_telephone_directory} was copyrightable",
+                    content="{rural_s_telephone_directory} was copyrightable",
                     truth=True,
                 ),
                 terms=(Entity(name="Rural's telephone directory")),
@@ -915,7 +915,7 @@ class TestContradiction:
         )
         false_fact = Fact(
             predicate=Predicate(
-                content="${the_java_api} was copyrightable", truth=False
+                content="{the_java_api} was copyrightable", truth=False
             ),
             terms=(Entity(name="the Java API", generic=True, plural=False)),
         )
@@ -927,20 +927,20 @@ class TestContradiction:
         Alice and Bob are both generics. So it's possible to reach a
         contradiction if you assume they correspond to one another.
         """
-        p_small_weight = Comparison(
+        p_small_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
-        p_large_weight = Comparison(
+        p_large_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Fact(predicate=p_large_weight, terms=alice)
-        bob_poor = Fact(predicate=p_small_weight, terms=bob)
+        alice_rich = Fact(predicate=p_large_weight, terms=[alice])
+        bob_poor = Fact(predicate=p_small_weight, terms=[bob])
         assert alice_rich.contradicts(bob_poor)
 
     def test_inconsistent_statements_about_corresponding_entities(self):
@@ -949,12 +949,12 @@ class TestContradiction:
         Alice in the first context corresponds with Alice in the second.
         So there's no contradiction.
         """
-        p_small_weight = Comparison(
+        p_small_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
-        p_large_weight = Comparison(
+        p_large_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
@@ -1064,12 +1064,12 @@ class TestConsistent:
 
 class TestAddition:
     predicate_less = Comparison.new(
-        content="${vehicle}'s speed was",
+        content="{vehicle}'s speed was",
         sign=">",
         expression=Q_("30 miles per hour"),
     )
     predicate_more = Comparison.new(
-        content="${vehicle}'s speed was",
+        content="{vehicle}'s speed was",
         sign=">=",
         expression=Q_("60 miles per hour"),
     )

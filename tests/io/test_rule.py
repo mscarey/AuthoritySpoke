@@ -43,7 +43,7 @@ class TestLoadRules:
         )
         assert (
             beard_rules[0].outputs[0].predicate.content
-            == "${the_suspected_beard} was a beard"
+            == "{the_suspected_beard} was a beard"
         )
 
     def test_imported_rule_is_type_rule(self, fake_beard_client):

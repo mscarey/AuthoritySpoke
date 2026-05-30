@@ -110,7 +110,7 @@ class TestCollectMentioned:
         assert holdings[2]["inputs"][0] == "the Java API was an original work"
         assert (
             mentioned["the Java API was an original work"]["predicate"]["content"]
-            == "${the_java_api} was an original work"
+            == "{the_java_api} was an original work"
         )
 
     def test_enactment_name_index(self):
@@ -177,7 +177,7 @@ class TestCollectMentioned:
             obj=raw_fact, mentioned=old_mentioned
         )
         found_content = obj["predicate"]["content"].lower()
-        assert found_content == "${bradley} lived at {bradley_s_house}"
+        assert found_content == "{bradley} lived at {bradley_s_house}"
         # Check that terms match the order of the sentence
         assert obj["terms"][0]["name"] == "Bradley"
         assert obj["terms"][1]["name"] == "Bradley's house"

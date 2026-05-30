@@ -209,17 +209,17 @@ class TestUnion:
 
 class TestConsistent:
     predicate_less_specific = Comparison.new(
-        content="${vehicle}'s speed was",
+        content="{vehicle}'s speed was",
         sign="<",
         expression="30 miles per hour",
     )
     predicate_less_general = Comparison.new(
-        content="${vehicle}'s speed was",
+        content="{vehicle}'s speed was",
         sign="<",
         expression="60 miles per hour",
     )
     predicate_more = Comparison.new(
-        content="${vehicle}'s speed was",
+        content="{vehicle}'s speed was",
         sign=">",
         expression="55 miles per hour",
     )

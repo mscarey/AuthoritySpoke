@@ -704,7 +704,7 @@ class TestAddition:
                 ),
                 outputs=Fact(
                     predicate=Predicate(
-                        content="${work} was copyrightable", truth=False
+                        content="{work} was copyrightable", truth=False
                     ),
                     terms=three,
                 ),
@@ -1114,26 +1114,26 @@ class TestStatuteRules:
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
         was_facial_hair = Predicate(content="{thing} was facial hair")
-        fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=beard)
+        fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=[beard])
         hypothetical = Rule(
             procedure=Procedure(
                 inputs=[
                     fact_was_facial_hair,
                     Fact(
-                        predicate=Comparison(
+                        predicate=Comparison.new(
                             content="the length of {thing} was",
                             sign=">=",
                             expression=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
                         ),
-                        terms=beard,
+                        terms=[beard],
                     ),
                     Fact(
                         predicate=Predicate(
                             content="{thing} occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
-                        terms=beard,
+                        terms=[beard],
                     ),
                     Fact(
                         predicate=Predicate(
@@ -1141,11 +1141,11 @@ class TestStatuteRules:
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
-                        terms=beard,
+                        terms=[beard],
                     ),
                 ],
                 outputs=Fact(
-                    predicate=Predicate(content="{thing} was a beard"), terms=beard
+                    predicate=Predicate(content="{thing} was a beard"), terms=[beard]
                 ),
             ),
             enactments=sec_4,

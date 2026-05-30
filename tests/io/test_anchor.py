@@ -52,7 +52,7 @@ class TestCollectAnchors:
                     "name": name,
                     "type": "fact",
                     "predicate": {
-                        "content": "${the_java_api} was essentially the only way to express the idea that it embodied"
+                        "content": "{the_java_api} was essentially the only way to express the idea that it embodied"
                     },
                     "terms": [{"name": "the Java API", "type": "Entity"}],
                 },

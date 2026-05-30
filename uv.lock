@@ -70,7 +70,7 @@ requires-dist = [
     { name = "justopinion", specifier = "==0.4.0" },
     { name = "legislice", specifier = "==0.8.1" },
     { name = "lxml", specifier = ">=4.9.1" },
-    { name = "nettlesome", git = "https://github.com/mscarey/nettlesome.git?rev=termsequence-items" },
+    { name = "nettlesome", git = "https://github.com/mscarey/nettlesome.git?rev=termsequence-rootmodel" },
     { name = "pint", specifier = ">=0.25.3" },
     { name = "pydantic", specifier = ">=2.13.3" },
     { name = "python-dotenv" },
@@ -415,7 +415,7 @@ wheels = [
 [[package]]
 name = "nettlesome"
 version = "0.8.0"
-source = { git = "https://github.com/mscarey/nettlesome.git?rev=termsequence-items#d16775bc6fb29fdf003b3ee3476922583fabdad2" }
+source = { git = "https://github.com/mscarey/nettlesome.git?rev=termsequence-rootmodel#74254d88ef071463e430039904e12d5f2ad94488" }
 dependencies = [
     { name = "pint" },
     { name = "pydantic" },

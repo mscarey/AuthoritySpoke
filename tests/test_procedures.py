@@ -399,12 +399,12 @@ class TestFactorGroups:
         """Test part of the process of checking contradiction."""
         rural = Entity(name="Rural's telephone directory")
         compilation = Predicate(
-            content="${rural_s_telephone_directory} was a compilation of facts"
+            content="{rural_s_telephone_directory} was a compilation of facts"
         )
-        idea = Predicate(content="${rural_s_telephone_directory} was an idea")
+        idea = Predicate(content="{rural_s_telephone_directory} was an idea")
         copyrightable = Fact(
             predicate=Predicate(
-                content="${rural_s_telephone_directory} was copyrightable"
+                content="{rural_s_telephone_directory} was copyrightable"
             ),
             terms=rural,
         )

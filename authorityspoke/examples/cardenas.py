@@ -36,13 +36,13 @@ ENTITIES: dict[str, Entity] = {
     "parole_officer": Entity(name="parole officer", generic=True),
 }
 _FACT_ADDICTED_TO_HEROIN = Fact(
-    predicate=Predicate(content="${the_defendant} was addicted to heroin"),
+    predicate=Predicate(content="{the_defendant} was addicted to heroin"),
     terms=[ENTITIES["the_defendant"]],
     name="fact that the defendant was addicted to heroin",
     generic=False,
 )
 _FACT_ATTEMPTED_ROBBERY = Fact(
-    predicate=Predicate(content="${the_defendant} committed an attempted robbery"),
+    predicate=Predicate(content="{the_defendant} committed an attempted robbery"),
     terms=[ENTITIES["the_defendant"]],
     name="fact that the defendant committed an attempted robbery",
     generic=False,
@@ -69,7 +69,7 @@ _FACT_PROBATIVE_VALUE_WITH_DEFENDANT = Fact(
 )
 _FACT_RELEVANT_MOTIVE = Fact(
     predicate=Predicate(
-        content="${officer_s_testimony_that_the_defendant_was_addicted_to_heroin} was relevant to show {the_defendant} had a motive to commit an attempted robbery"
+        content="{officer_s_testimony_that_the_defendant_was_addicted_to_heroin} was relevant to show {the_defendant} had a motive to commit an attempted robbery"
     ),
     terms=[_OFFICER_TESTIMONY, ENTITIES["the_defendant"]],
     name="officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",

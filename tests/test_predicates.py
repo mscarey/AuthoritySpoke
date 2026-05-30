@@ -13,14 +13,14 @@ from nettlesome.quantities import Comparison, Q_, Quantity
 class TestComparisons:
     def test_comparison_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
-            _ = Comparison(
+            _ = Comparison.new(
                 content="the height of {} was {}",
                 sign=">>",
                 expression=Q_("160 centimeters"),
             )
 
     def test_comparison_interval(self):
-        comparison = Comparison(
+        comparison = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("20 miles"),
@@ -28,7 +28,7 @@ class TestComparisons:
         assert comparison.interval == Interval(Decimal("20"), oo, left_open=True)
 
     def test_comparison_not_equal(self):
-        comparison = Comparison(
+        comparison = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign="!=",
             expression=Q_("20 miles"),
@@ -254,16 +254,16 @@ class TestImplication:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Comparison(content="The number of mice was", sign=">", expression=4)
-        more = Comparison(content="The number of mice was", sign=">=", expression=5)
+        less = Comparison.new(content="The number of mice was", sign=">", expression=4)
+        more = Comparison.new(content="The number of mice was", sign=">=", expression=5)
         assert not less.implies(more)
 
     def test_no_contradiction_inconsistent_dimensions(self):
-        equal = Comparison(
-            content="${defendant}'s sentence was", sign="=", expression="8 years"
+        equal = Comparison.new(
+            content="{defendant}'s sentence was", sign="=", expression="8 years"
         )
-        less = Comparison(
-            content="${defendant}'s sentence was", sign="<=", expression="10 parsecs"
+        less = Comparison.new(
+            content="{defendant}'s sentence was", sign="<=", expression="10 parsecs"
         )
         assert not equal.contradicts(less)
         assert not equal.implies(less)
@@ -286,12 +286,12 @@ class TestImplication:
         assert not make_predicate["p7_true"] > watt_factor["f7"]
 
     def test_implication_due_to_dates(self):
-        copyright_date_range = Comparison(
+        copyright_date_range = Comparison.new(
             content="the date when {work} was created was",
             sign=">=",
             expression=date(1978, 1, 1),
         )
-        copyright_date_specific = Comparison(
+        copyright_date_specific = Comparison.new(
             content="the date when {work} was created was",
             sign="=",
             expression=date(1980, 6, 20),
@@ -347,12 +347,12 @@ class TestContradiction:
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])
 
     def test_contradictory_date_ranges(self):
-        later = Comparison(
+        later = Comparison.new(
             content="the date {dentist} became a licensed dentist was",
             sign=">",
             expression=date(2010, 1, 1),
         )
-        earlier = Comparison(
+        earlier = Comparison.new(
             content="the date {dentist} became a licensed dentist was",
             sign="<",
             expression=date(1990, 1, 1),
@@ -361,13 +361,13 @@ class TestContradiction:
         assert earlier.contradicts(later)
 
     def test_no_contradiction_without_truth_value(self):
-        later = Comparison(
+        later = Comparison.new(
             content="the date {dentist} became a licensed dentist was",
             sign=">",
             expression=date(2010, 1, 1),
             truth=None,
         )
-        earlier = Comparison(
+        earlier = Comparison.new(
             content="the date {dentist} became a licensed dentist was",
             sign="<",
             expression=date(1990, 1, 1),
@@ -376,12 +376,12 @@ class TestContradiction:
         assert not earlier.contradicts(later)
 
     def test_no_contradiction_date_and_time_period(self):
-        later = Comparison(
+        later = Comparison.new(
             content="the date {dentist} became a licensed dentist was",
             sign=">",
             expression=date(2010, 1, 1),
         )
-        earlier = Comparison(
+        earlier = Comparison.new(
             content="the date {dentist} became a licensed dentist was",
             sign="<",
             expression="2000 years",
@@ -390,12 +390,12 @@ class TestContradiction:
         assert not earlier.contradicts(later)
 
     def test_no_contradiction_irrelevant_quantities(self):
-        more_cows = Comparison(
+        more_cows = Comparison.new(
             content="the number of cows {person} owned was",
             sign=">",
             expression=10,
         )
-        fewer_horses = Comparison(
+        fewer_horses = Comparison.new(
             content="the number of horses {person} owned was",
             sign="<",
             expression=3,
@@ -404,7 +404,7 @@ class TestContradiction:
         assert not fewer_horses.contradicts(more_cows)
 
     def test_no_contradiction_of_predicate(self):
-        more_cows = Comparison(
+        more_cows = Comparison.new(
             content="the number of cows {person} owned was",
             sign=">",
             expression=10,
@@ -418,12 +418,12 @@ class TestContradiction:
 
 class TestQuantities:
     def test_does_not_exclude_other_quantity(self):
-        comparison = Comparison(
+        comparison = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("20 miles"),
         )
-        comparison_opposite = Comparison(
+        comparison_opposite = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign="<",
             expression=Q_("30 miles"),
@@ -431,12 +431,12 @@ class TestQuantities:
         assert not comparison.contradicts(comparison_opposite)
 
     def test_convert_quantity_of_Comparison(self):
-        comparison = Comparison(
+        comparison = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("20 miles"),
         )
-        comparison_km = Comparison(
+        comparison_km = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("30 kilometers"),
@@ -444,7 +444,7 @@ class TestQuantities:
         assert comparison > comparison_km
 
     def test_quantity_comparison_to_predicate(self):
-        distance = Comparison(
+        distance = Comparison.new(
             content="the distance between {place1} and {place2} was",
             sign=">",
             expression="20 miles",

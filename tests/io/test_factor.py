@@ -122,8 +122,7 @@ class TestFactorLoad:
         holdings = readers.read_holdings(loaded)
         factor = holdings[0].inputs[1].fact
         assert (
-            factor.predicate.content
-            == "${the_defendant} committed an attempted robbery"
+            factor.predicate.content == "{the_defendant} committed an attempted robbery"
         )
 
 

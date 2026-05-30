@@ -41,47 +41,47 @@ ENTITIES: dict[str, Entity] = {
 
 _FACT_FALSE_DIRECTORY_COPYRIGHTABLE = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} was copyrightable", truth=False
+        content="{rural_s_telephone_directory} was copyrightable", truth=False
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="false Rural's telephone directory was copyrightable",
     generic=False,
 )
 _FACT_DIRECTORY_IS_FACT = Fact(
-    predicate=Predicate(content="${rural_s_telephone_directory} was a fact"),
+    predicate=Predicate(content="{rural_s_telephone_directory} was a fact"),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory was a fact",
     generic=False,
 )
 _FACT_DIRECTORY_COPYRIGHTABLE = Fact(
-    predicate=Predicate(content="${rural_s_telephone_directory} was copyrightable"),
+    predicate=Predicate(content="{rural_s_telephone_directory} was copyrightable"),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory was copyrightable",
     generic=False,
 )
 _FACT_DIRECTORY_COMPILATION = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} was a compilation of facts"
+        content="{rural_s_telephone_directory} was a compilation of facts"
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory was a compilation of facts",
     generic=False,
 )
 _FACT_DIRECTORY_IDEA = Fact(
-    predicate=Predicate(content="${rural_s_telephone_directory} was an idea"),
+    predicate=Predicate(content="{rural_s_telephone_directory} was an idea"),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory was an idea",
     generic=False,
 )
 _FACT_DIRECTORY_ORIGINAL = Fact(
-    predicate=Predicate(content="${rural_s_telephone_directory} was an original work"),
+    predicate=Predicate(content="{rural_s_telephone_directory} was an original work"),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory was an original work",
     generic=False,
 )
 _FACT_DIRECTORY_INDEPENDENTLY_CREATED = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} was independently created by {rural_telephone_service_company}, as opposed to copied from other works"
+        content="{rural_s_telephone_directory} was independently created by {rural_telephone_service_company}, as opposed to copied from other works"
     ),
     terms=[
         ENTITIES["rural_s_telephone_directory"],
@@ -92,7 +92,7 @@ _FACT_DIRECTORY_INDEPENDENTLY_CREATED = Fact(
 )
 _FACT_DIRECTORY_MINIMAL_CREATIVITY = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} possessed at least some minimal degree of creativity"
+        content="{rural_s_telephone_directory} possessed at least some minimal degree of creativity"
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory possessed at least some minimal degree of creativity",
@@ -100,7 +100,7 @@ _FACT_DIRECTORY_MINIMAL_CREATIVITY = Fact(
 )
 _FACT_DIRECTORY_RESEMBLED_OTHERS = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} closely resembled other works"
+        content="{rural_s_telephone_directory} closely resembled other works"
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory closely resembled other works",
@@ -108,7 +108,7 @@ _FACT_DIRECTORY_RESEMBLED_OTHERS = Fact(
 )
 _FACT_FALSE_DIRECTORY_ORIGINAL = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} was an original work", truth=False
+        content="{rural_s_telephone_directory} was an original work", truth=False
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="false Rural's telephone directory was an original work",
@@ -116,7 +116,7 @@ _FACT_FALSE_DIRECTORY_ORIGINAL = Fact(
 )
 _FACT_COMPANY_COMPILER = Fact(
     predicate=Predicate(
-        content="${rural_telephone_service_company} was the compiler of {rural_s_telephone_directory}"
+        content="{rural_telephone_service_company} was the compiler of {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["rural_telephone_service_company"],
@@ -127,7 +127,7 @@ _FACT_COMPANY_COMPILER = Fact(
 )
 _FACT_COMPANY_CREATIVE_CHOICE_FACTS = Fact(
     predicate=Predicate(
-        content="${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in {rural_s_telephone_directory}"
+        content="{rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["rural_telephone_service_company"],
@@ -138,7 +138,7 @@ _FACT_COMPANY_CREATIVE_CHOICE_FACTS = Fact(
 )
 _FACT_COMPANY_CREATIVE_ARRANGEMENT = Fact(
     predicate=Predicate(
-        content="${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in {rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers"
+        content="{rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in {rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers"
     ),
     terms=[
         ENTITIES["rural_telephone_service_company"],
@@ -149,7 +149,7 @@ _FACT_COMPANY_CREATIVE_ARRANGEMENT = Fact(
 )
 _FACT_FALSE_DIRECTORY_PROTECTABLE_EXPRESSION = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} contained written expression protectable by copyright",
+        content="{rural_s_telephone_directory} contained written expression protectable by copyright",
         truth=False,
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
@@ -158,7 +158,7 @@ _FACT_FALSE_DIRECTORY_PROTECTABLE_EXPRESSION = Fact(
 )
 _FACT_FALSE_FEIST_INFRINGED = Fact(
     predicate=Predicate(
-        content="${feist_publications} infringed the copyright on {rural_s_telephone_directory}",
+        content="{feist_publications} infringed the copyright on {rural_s_telephone_directory}",
         truth=False,
     ),
     terms=[
@@ -170,7 +170,7 @@ _FACT_FALSE_FEIST_INFRINGED = Fact(
 )
 _FACT_FEIST_DIFFERENT_SELECTION = Fact(
     predicate=Predicate(
-        content="${feist_s_telephone_directory} did not feature the same selection and arrangement of facts as {rural_s_telephone_directory}"
+        content="{feist_s_telephone_directory} did not feature the same selection and arrangement of facts as {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["feist_s_telephone_directory"],
@@ -181,7 +181,7 @@ _FACT_FEIST_DIFFERENT_SELECTION = Fact(
 )
 _FACT_FEIST_COPIED_FACTS = Fact(
     predicate=Predicate(
-        content="${feist_publications} freely copied the facts contained in {rural_s_telephone_directory}, in preparing {feist_s_telephone_directory}"
+        content="{feist_publications} freely copied the facts contained in {rural_s_telephone_directory}, in preparing {feist_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["feist_publications"],
@@ -193,7 +193,7 @@ _FACT_FEIST_COPIED_FACTS = Fact(
 )
 _FACT_FALSE_LISTINGS_ORIGINAL = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_listings} were an original work", truth=False
+        content="{rural_s_telephone_listings} were an original work", truth=False
     ),
     terms=[ENTITIES["rural_s_telephone_listings"]],
     name="false Rural's telephone listings were an original work",
@@ -201,7 +201,7 @@ _FACT_FALSE_LISTINGS_ORIGINAL = Fact(
 )
 _FACT_LISTINGS_ARE_NAMES_TOWNS_NUMBERS = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_listings} were names, towns, and telephone numbers of telephone subscribers"
+        content="{rural_s_telephone_listings} were names, towns, and telephone numbers of telephone subscribers"
     ),
     terms=[ENTITIES["rural_s_telephone_listings"]],
     name="Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
@@ -209,7 +209,7 @@ _FACT_LISTINGS_ARE_NAMES_TOWNS_NUMBERS = Fact(
 )
 _FACT_FALSE_ARRANGEMENT_ORIGINAL = Fact(
     predicate=Predicate(
-        content="${rural_s_arragement_of_its_telephone_listings} was an original work",
+        content="{rural_s_arragement_of_its_telephone_listings} was an original work",
         truth=False,
     ),
     terms=[ENTITIES["rural_s_arragement_of_its_telephone_listings"]],
@@ -218,7 +218,7 @@ _FACT_FALSE_ARRANGEMENT_ORIGINAL = Fact(
 )
 _FACT_DIRECTORY_IS_TELEPHONE_DIRECTORY = Fact(
     predicate=Predicate(
-        content="${rural_s_telephone_directory} was a telephone directory"
+        content="{rural_s_telephone_directory} was a telephone directory"
     ),
     terms=[ENTITIES["rural_s_telephone_directory"]],
     name="Rural's telephone directory was a telephone directory",
@@ -226,7 +226,7 @@ _FACT_DIRECTORY_IS_TELEPHONE_DIRECTORY = Fact(
 )
 _FACT_ARRANGEMENT_IS_ALPHABETICAL_METHOD = Fact(
     predicate=Predicate(
-        content="${rural_s_arragement_of_its_telephone_listings} was the method of listing subscribers alphabetically by surname in {rural_s_telephone_directory}"
+        content="{rural_s_arragement_of_its_telephone_listings} was the method of listing subscribers alphabetically by surname in {rural_s_telephone_directory}"
     ),
     terms=[
         ENTITIES["rural_s_arragement_of_its_telephone_listings"],

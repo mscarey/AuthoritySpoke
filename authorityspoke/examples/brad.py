@@ -75,32 +75,32 @@ def _build_holdings() -> HoldingGroup:
     no_evidence_of_guilt = AbsenceOfFactor(absent=evidence_of_guilt)
 
     f1 = fact(
-        "${officers_search_of_the_yard} was a warrantless search and seizure",
+        "{officers_search_of_the_yard} was a warrantless search and seizure",
         [e["officers_search_of_the_yard"]],
         "officers' search of the yard was a warrantless search and seizure",
     )
     f2 = fact(
-        "${bradley_s_house} was a house",
+        "{bradley_s_house} was a house",
         [e["bradley_s_house"]],
         "Bradley's house was a house",
     )
     f3 = fact(
-        "${bradley} lived at {bradley_s_house}",
+        "{bradley} lived at {bradley_s_house}",
         [e["bradley"], e["bradley_s_house"]],
         "Bradley lived at Bradley's house",
     )
     f4 = fact(
-        "${officers_search_of_the_yard} was performed by law enforcement officers",
+        "{officers_search_of_the_yard} was performed by law enforcement officers",
         [e["officers_search_of_the_yard"]],
         "officers' search of the yard was performed by law enforcement officers",
     )
     f5 = fact(
-        "${officers_search_of_the_yard} was performed in the grounds around {bradley_s_house}",
+        "{officers_search_of_the_yard} was performed in the grounds around {bradley_s_house}",
         [e["officers_search_of_the_yard"], e["bradley_s_house"]],
         "officers' search of the yard was performed in the grounds around Bradley's house",
     )
     f6 = fact(
-        "${bradley} exhibited an expectation of privacy in {bradley_s_marijuana_patch}",
+        "{bradley} exhibited an expectation of privacy in {bradley_s_marijuana_patch}",
         [e["bradley"], e["bradley_s_marijuana_patch"]],
         "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
     )
@@ -110,7 +110,7 @@ def _build_holdings() -> HoldingGroup:
         "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
     )
     f8 = fact(
-        "${officers_search_of_the_yard} violated {bradley}'s expectation of privacy in {bradley_s_marijuana_patch}",
+        "{officers_search_of_the_yard} violated {bradley}'s expectation of privacy in {bradley_s_marijuana_patch}",
         [
             e["officers_search_of_the_yard"],
             e["bradley"],
@@ -119,23 +119,23 @@ def _build_holdings() -> HoldingGroup:
         "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
     )
     f9 = fact(
-        "${officers_search_of_the_yard} was an unreasonable governmental intrusion upon {bradley_s_marijuana_patch}",
+        "{officers_search_of_the_yard} was an unreasonable governmental intrusion upon {bradley_s_marijuana_patch}",
         [e["officers_search_of_the_yard"], e["bradley_s_marijuana_patch"]],
         "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
     )
     f10 = fact(
-        "${proof_of_bradley_s_guilt} was derived from {officers_search_of_the_yard}",
+        "{proof_of_bradley_s_guilt} was derived from {officers_search_of_the_yard}",
         [proof_exhibit, e["officers_search_of_the_yard"]],
         "proof of Bradley's guilt was derived from officers' search of the yard",
     )
     f12 = fact(
-        "${bradley} exhibited an expectation of privacy in {bradley_s_marijuana_patch}",
+        "{bradley} exhibited an expectation of privacy in {bradley_s_marijuana_patch}",
         [e["bradley"], e["bradley_s_marijuana_patch"]],
         "false Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
         truth=False,
     )
     f14 = fact(
-        "${officers_search_of_the_yard} was an unreasonable intrusion upon {bradley_s_marijuana_patch}",
+        "{officers_search_of_the_yard} was an unreasonable intrusion upon {bradley_s_marijuana_patch}",
         [e["officers_search_of_the_yard"], e["bradley_s_marijuana_patch"]],
         "officers' search of the yard was an unreasonable intrusion upon Bradley's marijuana patch",
     )
@@ -146,7 +146,7 @@ def _build_holdings() -> HoldingGroup:
         truth=False,
     )
     f16 = fact(
-        "${officers_search_of_the_yard} violated {bradley}'s expectation of privacy in {bradley_s_marijuana_patch}",
+        "{officers_search_of_the_yard} violated {bradley}'s expectation of privacy in {bradley_s_marijuana_patch}",
         [
             e["officers_search_of_the_yard"],
             e["bradley"],
@@ -156,7 +156,7 @@ def _build_holdings() -> HoldingGroup:
         truth=False,
     )
     f17 = fact(
-        "${officers_search_of_the_yard} was an unreasonable governmental intrusion upon {bradley_s_marijuana_patch}",
+        "{officers_search_of_the_yard} was an unreasonable governmental intrusion upon {bradley_s_marijuana_patch}",
         [e["officers_search_of_the_yard"], e["bradley_s_marijuana_patch"]],
         "false officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
         truth=False,
@@ -169,19 +169,19 @@ def _build_holdings() -> HoldingGroup:
         expression=3,
     )
     f19 = fact(
-        "${bradley_s_marijuana_patch} was in a yard accessible from a house that did not belong to {bradley}",
+        "{bradley_s_marijuana_patch} was in a yard accessible from a house that did not belong to {bradley}",
         [e["bradley_s_marijuana_patch"], e["bradley"]],
         "Bradley's marijuana patch was in a yard accessible from a house that did not belong to Bradley",
     )
     f20 = fact(
-        "${bradley_s_marijuana_patch} was entirely hidden by foliage",
+        "{bradley_s_marijuana_patch} was entirely hidden by foliage",
         [e["bradley_s_marijuana_patch"]],
         "false Bradley's marijuana patch was entirely hidden by foliage",
         truth=False,
     )
     f21_absent = AbsenceOfFactor(
         absent=fact(
-            "${bradley_s_marijuana_patch} was covered by nontransparent material",
+            "{bradley_s_marijuana_patch} was covered by nontransparent material",
             [e["bradley_s_marijuana_patch"]],
             "Bradley's marijuana patch was covered by nontransparent material",
         )
@@ -206,12 +206,12 @@ def _build_holdings() -> HoldingGroup:
         "a house that did not belong to Bradley had access to the rear yard where Bradley's marijuana patch was located",
     )
     f25 = fact(
-        "${bradley_s_marijuana_patch} was partially hidden by foliage",
+        "{bradley_s_marijuana_patch} was partially hidden by foliage",
         [e["bradley_s_marijuana_patch"]],
         "Bradley's marijuana patch was partially hidden by foliage",
     )
     f26 = fact(
-        "${bradley_s_marijuana_patch} was in the fenced rear yard of {bradley_s_house}",
+        "{bradley_s_marijuana_patch} was in the fenced rear yard of {bradley_s_house}",
         [e["bradley_s_marijuana_patch"], e["bradley_s_house"]],
         "Bradley's marijuana patch was in the fenced rear yard of Bradley's house",
     )

@@ -612,7 +612,7 @@ class TestContradiction:
         absent_fact = AbsenceOfFactor(
             absent=Fact(
                 predicate=Predicate(
-                    content="${rural_s_telephone_directory} was copyrightable",
+                    content="{rural_s_telephone_directory} was copyrightable",
                     truth=True,
                 ),
                 terms=(Entity(name="Rural's telephone directory")),
@@ -620,7 +620,7 @@ class TestContradiction:
         )
         false_fact = Fact(
             predicate=Predicate(
-                content="${the_java_api} was copyrightable", truth=False
+                content="{the_java_api} was copyrightable", truth=False
             ),
             terms=(Entity(name="the Java API", generic=True, plural=False)),
         )
@@ -632,12 +632,12 @@ class TestContradiction:
         Alice and Bob are both generics. So it's possible to reach a
         contradiction if you assume they correspond to one another.
         """
-        p_small_weight = Comparison(
+        p_small_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
-        p_large_weight = Comparison(
+        p_large_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
@@ -654,20 +654,20 @@ class TestContradiction:
         Alice in the first context corresponds with Alice in the second.
         So there's no contradiction.
         """
-        p_small_weight = Comparison(
+        p_small_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
-        p_large_weight = Comparison(
+        p_large_weight = Comparison.new(
             content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Fact(predicate=p_large_weight, terms=alice)
-        bob_poor = Fact(predicate=p_small_weight, terms=bob)
+        alice_rich = Fact(predicate=p_large_weight, terms=[alice])
+        bob_poor = Fact(predicate=p_small_weight, terms=[bob])
         register = ContextRegister()
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)

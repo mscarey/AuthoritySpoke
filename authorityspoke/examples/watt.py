@@ -61,13 +61,13 @@ TERMS_BY_KEY: dict[str, Entity | Exhibit] = {
 FACT_SPECS: list[FactSpec] = [
     {
         "name": "Hideaway Lodge was a motel",
-        "predicate": {"content": "${hideaway_lodge} was a motel", "truth": True},
+        "predicate": {"content": "{hideaway_lodge} was a motel", "truth": True},
         "terms": ["hideaway_lodge"],
     },
     {
         "name": "Wattenburg lived at Hideaway Lodge",
         "predicate": {
-            "content": "${wattenburg} lived at {hideaway_lodge}",
+            "content": "{wattenburg} lived at {hideaway_lodge}",
             "truth": True,
         },
         "terms": ["wattenburg", "hideaway_lodge"],
@@ -75,7 +75,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "Wattenburg operated Hideaway Lodge as a business",
         "predicate": {
-            "content": "${wattenburg} operated {hideaway_lodge} as a business",
+            "content": "{wattenburg} operated {hideaway_lodge} as a business",
             "truth": True,
         },
         "terms": ["wattenburg", "hideaway_lodge"],
@@ -83,7 +83,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "Hideaway Lodge was Wattenburg’s abode",
         "predicate": {
-            "content": "${hideaway_lodge} was {wattenburg}’s abode",
+            "content": "{hideaway_lodge} was {wattenburg}’s abode",
             "truth": True,
         },
         "terms": ["hideaway_lodge", "wattenburg"],
@@ -91,7 +91,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the stockpile of trees was on the premises of Hideaway Lodge",
         "predicate": {
-            "content": "${the_stockpile_of_trees} was on the premises of {hideaway_lodge}",
+            "content": "{the_stockpile_of_trees} was on the premises of {hideaway_lodge}",
             "truth": True,
         },
         "terms": ["the_stockpile_of_trees", "hideaway_lodge"],
@@ -99,7 +99,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the stockpile of trees was a stockpile of Christmas trees",
         "predicate": {
-            "content": "${the_stockpile_of_trees} was a stockpile of Christmas trees",
+            "content": "{the_stockpile_of_trees} was a stockpile of Christmas trees",
             "truth": True,
         },
         "terms": ["the_stockpile_of_trees"],
@@ -107,7 +107,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the stockpile of trees was among some standing trees",
         "predicate": {
-            "content": "${the_stockpile_of_trees} was among some standing trees",
+            "content": "{the_stockpile_of_trees} was among some standing trees",
             "truth": True,
         },
         "terms": ["the_stockpile_of_trees"],
@@ -115,7 +115,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "long distance",
         "predicate": {
-            "content": "the distance between $place1 and $place2 was",
+            "content": "the distance between {place1} and {place2} was",
             "truth": True,
             "quantity_range": {
                 "sign": "<=",
@@ -143,7 +143,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the distance between the stockpile of trees and Hideaway Lodge was >= 20 feet",
         "predicate": {
-            "content": "the distance between $place1 and $place2 was",
+            "content": "the distance between {place1} and {place2} was",
             "truth": True,
             "quantity_range": {
                 "sign": ">=",
@@ -157,7 +157,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the stockpile of trees was within the curtilage of Hideaway Lodge",
         "predicate": {
-            "content": "${the_stockpile_of_trees} was within the curtilage of {hideaway_lodge}",
+            "content": "{the_stockpile_of_trees} was within the curtilage of {hideaway_lodge}",
             "truth": True,
         },
         "terms": ["the_stockpile_of_trees", "hideaway_lodge"],
@@ -165,7 +165,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "officers' search of the stockpile was a warrantless search and seizure",
         "predicate": {
-            "content": "${officers_search_of_the_stockpile} was a warrantless search and seizure",
+            "content": "{officers_search_of_the_stockpile} was a warrantless search and seizure",
             "truth": True,
         },
         "terms": ["officers_search_of_the_stockpile"],
@@ -173,7 +173,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "officers' search of the stockpile was performed by law enforcement officers",
         "predicate": {
-            "content": "${officers_search_of_the_stockpile} was performed by law enforcement officers",
+            "content": "{officers_search_of_the_stockpile} was performed by law enforcement officers",
             "truth": True,
         },
         "terms": ["officers_search_of_the_stockpile"],
@@ -181,7 +181,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "officers' search of the stockpile was performed by federal officers",
         "predicate": {
-            "content": "${officers_search_of_the_stockpile} was performed by federal officers",
+            "content": "{officers_search_of_the_stockpile} was performed by federal officers",
             "truth": True,
         },
         "terms": ["officers_search_of_the_stockpile"],
@@ -211,7 +211,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees",
         "predicate": {
-            "content": "${officers_search_of_the_stockpile} constituted an intrusion upon {the_stockpile_of_trees}",
+            "content": "{officers_search_of_the_stockpile} constituted an intrusion upon {the_stockpile_of_trees}",
             "truth": True,
         },
         "terms": ["officers_search_of_the_stockpile", "the_stockpile_of_trees"],
@@ -219,7 +219,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "Hideaway Lodge was Wattenburg's abode",
         "predicate": {
-            "content": "${hideaway_lodge} was {wattenburg}'s abode",
+            "content": "{hideaway_lodge} was {wattenburg}'s abode",
             "truth": True,
         },
         "terms": ["hideaway_lodge", "wattenburg"],
@@ -227,7 +227,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "Wattenburg sought to preserve the stockpile of trees as private",
         "predicate": {
-            "content": "${wattenburg} sought to preserve {the_stockpile_of_trees} as private",
+            "content": "{wattenburg} sought to preserve {the_stockpile_of_trees} as private",
             "truth": True,
         },
         "terms": ["wattenburg", "the_stockpile_of_trees"],
@@ -235,7 +235,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the stockpile of trees was in an area accessible to the public",
         "predicate": {
-            "content": "${the_stockpile_of_trees} was in an area accessible to the public",
+            "content": "{the_stockpile_of_trees} was in an area accessible to the public",
             "truth": True,
         },
         "terms": ["the_stockpile_of_trees"],
@@ -243,7 +243,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "the distance between the the stockpile of trees and Hideaway Lodge was >= 20 feet",
         "predicate": {
-            "content": "the distance between the $place1 and $place2 was",
+            "content": "the distance between the {place1} and {place2} was",
             "truth": True,
             "quantity_range": {
                 "sign": ">=",
@@ -257,7 +257,7 @@ FACT_SPECS: list[FactSpec] = [
     {
         "name": "proof of Wattenburg's guilt was derived from officers' search of the stockpile",
         "predicate": {
-            "content": "${proof_of_wattenburg_s_guilt} was derived from {officers_search_of_the_stockpile}",
+            "content": "{proof_of_wattenburg_s_guilt} was derived from {officers_search_of_the_stockpile}",
             "truth": True,
         },
         "terms": ["proof_of_wattenburg_s_guilt", "officers_search_of_the_stockpile"],
@@ -287,7 +287,7 @@ FACTS: list[Fact] = _build_facts()
 FACTS_BY_NAME = {fact.name: fact for fact in FACTS}
 
 WATTENBURG_COMMITTED_A_CRIME = Fact(
-    predicate=Predicate(content="${wattenburg} committed a crime", truth=True),
+    predicate=Predicate(content="{wattenburg} committed a crime", truth=True),
     terms=[ENTITIES["wattenburg"]],
     name="Wattenburg committed a crime",
     generic=False,

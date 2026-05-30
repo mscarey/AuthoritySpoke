@@ -335,7 +335,7 @@ using the ``.model_dump()`` or ``.model_dump_json()`` methods.
     [{'absent': False,
       'generic': False,
       'name': 'false the Java API was copyrightable',
-      'predicate': {'content': '${the_java_api} was copyrightable', 'truth': False},
+      'predicate': {'content': '{the_java_api} was copyrightable', 'truth': False},
       'standard_of_proof': None,
       'terms': [{'absent': False,
                  'generic': True,

@@ -284,7 +284,7 @@ class TestImplication:
             inputs=FactorGroup(
                 [
                     Fact(
-                        predicate="${work} was copyrightable",
+                        predicate="{work} was copyrightable",
                         terms=Entity(name="the birthday song"),
                     ),
                     Fact(

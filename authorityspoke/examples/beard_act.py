@@ -42,7 +42,7 @@ def rules() -> list[Rule]:
     customer = Entity(name="the customer")
 
     fact_facial_hair = Fact(
-        predicate=Predicate(content="${the_suspected_beard} was facial hair"),
+        predicate=Predicate(content="{the_suspected_beard} was facial hair"),
         terms=[suspected_beard],
     )
     fact_length = Fact(
@@ -66,12 +66,12 @@ def rules() -> list[Rule]:
         )
     )
     fact_is_beard = Fact(
-        predicate=Predicate(content="${the_suspected_beard} was a beard"),
+        predicate=Predicate(content="{the_suspected_beard} was a beard"),
         terms=[suspected_beard],
         name="the fact that the facial hair was a beard",
     )
     fact_wore_beard = Fact(
-        predicate=Predicate(content="${the_defendant} wore the suspected beard"),
+        predicate=Predicate(content="{the_defendant} wore the suspected beard"),
         terms=[defendant],
         name="the defendant's act of wearing the suspected beard",
     )
@@ -88,7 +88,7 @@ def rules() -> list[Rule]:
     offense_wearing_without_exemption = Fact(
         predicate=Predicate(
             content=(
-                "${the_defendant} committed the offense of wearing of a beard "
+                "{the_defendant} committed the offense of wearing of a beard "
                 "without exemption"
             )
         ),
@@ -126,8 +126,8 @@ def rules() -> list[Rule]:
     beardcoin_transfer = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was a transfer of beardcoin between "
-                "${the_defendant} and {the_counterparty}"
+                "{the_beardcoin_transaction} was a transfer of beardcoin between "
+                "{the_defendant} and {the_counterparty}"
             )
         ),
         terms=[transaction, defendant, counterparty],
@@ -136,7 +136,7 @@ def rules() -> list[Rule]:
     purchase_transfer = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was {the_defendant}'s purchase of any "
+                "{the_beardcoin_transaction} was {the_defendant}'s purchase of any "
                 "beardcoin from {the_counterparty}"
             )
         ),
@@ -145,7 +145,7 @@ def rules() -> list[Rule]:
     counterparty_purchase = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was the counterparty's purchase of any "
+                "{the_beardcoin_transaction} was the counterparty's purchase of any "
                 "beardcoin from the defendant"
             )
         ),
@@ -154,7 +154,7 @@ def rules() -> list[Rule]:
     defendant_loan = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was the defendant's loan of any beardcoin "
+                "{the_beardcoin_transaction} was the defendant's loan of any beardcoin "
                 "to the counterparty"
             )
         ),
@@ -163,7 +163,7 @@ def rules() -> list[Rule]:
     defendant_lease = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was the defendant's lease of any beardcoin "
+                "{the_beardcoin_transaction} was the defendant's lease of any beardcoin "
                 "to the counterparty"
             )
         ),
@@ -172,7 +172,7 @@ def rules() -> list[Rule]:
     defendant_gift = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was the defendant's gift of any beardcoin "
+                "{the_beardcoin_transaction} was the defendant's gift of any beardcoin "
                 "to the counterparty"
             )
         ),
@@ -181,7 +181,7 @@ def rules() -> list[Rule]:
     defendant_receipt = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was the defendant's receipt of any "
+                "{the_beardcoin_transaction} was the defendant's receipt of any "
                 "beardcoin from the counterparty"
             )
         ),
@@ -189,14 +189,14 @@ def rules() -> list[Rule]:
     )
     licensed_repurchase = Fact(
         predicate=Predicate(
-            content="${the_beardcoin_transaction} was a licensed beardcoin repurchase"
+            content="{the_beardcoin_transaction} was a licensed beardcoin repurchase"
         ),
         terms=[transaction],
     )
     absent_licensed_repurchase = AbsenceOfFactor(absent=licensed_repurchase)
     counterparty_not_department = Fact(
         predicate=Predicate(
-            content="${the_counterparty} was the Department of Beards", truth=False
+            content="{the_counterparty} was the Department of Beards", truth=False
         ),
         terms=[counterparty],
     )
@@ -206,7 +206,7 @@ def rules() -> list[Rule]:
     improper_transfer_offense = Fact(
         predicate=Predicate(
             content=(
-                "${the_defendant} committed the offense of improper transfer of "
+                "{the_defendant} committed the offense of improper transfer of "
                 "beardcoin"
             )
         ),
@@ -228,7 +228,7 @@ def rules() -> list[Rule]:
     barber_purchase = Fact(
         predicate=Predicate(
             content=(
-                "${the_beardcoin_transaction} was {the_barber}'s purchase of any "
+                "{the_beardcoin_transaction} was {the_barber}'s purchase of any "
                 "beardcoin from {the_customer}"
             )
         ),

@@ -142,7 +142,7 @@ class Fact(Factor, BaseModel):
     @property
     def term_sequence(self) -> TermSequence:
         """Return a TermSequence of the terms in this Statement."""
-        return TermSequence(items=self.terms)
+        return TermSequence(root=self.terms)
 
     @property
     def terms_without_nulls(self) -> Sequence[Term]:
@@ -317,7 +317,10 @@ class Fact(Factor, BaseModel):
         """
         result = deepcopy(self)
         new_terms = TermSequence(
-            [factor.new_context(changes=changes) for factor in self.terms_without_nulls]
+            root=[
+                factor.new_context(changes=changes)
+                for factor in self.terms_without_nulls
+            ]
         )
         result.terms = list(new_terms)
         return result
@@ -355,7 +358,7 @@ class Fact(Factor, BaseModel):
         """Generate permutations of context factors that preserve same meaning."""
         for pattern in self.predicate.term_index_permutations():
             sorted_terms = [x for _, x in sorted(zip(pattern, self.terms))]
-            yield TermSequence(sorted_terms)
+            yield TermSequence(root=sorted_terms)
 
 
 def build_fact(

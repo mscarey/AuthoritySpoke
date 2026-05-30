@@ -53,19 +53,19 @@ def collapse_known_factors(obj: Dict):
 def replace_brackets_with_placeholder(content: str, name: str):
     """Replace brackets with placeholder to show it is referenced in terms."""
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
-    placeholder_slug = "${" + slug + "}"
+    placeholder_slug = "{" + slug + "}"
     if placeholder_slug not in content:
-        content = content.replace("{}", "${" + slug + "}", 1)
+        content = content.replace("{}", "{" + slug + "}", 1)
     return content
 
 
 def collapse_name_in_content(content: str, name: str):
     """Replace name with placeholder to show it is referenced in terms."""
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
-    placeholder_slug = "${" + slug + "}"
+    placeholder_slug = "{" + slug + "}"
     if placeholder_slug not in content:
         content = content.replace(name, placeholder_slug)
-        content = content.replace("{${", "${", 1).replace("}}", "}", 1)
+        content = content.replace("{{", "{", 1).replace("}}", "}", 1)
     return content
 
 
@@ -83,7 +83,7 @@ def add_found_context_with_brackets(
     bracketed_name = "{" + factor["name"] + "}"
     if bracketed_name in content:
         index_in_content = content.index(bracketed_name)
-        index_in_factor_list = content[:index_in_content].count("${")
+        index_in_factor_list = content[:index_in_content].count("{")
         terms.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"])
     return content, terms
