@@ -142,6 +142,7 @@ class TestProcedureImplication:
         c1_order = make_procedure["c1_entity_order"]
         assert f["f2"] in c1_easy.inputs
         assert f["f1"] not in c1_easy.inputs
+        assert c1_order.inputs_group.implies(f["f2"])
 
     def test_factor_implication_with_exact_quantity(self, watt_factor, make_procedure):
         """This test is mostly to demonstrate the relationships
@@ -253,10 +254,7 @@ class TestProcedureImplication:
         p = make_procedure
         assert p["c2_irrelevant_outputs"].implies_all_to_all(p["c2"])
 
-    def test_fewer_inputs_implies_all_to_all(
-        self, make_procedure, make_problem_procedure
-    ):
-        c = make_procedure
+    def test_fewer_inputs_implies_all_to_all(self, make_problem_procedure):
         assert make_problem_procedure["c3_fewer_inputs"].implies_all_to_all(
             make_problem_procedure["c3"]
         )

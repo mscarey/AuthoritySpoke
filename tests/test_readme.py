@@ -1,14 +1,14 @@
 """Tests for any commands in readme.md."""
 
-from authorityspoke.decisions import DecisionReading
 from dotenv import load_dotenv
 
-load_dotenv()
-
+from authorityspoke.decisions import DecisionReading
 from authorityspoke.examples import lotus as lotus_example
 from authorityspoke.examples import oracle as oracle_example
 from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
 from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
+
+load_dotenv()
 
 
 class TestReadme:

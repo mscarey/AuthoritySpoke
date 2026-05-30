@@ -19,7 +19,7 @@ import pytest
 from authorityspoke.examples import oracle
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.facts import Fact
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
 
 

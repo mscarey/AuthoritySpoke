@@ -34,7 +34,7 @@ from authorityspoke.facts import (
 )
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
-from authorityspoke.opinions import OpinionReading, AnchoredHoldings
+from authorityspoke.opinions import OpinionReading
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders
@@ -1074,7 +1074,7 @@ def e_in_no_case(make_response):
 @pytest.fixture(scope="module")
 def e_method_of_operation(make_response):
     enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
-    passage = nactment.select(TextQuoteSelector(exact="method of operation"))
+    passage = enactment.select(TextQuoteSelector(exact="method of operation"))
     return passage
 
 

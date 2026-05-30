@@ -96,7 +96,9 @@ class TestDecision:
         decision_reading.posit(lotus_analysis)
         assert len(decision_reading.holdings) == len(lotus_analysis.holdings)
 
-    def test_error_decision_with_no_majority_posits_holding(self, make_anchored_holding):
+    def test_error_decision_with_no_majority_posits_holding(
+        self, make_anchored_holding
+    ):
         lotus_analysis = make_anchored_holding["lotus"]
         reading1 = OpinionReading(opinion_type="plurality")
         reading2 = OpinionReading(opinion_type="concurring")

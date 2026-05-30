@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 import pytest
 
 from justopinion import CAPClient
-from justopinion.decisions import Decision
 from justopinion.download import CaseAccessProjectAPIError
 
 from authorityspoke import DecisionReading
