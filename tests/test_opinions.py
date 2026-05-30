@@ -245,10 +245,10 @@ class TestOpinionHoldings:
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         elephants = Fact(
-            predicate="$animal was an elephant", terms=Entity(name="the elephant")
+            predicate="{animal} was an elephant", terms=Entity(name="the elephant")
         )
         mouseholes = Fact(
-            predicate=Predicate(content="$animal hides in mouseholes", truth=False),
+            predicate=Predicate(content="{animal} hides in mouseholes", truth=False),
             terms=Entity(name="the elephant"),
         )
         procedure = Procedure(inputs=elephants, outputs=mouseholes)
@@ -286,7 +286,7 @@ class TestOpinionFactors:
         anchors = TextPositionSet(quotes=quote_selector)
         fact = Fact(
             predicate=Predicate(
-                content="$product possessed at least some minimal degree of creativity"
+                content="{product} possessed at least some minimal degree of creativity"
             ),
             terms=[api],
         )

@@ -59,7 +59,7 @@ class TestSameMeaning:
 
     def test_entity_does_not_mean_statement(self):
         entity = Entity(name="Bob")
-        statement = Fact(predicate="$person loves ice cream", terms=entity)
+        statement = Fact(predicate="{person} loves ice cream", terms=entity)
         assert not entity.means(statement)
         assert not statement.means(entity)
 
@@ -108,7 +108,7 @@ class TestImplication:
 
     def test_entity_does_not_imply_statement(self):
         entity = Entity(name="Bob")
-        statement = Fact(predicate="$person loves ice cream", terms=entity)
+        statement = Fact(predicate="{person} loves ice cream", terms=entity)
         assert not entity.implies(statement)
         assert not statement.implies(entity)
         assert not entity >= statement

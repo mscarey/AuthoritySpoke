@@ -288,13 +288,13 @@ class TestImplication:
                         terms=Entity(name="the birthday song"),
                     ),
                     Fact(
-                        predicate="$person copied constituent elements of $work that were original",
+                        predicate="{person} copied constituent elements of {work} that were original",
                         terms=[Entity(name="Eve"), Entity(name="the birthday song")],
                     ),
                 ]
             ),
             outputs=Fact(
-                predicate="$person infringed the copyright in $work",
+                predicate="{person} infringed the copyright in {work}",
                 terms=[Entity(name="Eve"), Entity(name="the birthday song")],
             ),
             enactments=e_copyright_protection,
@@ -318,7 +318,7 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(
-            predicate=Predicate(content="$person was a person"),
+            predicate=Predicate(content="{person} was a person"),
             terms=Entity(name="Alice"),
         ).implies(make_holding["h1"])
 

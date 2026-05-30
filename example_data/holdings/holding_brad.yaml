@@ -250,7 +250,7 @@
     content: the distance from which part of Bradley's marijuana patch could be seen
       plainly was >= 1 foot
   - type: fact
-    content: the distance between $place1 and $place2 was >= 20 feet
+    content: the distance between {place1} and {place2} was >= 20 feet
     terms:
     - type: entity
       name: Bradley's marijuana patch

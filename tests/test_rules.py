@@ -347,9 +347,9 @@ class TestImplication:
         )
 
     def test_implication_interchangeable_terms(self):
-        ate_together = Predicate(content="$person1 ate at $place with $person2")
-        shot = Predicate(content="$attacker shot $victim")
-        murder = Predicate(content="$attacker murdered $victim")
+        ate_together = Predicate(content="{person1} ate at {place} with {person2}")
+        shot = Predicate(content="{attacker} shot {victim}")
+        murder = Predicate(content="{attacker} murdered {victim}")
 
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
@@ -385,7 +385,7 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_rule):
         assert not Statement(
-            predicate=Predicate(content="$person was a person"),
+            predicate=Predicate(content="{person} was a person"),
             terms=Entity(name="Alice"),
         ).implies(make_rule["h1"])
 
@@ -683,11 +683,11 @@ class TestAddition:
         fact_not_original = Rule(
             procedure=Procedure(
                 inputs=Fact(
-                    predicate=Predicate(content="$work was a fact"), terms=context
+                    predicate=Predicate(content="{work} was a fact"), terms=context
                 ),
                 outputs=Fact(
                     predicate=Predicate(
-                        content="$work was an original work", truth=False
+                        content="{work} was an original work", truth=False
                     ),
                     terms=context,
                 ),
@@ -698,7 +698,7 @@ class TestAddition:
             procedure=Procedure(
                 inputs=Fact(
                     predicate=Predicate(
-                        content="$work was an original work", truth=False
+                        content="{work} was an original work", truth=False
                     ),
                     terms=three,
                 ),
@@ -1113,7 +1113,7 @@ class TestStatuteRules:
 
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
-        was_facial_hair = Predicate(content="$thing was facial hair")
+        was_facial_hair = Predicate(content="{thing} was facial hair")
         fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=beard)
         hypothetical = Rule(
             procedure=Procedure(
@@ -1121,7 +1121,7 @@ class TestStatuteRules:
                     fact_was_facial_hair,
                     Fact(
                         predicate=Comparison(
-                            content="the length of $thing was",
+                            content="the length of {thing} was",
                             sign=">=",
                             expression=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
@@ -1130,14 +1130,14 @@ class TestStatuteRules:
                     ),
                     Fact(
                         predicate=Predicate(
-                            content="$thing occurred on or below the chin",
+                            content="{thing} occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
                         terms=beard,
                     ),
                     Fact(
                         predicate=Predicate(
-                            content="$thing existed in an uninterrupted line from the front "
+                            content="{thing} existed in an uninterrupted line from the front "
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
@@ -1145,7 +1145,7 @@ class TestStatuteRules:
                     ),
                 ],
                 outputs=Fact(
-                    predicate=Predicate(content="$thing was a beard"), terms=beard
+                    predicate=Predicate(content="{thing} was a beard"), terms=beard
                 ),
             ),
             enactments=sec_4,

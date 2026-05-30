@@ -39,21 +39,21 @@ class TestHoldingDump:
         holding = make_holding["h2"]
         dumped = holding.model_dump()
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
-        assert content == "$thing was on the premises of $place"
+        assert content == "{thing} was on the premises of {place}"
 
         loaded = readers.read_holdings([dumped], client=fake_usc_client)
         loaded_content = loaded[0].despite[0].predicate.content
-        assert "the distance between $place1 and $place2 was" in loaded_content
+        assert "the distance between {place1} and {place2} was" in loaded_content
 
     def test_dump_and_load_holding(self, fake_usc_client, make_holding):
         """Dump holding and load it as if it was a JSON API response."""
         holding = make_holding["h2"]
         dumped = holding.model_dump()
         content = dumped["rule"]["procedure"]["inputs"][1]["predicate"]["content"]
-        assert content == "$thing was a stockpile of Christmas trees"
+        assert content == "{thing} was a stockpile of Christmas trees"
         loaded = Holding(**dumped)
         loaded_content = loaded.inputs[0].predicate.content
-        assert "$thing was on the premises of $place" in loaded_content
+        assert "{thing} was on the premises of {place}" in loaded_content
 
     def test_dump_holdings_with_comparison(self, fake_usc_client):
         holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
@@ -663,10 +663,10 @@ class TestExclusiveFlag:
 
         directory = Entity(name="Rural's telephone directory")
         original = Fact(
-            predicate=Predicate(content="$work was an original work"), terms=directory
+            predicate=Predicate(content="{work} was an original work"), terms=directory
         )
         copyrightable = Fact(
-            predicate=Predicate(content="$work was copyrightable"), terms=directory
+            predicate=Predicate(content="{work} was copyrightable"), terms=directory
         )
         originality_enactments = [
             e_securing_exclusive_right_to_writings,

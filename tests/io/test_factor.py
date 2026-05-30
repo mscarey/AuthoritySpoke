@@ -71,7 +71,7 @@ class TestFactLoad:
 
     def test_make_fact_from_string(self, watt_factor):
         fact_float_data = {
-            "content": "the distance between $person0 and $person1 was >= 20.1",
+            "content": "the distance between {person0} and {person1} was >= 20.1",
             "terms": [
                 {"type": "Entity", "name": "Ann"},
                 {"type": "Entity", "name": "Lee"},
@@ -90,7 +90,7 @@ class TestFactorLoad:
     def test_load_factor_marked_reciprocal(self):
         fact = Fact(
             predicate=Comparison(
-                content="the distance between $place1 and $place2 was",
+                content="the distance between {place1} and {place2} was",
                 sign="<",
                 expression="5 miles",
             ),
@@ -145,7 +145,7 @@ class TestFactDump:
 class TestExhibitLoad:
     def test_load_exhibit_with_bracketed_names(self):
         fact_data = {
-            "content": "the distance that $officer pursued $suspect was >= 5 miles",
+            "content": "the distance that {officer} pursued {suspect} was >= 5 miles",
             "terms": [
                 {"type": "Entity", "name": "Officer Lin"},
                 {"type": "Entity", "name": "Al"},

@@ -15,13 +15,13 @@ class TestPredicateLoad:
     """
 
     def test_load_just_content(self):
-        data = {"content": "$person was on the premises of $place"}
+        data = {"content": "{person} was on the premises of {place}"}
         p4 = Predicate(**data)
         assert p4.truth is True
 
     def test_load_comparison_not_ending_with_was(self):
         data = {
-            "content": "the distance between $place1 and $place2 was 35 feet",
+            "content": "the distance between {place1} and {place2} was 35 feet",
             "truth": True,
             "sign": "!=",
             "expression": "35 feet",
@@ -31,7 +31,7 @@ class TestPredicateLoad:
 
     def test_load_comparison(self):
         data = {
-            "content": "the distance between $place1 and $place2 was",
+            "content": "the distance between {place1} and {place2} was",
             "truth": True,
             "sign": "!=",
             "expression": "35 feet",
@@ -41,7 +41,7 @@ class TestPredicateLoad:
 
     def test_load_and_normalize_quantity(self):
         data = {
-            "content": "the distance between $place1 and $place2 was",
+            "content": "the distance between {place1} and {place2} was",
             "sign": "!=",
             "expression": "35 feet",
             "truth": True,
@@ -51,7 +51,7 @@ class TestPredicateLoad:
 
     def test_load_and_normalize_comparison(self):
         data = {
-            "content": "the distance between $place1 and $place2 was",
+            "content": "the distance between {place1} and {place2} was",
             "truth": True,
             "sign": "!=",
             "expression": "35 feet",
@@ -61,15 +61,15 @@ class TestPredicateLoad:
 
     def test_make_comparison_when_absent(self):
         statement = Comparison(
-            **{"content": "$person's favorite number was", "expression": 42}
+            **{"content": "{person}'s favorite number was", "expression": 42}
         )
         assert statement.sign == "=="
-        assert "$person's favorite number was exactly equal to 42" in str(statement)
+        assert "{person}'s favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
 
     def test_load_predicate_with_date_expression(self):
         data = {
-            "content": "the date when $work was created was",
+            "content": "the date when {work} was created was",
             "expression": "1978-01-01",
             "sign": ">=",
             "truth": True,
@@ -81,7 +81,7 @@ class TestPredicateLoad:
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
         predicate = Comparison(
-            content="the distance between $place1 and $place2 was",
+            content="the distance between {place1} and {place2} was",
             truth=True,
             sign="<>",
             expression=Q_("35 feet"),
@@ -99,7 +99,7 @@ class TestPredicateDump:
 
     def test_dump_predicate_with_date_expression(self):
         copyright_date_range = Comparison(
-            content="the date when $work was created was",
+            content="the date when {work} was created was",
             sign=">=",
             expression=date(1978, 1, 1),
         )

@@ -142,7 +142,7 @@ class Fact(Factor, BaseModel):
     @property
     def term_sequence(self) -> TermSequence:
         """Return a TermSequence of the terms in this Statement."""
-        return TermSequence(self.terms)
+        return TermSequence(items=self.terms)
 
     @property
     def terms_without_nulls(self) -> Sequence[Term]:
