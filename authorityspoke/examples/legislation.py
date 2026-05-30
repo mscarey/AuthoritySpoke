@@ -497,3 +497,31 @@ IDEA_EXPRESSION_RULE = EnactmentPassage(
         ],
     ),
 )
+
+COPYRIGHT_REGISTRATION_EVIDENCE_RULE = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/usc/t17/s410/c",
+        start_date=date(2013, 7, 18),
+        heading="",
+        text_version=TextVersion(
+            content="In any judicial proceedings the certificate of a registration made before or within five years after first publication of the work shall constitute prima facie evidence of the validity of the copyright and of the facts stated in the certificate. The evidentiary weight to be accorded the certificate of a registration made thereafter shall be within the discretion of the court.",
+            url="https://authorityspoke.com/api/v1/textversions/1031576/",
+            id=1031576,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/usc/t17/s410/c",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        positions=[
+            TextPositionSelector(
+                start=0,
+                end=None,
+            )
+        ],
+    ),
+)
