@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from legislice.download import Client
 from legislice.groups import EnactmentGroup
-from nettlesome.terms import ContextRegister
+from nettlesome.terms import ContextRegister, TermSequence
 from nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
 from nettlesome.predicates import Predicate
@@ -386,7 +386,7 @@ class TestImplication:
     def test_not_implied_by_statement(self, make_rule):
         assert not Statement(
             predicate=Predicate(content="{person} was a person"),
-            terms=Entity(name="Alice"),
+            terms=TermSequence(root=(Entity(name="Alice"),)),
         ).implies(make_rule["h1"])
 
     def test_not_implied_by_procedure(self, make_procedure, make_rule):

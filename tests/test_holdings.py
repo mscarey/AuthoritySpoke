@@ -319,7 +319,7 @@ class TestImplication:
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(
             predicate=Predicate(content="{person} was a person"),
-            terms=Entity(name="Alice"),
+            terms=TermSequence(root=(Entity(name="Alice"),)),
         ).implies(make_holding["h1"])
 
     def test_cannot_check_if_holding_implies_factor(self, make_holding, make_factor):

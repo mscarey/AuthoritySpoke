@@ -18,7 +18,6 @@ import pytest
 
 from authorityspoke.decisions import DecisionReading
 from authorityspoke.examples.beard_act import rules as beard_act_rules
-from authorityspoke.examples.beard_act import beard_response
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
 from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
@@ -38,7 +37,7 @@ from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import OpinionReading, AnchoredHoldings
 from authorityspoke.rules import Procedure, Rule
 
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
 
 load_dotenv()
@@ -1522,13 +1521,7 @@ def make_rule(
 @pytest.fixture(scope="class")
 def make_beard_rule() -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
-    client = FakeClient(responses=beard_response())
-    beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-    holdings = readers.read_holdings(
-        beard_dictionary,
-        client=client,
-    )
-    return [holding.rule for holding in holdings]
+    return beard_act_rules()
 
 
 @pytest.fixture(scope="class")
@@ -1621,14 +1614,14 @@ def make_anchored_holding(make_response, make_decision):
 def make_anchored_holding_with_yaml(
     make_response, make_decision
 ) -> Dict[str, List[AnchoredHolding]]:
-    client_without_api_access = FakeClient(responses=make_response)
-    holdings = {}
-    for name in make_decision.keys():
-        holdings[name] = loaders.read_anchored_holdings_from_file(
-            f"holding_{name}.yaml",
-            client=client_without_api_access,
-        )
-    return holdings
+    return {
+        "feist": feist_holdings(),
+        "lotus": lotus_holdings(),
+        "oracle": oracle_holdings(),
+        "brad": brad_holdings(),
+        "cardenas": cardenas_holdings(),
+        "watt": watt_holdings(),
+    }
 
 
 @pytest.fixture(scope="class")
