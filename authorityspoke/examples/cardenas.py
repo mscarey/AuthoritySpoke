@@ -26,7 +26,6 @@ from authorityspoke.facts import (
 )
 from authorityspoke.procedures import Procedure
 
-HOLDINGS = HoldingGroup(holdings=[])
 ENTITIES: dict[str, Entity] = {
     "fact_that_the_defendant_committed_an_attempted_robbery": Entity(
         name="fact that the defendant committed an attempted robbery",
@@ -91,8 +90,6 @@ FACTS: list[Fact] = [
     _FACT_RELEVANT_MOTIVE,
     _FACT_PROBATIVE_VALUE_TO_DEFENDANT,
 ]
-
-HOLDINGS = HoldingGroup()
 
 
 def _build_holdings() -> HoldingGroup:

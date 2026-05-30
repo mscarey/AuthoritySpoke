@@ -235,3 +235,265 @@ ATTEMPT_STATUTE = EnactmentPassage(
         ],
     ),
 )
+
+COPYRIGHT_CLAUSE = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/const/article/I/8/8",
+        start_date=date(1788, 9, 13),
+        heading="Patents and copyrights.",
+        text_version=TextVersion(
+            content="To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+            url="https://authorityspoke.com/api/v1/textversions/735650/",
+            id=735650,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/const/article/I/8/8",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact="To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                prefix="",
+                suffix="",
+            ),
+            TextQuoteSelector(
+                exact="the exclusive Right to their respective Writings",
+                prefix="",
+                suffix="",
+            ),
+        ],
+    ),
+)
+
+COMPILATION_COPYRIGHT_RULE = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/usc/t17/s103/b",
+        start_date=date(2013, 7, 18),
+        heading="",
+        text_version=TextVersion(
+            content="The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+            url="https://authorityspoke.com/api/v1/textversions/1030582/",
+            id=1030582,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/usc/t17/s103/b",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact="The copyright in a compilation",
+                prefix="",
+                suffix="",
+            ),
+            TextQuoteSelector(
+                exact="extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                prefix="",
+                suffix="",
+            ),
+        ],
+    ),
+)
+
+COPYRIGHTABILITY_REQUIREMENT = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/usc/t17/s102/a",
+        start_date=date(2013, 7, 18),
+        heading="",
+        text_version=TextVersion(
+            content="Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
+            url="https://authorityspoke.com/api/v1/textversions/1030579/",
+            id=1030579,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/usc/t17/s102/a",
+        children=[
+            Enactment(
+                node="/us/usc/t17/s102/a/1",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="literary works;",
+                    url="https://authorityspoke.com/api/v1/textversions/1030571/",
+                    id=1030571,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/2",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="musical works, including any accompanying words;",
+                    url="https://authorityspoke.com/api/v1/textversions/1030572/",
+                    id=1030572,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/3",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="dramatic works, including any accompanying music;",
+                    url="https://authorityspoke.com/api/v1/textversions/1030573/",
+                    id=1030573,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/4",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="pantomimes and choreographic works;",
+                    url="https://authorityspoke.com/api/v1/textversions/1030574/",
+                    id=1030574,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/5",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="pictorial, graphic, and sculptural works;",
+                    url="https://authorityspoke.com/api/v1/textversions/1030575/",
+                    id=1030575,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/6",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="motion pictures and other audiovisual works;",
+                    url="https://authorityspoke.com/api/v1/textversions/1030576/",
+                    id=1030576,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/7",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="sound recordings; and",
+                    url="https://authorityspoke.com/api/v1/textversions/1030577/",
+                    id=1030577,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+            Enactment(
+                node="/us/usc/t17/s102/a/8",
+                start_date=date(2013, 7, 18),
+                heading="",
+                text_version=TextVersion(
+                    content="architectural works.",
+                    url="https://authorityspoke.com/api/v1/textversions/1030578/",
+                    id=1030578,
+                ),
+                end_date=None,
+                first_published=None,
+                earliest_in_db=None,
+                anchors=[],
+                citations=[],
+                name="",
+                children=[],
+            ),
+        ],
+    ),
+    selection=TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact="",
+                prefix="",
+                suffix="fixed in any tangible",
+            ),
+        ],
+    ),
+)
+
+IDEA_EXPRESSION_RULE = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/usc/t17/s102/b",
+        start_date=date(2013, 7, 18),
+        heading="",
+        text_version=TextVersion(
+            content="In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work.",
+            url="https://authorityspoke.com/api/v1/textversions/1030580/",
+            id=1030580,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/usc/t17/s102/b",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        positions=[
+            TextPositionSelector(
+                start=0,
+                end=None,
+            )
+        ],
+    ),
+)
