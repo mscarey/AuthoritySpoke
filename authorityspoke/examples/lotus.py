@@ -1,5 +1,4 @@
 import copy
-import datetime
 
 from anchorpoint.textselectors import TextQuoteSelector
 from authorityspoke.examples.legislation import (

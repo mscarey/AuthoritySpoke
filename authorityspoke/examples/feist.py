@@ -1,5 +1,4 @@
 import copy
-import datetime
 
 from authorityspoke.examples.legislation import (
     COMPILATION_COPYRIGHT_RULE,
@@ -17,13 +16,6 @@ from authorityspoke.opinions import (
 from legislice.groups import EnactmentGroup
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.holdings import HoldingGroup
-from authorityspoke.facts import (
-    AbsenceOfFactor,
-    Allegation,
-    Evidence,
-    Exhibit,
-    Pleading,
-)
 from authorityspoke.procedures import Procedure
 
 HOLDINGS = HoldingGroup(holdings=[])
