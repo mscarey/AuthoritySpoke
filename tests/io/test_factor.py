@@ -1,3 +1,4 @@
+import copy
 from decimal import Decimal
 import os
 import pathlib
@@ -10,8 +11,8 @@ from nettlesome.quantities import Comparison, UnitRange
 import pytest
 
 from authorityspoke.facts import Fact, Exhibit, Evidence
+from authorityspoke.examples import cardenas as cardenas_example
 
-from authorityspoke.io import readers
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.text_expansion import expand_shorthand
@@ -84,8 +85,7 @@ class TestFactorLoad:
         assert str(fact) == "the fact it was false that pigs flew"
 
     def test_import_facts_with_factor_schema(self):
-        loaded = load_holdings("holding_cardenas.yaml")
-        holdings = readers.read_holdings(loaded)
+        holdings = copy.deepcopy(list(cardenas_example.HOLDINGS))
         factor = holdings[0].inputs[1].fact
         assert (
             factor.predicate.content == "{the_defendant} committed an attempted robbery"

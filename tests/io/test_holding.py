@@ -1,3 +1,4 @@
+import copy
 from datetime import date
 from decimal import Decimal
 
@@ -13,6 +14,10 @@ from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 
 from authorityspoke.decisions import Decision, DecisionReading
+from authorityspoke.examples import brad as brad_example
+from authorityspoke.examples import feist as feist_example
+from authorityspoke.examples import lotus as lotus_example
+from authorityspoke.examples import watt as watt_example
 from authorityspoke.facts import Fact, AbsenceOfFactor
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import (
@@ -21,7 +26,7 @@ from authorityspoke.opinions import (
     AnchoredHoldings,
 )
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import text_expansion
@@ -81,9 +86,7 @@ class TestTextAnchors:
         assert not reading.holding_anchors[0].quotes
 
     def test_enactment_text_limited_to_subsection(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_lotus.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(lotus_example.HOLDINGS))
         assert "architectural works" not in str(holdings[8].enactments[0])
 
     @pytest.mark.xfail
@@ -102,18 +105,12 @@ class TestTextAnchors:
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_watt.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(watt_example.HOLDINGS))
         assert holdings[0].enactments[0].means(holdings[1].enactments[0])
 
     def test_same_enactment_in_two_opinions(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
-        brad_holdings = readers.read_holdings(to_read, client=mock_client)
-
-        to_read = load_holdings("holding_watt.yaml")
-        watt_holdings = readers.read_holdings(to_read, client=mock_client)
+        brad_holdings = copy.deepcopy(list(brad_example.HOLDINGS))
+        watt_holdings = copy.deepcopy(list(watt_example.HOLDINGS))
 
         assert any(
             watt_holdings[0].enactments[0].means(brad_enactment)
@@ -126,30 +123,22 @@ class TestTextAnchors:
         for multiple Rules, instead of using the "name" field as a shortcut.
         This tests whether the loaded objects turn out equal.
         """
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(brad_example.HOLDINGS))
         assert any(holdings[6].inputs[0].means(x) for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_response):
-        to_read = load_holdings("holding_watt.yaml")
-        mock_client = FakeClient(responses=make_response)
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(watt_example.HOLDINGS))
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.terms[0], Entity)
 
     def test_fact_with_quantity(self, make_response):
-        to_read = load_holdings("holding_watt.yaml")
-        mock_client = FakeClient(responses=make_response)
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(watt_example.HOLDINGS))
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
     def test_use_int_not_pint_without_dimension(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
-        loaded_holdings = readers.read_holdings(to_read, client=mock_client)
+        loaded_holdings = copy.deepcopy(list(brad_example.HOLDINGS))
         anchored_holdings = AnchoredHoldings(
             holdings=[HoldingWithAnchors(holding=item) for item in loaded_holdings]
         )
@@ -159,9 +148,7 @@ class TestTextAnchors:
         assert expectation_not_reasonable.inputs[0].predicate.quantity == 3
 
     def test_opinion_posits_holding(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(brad_example.HOLDINGS))
         reading = OpinionReading()
         reading.posit(holdings[0])
         assert "warrantless search and seizure" in reading.holdings[0].short_string
@@ -171,9 +158,7 @@ class TestTextAnchors:
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
         """
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
-        brad_holdings = readers.read_holdings(to_read, client=mock_client)
+        brad_holdings = copy.deepcopy(list(brad_example.HOLDINGS))
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
@@ -191,9 +176,7 @@ class TestTextAnchors:
         case, but replacing one generic factor with a factor
         from Watt.
         """
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(brad_example.HOLDINGS))
         breading = OpinionReading()
         breading.clear_holdings()
         breading.posit(holdings)
@@ -215,10 +198,8 @@ class TestTextAnchors:
         """
         This test originally required a ValueError, but why should it?
         """
-        mock_client = FakeClient(responses=make_response)
         reading = OpinionReading()
-        to_read = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
+        holdings = copy.deepcopy(list(brad_example.HOLDINGS))
         reading.posit(holdings)
         expectation_not_reasonable = reading.holdings[6]
         generic_patch = expectation_not_reasonable.generic_terms()[1]
@@ -257,9 +238,7 @@ class TestExclusiveFlag:
         inferred Holdings to be expanded. Instead, it now should generate
         inferred Rules that aren't expanded during data loading.
         """
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.yaml")
-        feist_holdings = readers.read_holdings(to_read["holdings"], client=mock_client)
+        feist_holdings = copy.deepcopy(list(feist_example.HOLDINGS))
 
         directory = Entity(name="Rural's telephone directory")
         not_original = AbsenceOfFactor(
