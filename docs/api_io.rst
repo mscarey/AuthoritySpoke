@@ -6,6 +6,5 @@ I/O
 
     io/loaders
     io/filepaths
-    io/name_index
     io/readers
     io/writers

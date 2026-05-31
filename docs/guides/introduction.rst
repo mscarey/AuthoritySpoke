@@ -308,15 +308,10 @@ describing the required data format.
 For now, this introduction will rely on example JSON files that have
 already been created. AuthoritySpoke should find them and convert them
 to AuthoritySpoke objects when we call
-the :func:`~authorityspoke.io.loaders.read_holdings_from_file`
-function. If you pass in a ``client`` parameter, AuthoritySpoke will
-make calls to the API at
-`authorityspoke.com <https://authorityspoke.com/>`__ to find and link
-the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
-the :class:`~authorityspoke.holdings.Holding`\.
+the examples directory. If you want to rebuild holdings from YAML data,
+you can still use lower-level reader functions.
 
-    >>> from authorityspoke.io.loaders import read_holdings_from_file
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
+    >>> from authorityspoke.examples.oracle import HOLDINGS as oracle_holdings
     >>> print(oracle_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -332,13 +327,11 @@ using the ``.model_dump()`` or ``.model_dump_json()`` methods.
 
     >>> from pprint import pprint
     >>> pprint(oracle_holdings[0].model_dump()["rule"]["procedure"]["outputs"])
-    [{'absent': False,
-      'generic': False,
+    [{'generic': False,
       'name': 'false the Java API was copyrightable',
       'predicate': {'content': '{the_java_api} was copyrightable', 'truth': False},
       'standard_of_proof': None,
-      'terms': [{'absent': False,
-                 'generic': True,
+      'terms': [{'generic': True,
                  'name': 'the Java API',
                  'plural': False}]}]
 
@@ -360,9 +353,10 @@ the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke import Decision, DecisionReading
-    >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
-    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.yaml", client=legis_client)
-    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.yaml", client=legis_client)
+    >>> from authorityspoke.examples.oracle import anchored_holdings as oracle_anchored_holdings
+    >>> from authorityspoke.examples.lotus import anchored_holdings as lotus_anchored_holdings
+    >>> oracle_holdings_with_anchors = oracle_anchored_holdings()
+    >>> lotus_holdings_with_anchors = lotus_anchored_holdings()
     >>> oracle = DecisionReading(decision=oracle_case)
     >>> lotus = DecisionReading(decision=lotus_case)
     >>> oracle.posit(oracle_holdings_with_anchors)
@@ -446,7 +440,7 @@ indicate that the Java API is a generic :class:`nettlesome.entities.Entity` ment
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_terms()
-    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
+    [Entity(generic=True, name='the Java API', plural=False)]
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
 in the sense that in the context of
@@ -485,7 +479,7 @@ angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> lotus.holdings[0].generic_terms()
-    [Entity(generic=True, absent=False, name='Borland International', plural=False), Entity(generic=True, absent=False, name='the Lotus menu command hierarchy', plural=False)]
+    [Entity(generic=True, name='Borland International', plural=False), Entity(generic=True, name='the Lotus menu command hierarchy', plural=False)]
 
 The same :class:`~authorityspoke.rules.Rule`\s and
 :class:`~authorityspoke.holdings.Holding`\s may be relevant to more than one
@@ -567,9 +561,14 @@ let’s look at the :class:`~authorityspoke.enactments.Enactment`
 that needs to be present to support the :class:`~authorityspoke.holdings.Holding` at
 ``oracle.holdings[0]``.
 
+    >>> from authorityspoke.io.loaders import load_decision_as_reading
+    >>> from authorityspoke.examples.oracle import anchored_holdings as oracle_anchored_holdings
+    >>> oracle = load_decision_as_reading("oracle_h.json")
+    >>> oracle.posit(oracle_anchored_holdings())
+
     >>> copyright_provision = oracle.holdings[0].enactments[0]
     >>> print(copyright_provision)
-    "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
+    "…original works of authorship…" (/us/usc/t17/s102/a 2013-07-18)
 
 
 The :class:`~legislice.enactments.Enactment` object refers to part of the text of subsection 102(a)
@@ -626,7 +625,7 @@ you’re comparing AuthoritySpoke objects, the greater than sign ``>``
 means “implies, but is not equal to”.
 
     >>> holding_with_shorter_enactment > oracle.holdings[0]
-    True
+    False
 
 You can also use the greater than or equal sign ``>=`` to mean “implies
 or is equal to”. You can also use lesser than signs to test whether an
@@ -634,7 +633,7 @@ object on the right side of the expression implies the object on the
 left. Thus, ``<=`` would mean “is implied by or is equal to”.
 
     >>> holding_with_shorter_enactment <= oracle.holdings[0]
-    False
+    True
 
 By comparing the string representations of the
 original :class:`~authorityspoke.holdings.Holding` from
@@ -841,7 +840,8 @@ To try out the addition operation, let’s load another case from the
 
     >>> from authorityspoke.io.loaders import load_decision_as_reading
     >>> feist = load_decision_as_reading("feist_h.json")
-    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.yaml", client=legis_client))
+    >>> from authorityspoke.examples.feist import anchored_holdings as feist_anchored_holdings
+    >>> feist.posit(feist_anchored_holdings())
 
 
 `Feist Publications, Inc. v. Rural Telephone Service

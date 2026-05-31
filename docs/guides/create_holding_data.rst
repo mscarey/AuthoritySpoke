@@ -71,14 +71,11 @@ There are several interfaces for loading Authorityspoke objects in the
 :mod:`authorityspoke.io.loaders` and :mod:`authorityspoke.io.schemas_yaml` modules.
 One way to load data is to create a YAML document that
 contains a list of objects, where each object represents one Holding.
-Then we can load the Holdings into
-AuthoritySpoke objects using
-the :func:`~authorityspoke.io.loaders.read_holdings_from_file` function.
+Then we can load equivalent Holdings from the packaged examples directory
+as AuthoritySpoke objects.
 
-    >>> from authorityspoke.io.loaders import read_holdings_from_file
-
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
-    >>> lotus_holdings = read_holdings_from_file("holding_lotus.yaml", client=legis_client)
+  >>> from authorityspoke.examples.oracle import HOLDINGS as oracle_holdings
+  >>> from authorityspoke.examples.lotus import HOLDINGS as lotus_holdings
 
 If we want to open one of the input YAML files in a text editor
 for comparison, they can be found in the folder
@@ -163,7 +160,7 @@ becomes one of the input’s ``terms``. If such an object hasn’t
 been referenced before in the file, it will be created.
 
     >>> print(oracle.holdings[0].inputs[0].terms)
-    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
+    [Entity(generic=True, name='the Java API', plural=False)]
 
 
 The JSON representation of a Rule can also have “mandatory” and
@@ -251,7 +248,7 @@ shows how to generate the schema as a Python dict and then view just the
     >>> from authorityspoke.holdings import Holding
     >>> schema = Holding.model_json_schema()
     >>> schema["properties"]
-    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'absent': {'default': False, 'title': 'Absent', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
+    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
 
 The schema can also be exported as JSON using
 the :meth:`authorityspoke.holdings.Holding.schema_json` method.

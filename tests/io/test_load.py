@@ -5,10 +5,7 @@ import pytest
 from authorityspoke import LegisClient
 from authorityspoke.io import filepaths, loaders
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.loaders import (
-    read_holdings_from_file,
-    read_anchored_holdings_from_file,
-)
+
 
 LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
