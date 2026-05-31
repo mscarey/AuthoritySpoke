@@ -32,6 +32,11 @@ class TestAnchor:
             "without respect to whether or not Turismo"
         )
         assert len(anchored.holdings) == 2
+        key = "the fact that <Turismo Costa Brava> was a money transmitting business"
+        assert (
+            "Turismo conducted substantial money transmitting business"
+            in anchored.get_term_anchors(key).quotes[0].exact
+        )
 
 
 class TestOpinions:
