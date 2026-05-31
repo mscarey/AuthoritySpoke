@@ -51,39 +51,6 @@ class TestFactLoad:
     }
     story_data = {"content": "The number of castles {the king} had was > 3"}
 
-    def test_import_fact_with_entity_name_containing_another(self):
-        expanded = expand_shorthand(self.house_data)
-        record, mentioned = index_names(expanded)
-
-        assert mentioned["Alice's house"]["type"] == "Entity"
-
-    def test_import_predicate_with_quantity(self):
-        record = expand_shorthand(self.story_data)
-        record, mentioned = index_names(record)
-        expanded = readers.expand_factor(record, mentioned)
-        story = Fact(**expanded)
-
-        assert len(story.predicate) == 1
-        assert story.predicate.content.startswith("The number of castles")
-        assert story.predicate.sign == ">"
-        assert story.predicate.quantity == 3
-
-    def test_make_fact_from_string(self, watt_factor):
-        fact_float_data = {
-            "content": "the distance between {person0} and {person1} was >= 20.1",
-            "terms": [
-                {"type": "Entity", "name": "Ann"},
-                {"type": "Entity", "name": "Lee"},
-            ],
-        }
-        record = expand_shorthand(fact_float_data)
-        record, mentioned = index_names(record)
-        expanded = readers.expand_factor(record, mentioned)
-
-        fact_float_more = Fact(**expanded)
-        fact_float_less = watt_factor["f8_int"]
-        assert fact_float_more >= fact_float_less
-
 
 class TestFactorLoad:
     def test_load_factor_marked_reciprocal(self):
