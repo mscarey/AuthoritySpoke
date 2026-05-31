@@ -148,6 +148,44 @@ class TestRules:
             make_holding["h1"].rule.add_enactment(make_holding["h2"])
 
 
+class TestPydanticRoundTrip:
+    def test_fact_round_trip_from_dict(self, watt_factor):
+        original = watt_factor["f2"]
+        dumped = original.model_dump()
+
+        reloaded = Fact.model_validate(dumped)
+
+        assert reloaded == original
+        assert str(reloaded) == str(original)
+
+    def test_procedure_round_trip_from_json(self, make_rule):
+        original = make_rule["h3"].procedure
+        dumped_json = original.model_dump_json()
+
+        reloaded = Procedure.model_validate_json(dumped_json)
+
+        assert reloaded == original
+        assert str(reloaded) == str(original)
+
+    def test_rule_round_trip_from_json(self, make_rule):
+        original = make_rule["h2"]
+        dumped_json = original.model_dump_json()
+
+        reloaded = Rule.model_validate_json(dumped_json)
+
+        assert reloaded.means(original)
+        assert str(reloaded) == str(original)
+
+    def test_holding_round_trip_from_dict(self, make_holding):
+        original = make_holding["h2_despite_due_process"]
+        dumped = original.model_dump()
+
+        reloaded = Holding.model_validate(dumped)
+
+        assert reloaded.means(original)
+        assert str(reloaded) == str(original)
+
+
 class TestSameMeaning:
     def test_holdings_equivalent_entity_orders_equal(self, make_rule):
         """

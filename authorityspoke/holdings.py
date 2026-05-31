@@ -674,7 +674,7 @@ class HoldingGroup(FactorGroup):
             holdings = (holdings,)
         if any(not isinstance(holding, Holding) for holding in holdings):
             raise TypeError("All objects in HoldingGroup must be type Holding.")
-        self.sequence = holdings
+        super().__init__(sequence=holdings)
 
     def _explanations_implication_of_holding(
         self, other: Holding, context: Explanation

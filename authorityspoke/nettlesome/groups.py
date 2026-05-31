@@ -1,5 +1,7 @@
 """Groups of comparable Terms."""
 
+# pyright: reportIncompatibleVariableOverride=false
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -8,8 +10,9 @@ import operator
 import textwrap
 from typing import Callable, ClassVar, Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
+from typing import cast
 from typing import Self
-from pydantic import BaseModel
+from pydantic import ConfigDict, RootModel, field_validator, model_validator
 
 from authorityspoke.nettlesome.factors import Factor, AbsenceOf
 from authorityspoke.nettlesome.terms import (
@@ -39,19 +42,71 @@ def unique_explanations(func: Callable):
     return wrapper
 
 
-class FactorGroup(Comparable, BaseModel):
+class FactorGroup(Comparable, RootModel):
     r"""Terms to be used together in a comparison."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     term_class: ClassVar[type] = Factor
     absence_class: ClassVar[type] = AbsenceOf
-    generic: bool = False
+    generic: ClassVar[bool] = False  # pyright: ignore[reportIncompatibleVariableOverride]
     context_factor_names: ClassVar[Tuple[str, ...]] = ()
-    sequence: Sequence[Factor | AbsenceOf]
+    root: Tuple[object, ...] = ()
 
-    def _at_index(self, key: int) -> Factor | AbsenceOf:
+    def __init__(self, /, *args, **kwargs):
+        if "sequence" in kwargs:
+            if "root" in kwargs:
+                raise TypeError("Use either 'root' or 'sequence', not both.")
+            kwargs["root"] = kwargs.pop("sequence")
+        elif not args and "root" not in kwargs:
+            kwargs["root"] = ()
+        super().__init__(*args, **kwargs)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_root(cls, value):
+        if isinstance(value, dict):
+            if "root" in value:
+                value = value["root"]
+            elif "sequence" in value:
+                value = value["sequence"]
+            elif not value:
+                value = ()
+
+        if value is None:
+            return ()
+        if isinstance(value, cls):
+            return tuple(value.sequence)
+        if isinstance(value, (cls.term_class, cls.absence_class)):
+            return (value,)
+        if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+            return tuple(value)
+        return (value,)
+
+    @field_validator("root")
+    @classmethod
+    def validate_root(cls, value: Sequence[object]) -> tuple[object, ...]:
+        for factor in value:
+            if not isinstance(factor, (cls.term_class, cls.absence_class)):
+                raise TypeError(
+                    f'Object "{factor} could not be included in '
+                    f"{cls.__name__} because it is "
+                    f"type {factor.__class__.__name__}, not type {cls.term_class.__name__}"
+                )
+        return tuple(value)
+
+    @property
+    def sequence(self) -> Tuple[Comparable, ...]:
+        return cast(Tuple[Comparable, ...], tuple(self.root))
+
+    @sequence.setter
+    def sequence(self, value: Sequence[Comparable]) -> None:
+        self.root = tuple(value)
+
+    def _at_index(self, key: int) -> Comparable:
         return self.sequence[key]
 
-    def __getitem__(self, key: Union[int, slice]) -> Union[Factor | AbsenceOf, Self]:
+    def __getitem__(self, key: Union[int, slice]) -> Union[Comparable, Self]:
         if isinstance(key, slice):
             start, stop, step = key.indices(len(self))
             return self.__class__(
@@ -97,7 +152,9 @@ class FactorGroup(Comparable, BaseModel):
         if isinstance(other, self.__class__):
             return self._add_group(other)
         to_add = self.__class__(
-            sequence=[other] if isinstance(other, Factor | AbsenceOf) else list(other)
+            sequence=[other]
+            if isinstance(other, (self.term_class, self.absence_class))
+            else list(other)
         )
         added = self._add_group(to_add)
         added.internally_consistent()
@@ -291,8 +348,8 @@ class FactorGroup(Comparable, BaseModel):
     ) -> Iterator[Explanation]:
         """Generate explanations for how other may imply self."""
         reversed = explanation.reversed_context()
-        if isinstance(other, Factor):
-            other = FactorGroup(sequence=[other])
+        if isinstance(other, self.term_class):
+            other = self.__class__(sequence=[other])
         if isinstance(other, FactorGroup):
             yield from other._explanations_implication(self, explanation=reversed)
 
@@ -314,9 +371,9 @@ class FactorGroup(Comparable, BaseModel):
     ) -> Iterator[ContextRegister]:
         """Yield contexts that allow ``self`` and ``other`` to be combined with the union operation."""
         to_match = (
-            FactorGroup(sequence=other.sequence)
+            self.__class__(sequence=other.sequence)
             if isinstance(other, FactorGroup)
-            else FactorGroup(sequence=[other])
+            else self.__class__(sequence=[other])
         )
         context = context or ContextRegister()
         for partial in self._explanations_union_partial(to_match, context):
@@ -339,7 +396,7 @@ class FactorGroup(Comparable, BaseModel):
 
     def _verbose_comparison(
         self,
-        still_need_matches: list[Factor | AbsenceOf],
+        still_need_matches: list[Comparable],
         explanation: Explanation,
     ) -> Iterator[Explanation]:
         r"""
@@ -396,7 +453,7 @@ class FactorGroup(Comparable, BaseModel):
                 still_need_matches=list(other.sequence),
                 explanation=explanation,
             )
-        elif isinstance(other, (Factor, AbsenceOf)):
+        elif isinstance(other, (self.term_class, self.absence_class)):
             yield from self._verbose_comparison(
                 still_need_matches=[other],
                 explanation=explanation,
@@ -482,12 +539,12 @@ class FactorGroup(Comparable, BaseModel):
         """Create a FactorGroup from a Factor or sequence of Factors."""
         if isinstance(value, FactorGroup):
             return value
-        if isinstance(value, (Factor, AbsenceOf)):
-            return FactorGroup(sequence=[value])
+        if isinstance(value, (self.term_class, self.absence_class)):
+            return self.__class__(sequence=[value])
         elif isinstance(value, Sequence) and all(
-            isinstance(item, (Factor, AbsenceOf)) for item in value
+            isinstance(item, (self.term_class, self.absence_class)) for item in value
         ):
-            return FactorGroup(sequence=list(value))
+            return self.__class__(sequence=list(value))
         return None
 
     def explanations_same_meaning(
@@ -541,7 +598,7 @@ class FactorGroup(Comparable, BaseModel):
         context = context or ContextRegister()
         if isinstance(other, FactorGroup):
             yield from self._likely_contexts_for_factorgroup(other, context)
-        elif isinstance(other, Factor):
+        elif isinstance(other, self.term_class):
             yield from self._likely_contexts_for_factor(other, context)
 
     def drop_implied_factors(self) -> FactorGroup:
@@ -596,7 +653,7 @@ class FactorGroup(Comparable, BaseModel):
         context = context or ContextRegister()
         if not isinstance(other, self.__class__):
             other = self.__class__(
-                sequence=[other] if isinstance(other, Factor) else list(other)
+                sequence=[other] if isinstance(other, self.term_class) else list(other)
             )
         return self._union(other=other, context=context)
 
