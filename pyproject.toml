@@ -20,6 +20,8 @@ dependencies = [
     "pyyaml",
     "requests",
     "roman",
+    "bidict>=0.23.1",
+    "python-constraint2>=2.5.0",
 ]
 
 [build-system]

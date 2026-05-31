@@ -11,6 +11,8 @@ from typing import Any, Callable, ClassVar, Dict, Iterator
 from typing import List, NamedTuple, Optional, Sequence, Tuple, Union
 from typing import KeysView, ValuesView, ItemsView
 
+import bidict
+from constraint import Problem
 from pydantic import RootModel, ConfigDict, field_validator
 
 
@@ -1048,21 +1050,25 @@ class ContextRegister:
     When :class:`Factor`\s are matched in a ContextRegister, it indicates
     that their relationship can be described by a comparison function
     like :func:`means`, :meth:`Factor.implies`, or :meth:`Factor.consistent_with`\.
+
+    Internally uses a :class:`bidict.bidict` mapping each key Term's
+    ``short_string`` to the corresponding value Term's ``short_string``,
+    plus a ``_terms`` dict for fast string-to-Term lookup on both sides.
     """
 
     def __init__(self):
         """Index Comparables on each side by names of Comparables on the other side."""
-        self._matches = {}
-        self._reverse_matches = {}
+        self._bd: bidict.bidict = bidict.bidict()
+        self._terms: Dict[str, Term] = {}
 
     def __getitem__(self, item: str) -> Term:
-        return self.matches[item]
+        return self._terms[self._bd[item]]
 
     def __len__(self):
-        return len(self.matches)
+        return len(self._bd)
 
     def __repr__(self) -> str:
-        return "ContextRegister({})".format(self._matches.__repr__())
+        return "ContextRegister({})".format(self.matches.__repr__())
 
     def __str__(self) -> str:
         return f"ContextRegister({self.reason})"
@@ -1086,12 +1092,12 @@ class ContextRegister:
     @property
     def matches(self) -> Dict[str, Term]:
         """Get names of ``self``'s Terms matched to ``other``'s Terms."""
-        return self._matches
+        return {k: self._terms[v] for k, v in self._bd.items()}
 
     @property
     def reverse_matches(self) -> Dict[str, Term]:
         """Get names of ``other``'s Terms matched to ``self``'s Terms."""
-        return self._reverse_matches
+        return {v: self._terms[k] for k, v in self._bd.items()}
 
     @classmethod
     def _from_lists(
@@ -1205,8 +1211,8 @@ class ContextRegister:
 
     def factor_pairs(self) -> Iterator[Tuple[Term, Term]]:
         """Get pairs of corresponding Comparables."""
-        for value in self.values():
-            yield (self.reverse_matches[value.key], value)
+        for k, v in self._bd.items():
+            yield (self._terms[k], self._terms[v])
 
     def means(self, other: ContextRegister) -> bool:
         """Determine if self and other have the same Factor matches."""
@@ -1219,7 +1225,10 @@ class ContextRegister:
 
     def get(self, query: str) -> Optional[Comparable]:
         """Get value corresponding to the key named ``query``."""
-        return self.matches.get(query)
+        val_str = self._bd.get(query)
+        if val_str is None:
+            return None
+        return self._terms[val_str]
 
     def get_factor(self, query: Comparable) -> Optional[Comparable]:
         """Get value corresponding to the key ``query``."""
@@ -1227,7 +1236,10 @@ class ContextRegister:
 
     def get_reverse_factor(self, query: Term) -> Optional[Term]:
         """Get key corresponding to the value ``query``."""
-        return self.reverse_matches.get(query.short_string)
+        key_str = self._bd.inverse.get(query.short_string)
+        if key_str is None:
+            return None
+        return self._terms[key_str]
 
     def items(self) -> ItemsView:
         """Get items from ``matches`` mapping."""
@@ -1235,39 +1247,30 @@ class ContextRegister:
 
     def keys(self) -> KeysView:
         """Get keys from ``matches`` mapping."""
-        return self.matches.keys()
+        return self._bd.keys()
 
     def values(self) -> ValuesView:
         """Get values from ``matches`` mapping."""
         return self.matches.values()
 
-    def check_insert_pair(self, key: Term, value: Term) -> None:
-        """Raise exception if a pair of corresponding Terms can't be added to register."""
+    def insert_pair(self, key: Term, value: Term) -> None:
+        """Add a pair of corresponding Comparables."""
         for comp in (key, value):
             if not isinstance(comp, Term):
                 raise TypeError(
                     "'key' and 'value' must both be subclasses of 'Term'",
                     f"but {comp} was type {type(comp)}.",
                 )
-        found_value = self.get_factor(key)
-        if found_value and not self.check_match(key, value):
-            raise KeyError(
-                f"{key.key} already in mapping with value "
-                + f"{found_value.key}, not {value.key}"
+        try:
+            self._bd.put(
+                key.short_string,
+                value.short_string,
+                on_dup=bidict.ON_DUP_RAISE,
             )
-        found_key = self.get_reverse_factor(value)
-        if found_key and not self.check_match(key, value):
-            raise KeyError(
-                f"{value.key} already in mapping with key "
-                + f"{found_key.key}, not {key.key}"
-            )
-
-    def insert_pair(self, key: Term, value: Term) -> None:
-        """Add a pair of corresponding Comparables."""
-        self.check_insert_pair(key=key, value=value)
-
-        self._matches[key.short_string] = value
-        self._reverse_matches[value.short_string] = key
+        except bidict.DuplicationError as exc:
+            raise KeyError(str(exc)) from exc
+        self._terms[key.short_string] = key
+        self._terms[value.short_string] = value
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """
@@ -1277,26 +1280,23 @@ class ContextRegister:
 
         e.g. in "Amy and Bob were married" the order of "Amy" and "Bob" is interchangeable.
         """
-
         result = ContextRegister()
-        for key, value in self.matches.items():
-            replacement = replacements[key]
-            result.insert_pair(key=replacement, value=value)
-
+        for k_str, v_str in self._bd.items():
+            result.insert_pair(key=replacements[k_str], value=self._terms[v_str])
         return result
 
     def reversed(self) -> ContextRegister:
         """Swap keys for values and vice versa."""
-        return ContextRegister.from_lists(
-            to_replace=list(self.values()),
-            replacements=list(self.reverse_matches.values()),
-        )
+        new = ContextRegister()
+        new._bd = bidict.bidict(self._bd.inverse)
+        new._terms = self._terms.copy()
+        return new
 
     def _copy(self) -> ContextRegister:
-        """Shallow-copy self: new dicts, shared Term references."""
+        """Shallow-copy self: new bidict and terms dict, shared Term references."""
         new = ContextRegister()
-        new._matches = self._matches.copy()
-        new._reverse_matches = self._reverse_matches.copy()
+        new._bd = self._bd.copy()
+        new._terms = self._terms.copy()
         return new
 
     def merged_with(

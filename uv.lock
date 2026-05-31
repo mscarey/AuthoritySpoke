@@ -38,12 +38,14 @@ version = "0.10.0"
 source = { editable = "." }
 dependencies = [
     { name = "anchorpoint" },
+    { name = "bidict" },
     { name = "eyecite" },
     { name = "justopinion" },
     { name = "legislice" },
     { name = "lxml" },
     { name = "pint" },
     { name = "pydantic" },
+    { name = "python-constraint2" },
     { name = "python-dotenv" },
     { name = "python-ranges" },
     { name = "python-slugify" },
@@ -65,12 +67,14 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "anchorpoint", specifier = ">=0.7.0" },
+    { name = "bidict", specifier = ">=0.23.1" },
     { name = "eyecite", specifier = "~=2.6.3" },
     { name = "justopinion", specifier = "==0.4.0" },
     { name = "legislice", specifier = "==0.8.1" },
     { name = "lxml", specifier = ">=4.9.1" },
     { name = "pint", specifier = ">=0.25.3" },
     { name = "pydantic", specifier = ">=2.13.3" },
+    { name = "python-constraint2", specifier = ">=2.5.0" },
     { name = "python-dotenv" },
     { name = "python-ranges", specifier = ">=0.2.1" },
     { name = "python-slugify" },
@@ -97,6 +101,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7d/b2/51899539b6ceeeb420d40ed3cd4b7a40519404f9baf3d4ac99dc413a834b/babel-2.18.0.tar.gz", hash = "sha256:b80b99a14bd085fcacfa15c9165f651fbb3406e66cc603abf11c5750937c992d", size = 9959554 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/f5/21d2de20e8b8b0408f0681956ca2c69f1320a3848ac50e6e7f39c6159675/babel-2.18.0-py3-none-any.whl", hash = "sha256:e2b422b277c2b9a9630c1d7903c2a00d0830c409c59ac8cae9081c92f1aeba35", size = 10196845 },
+]
+
+[[package]]
+name = "bidict"
+version = "0.23.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9a/6e/026678aa5a830e07cd9498a05d3e7e650a4f56a42f267a53d22bcda1bdc9/bidict-0.23.1.tar.gz", hash = "sha256:03069d763bc387bbd20e7d49914e75fc4132a41937fa3405417e1a5a2d006d71", size = 29093 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/99/37/e8730c3587a65eb5645d4aba2d27aae48e8003614d6aaf15dda67f702f1f/bidict-0.23.1-py3-none-any.whl", hash = "sha256:5dae8d4d79b552a71cbabc7deb25dfe8ce710b17ff41711e13010ead2abfc3e5", size = 32764 },
 ]
 
 [[package]]
@@ -581,6 +594,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/32/9c/f4027c5f1693847b06d11caf4b4f6bb09f22c1581ada4663877ec166b8c6/pytest_recording-0.13.4.tar.gz", hash = "sha256:568d64b2a85992eec4ae0a419c855d5fd96782c5fb016784d86f18053792768c", size = 26576 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/42/c2/ce34735972cc42d912173e79f200fe66530225190c06655c5632a9d88f1e/pytest_recording-0.13.4-py3-none-any.whl", hash = "sha256:ad49a434b51b1c4f78e85b1e6b74fdcc2a0a581ca16e52c798c6ace971f7f439", size = 13723 },
+]
+
+[[package]]
+name = "python-constraint2"
+version = "2.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/ce/d197818c97c1ac79c36b2bf3efd2330a912cef4d5be5ec21cd2fd98c4e53/python_constraint2-2.5.0.tar.gz", hash = "sha256:f69ab4b3a7d1bda6d05738f1ae31ddd35a48be6f13f34bf4329204ff6f28479d", size = 821670 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/8a/5706af63599b5befa62e26952aa766c421bbb5ba7a9467dfcaf441bc5665/python_constraint2-2.5.0-cp314-cp314-macosx_15_0_arm64.whl", hash = "sha256:6b015ecc38d8828e8d372df32eca77af7b97439f98fd0de812368cd93ddef944", size = 1839623 },
+    { url = "https://files.pythonhosted.org/packages/80/4c/affcda6b3a4c60f68a6d31f1ca4a298abe24f79a85fe7ea849ba43c04bf0/python_constraint2-2.5.0-cp314-cp314-manylinux_2_35_x86_64.whl", hash = "sha256:f5c636ab637c0c1f2ac769dd966e78fa5b3c7d1fd606dff888854adc07293bc3", size = 4073644 },
+    { url = "https://files.pythonhosted.org/packages/4f/87/29f0726a4bdb0109cf0ed30b69bc1f6569218776a0a003c7e31af06c41c1/python_constraint2-2.5.0-cp314-cp314-manylinux_2_39_x86_64.whl", hash = "sha256:4104e3db4cf8c399775c61d6a06393af299ca519253cc5fa35b0c774b5f84384", size = 4190872 },
+    { url = "https://files.pythonhosted.org/packages/62/1d/e0e42b6c2d5983b9ead36eb1640c35bfbad602bd2b96399ee896dd89ab6b/python_constraint2-2.5.0-cp314-cp314-win_amd64.whl", hash = "sha256:90d3904e5d9461398c16b2e8923ed6e96cf99d4a54bac4c0b78017fb2fb36cfa", size = 851186 },
 ]
 
 [[package]]
