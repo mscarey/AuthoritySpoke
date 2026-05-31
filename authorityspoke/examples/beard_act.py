@@ -55,15 +55,19 @@ def rules() -> list[Rule]:
         terms=[suspected_beard],
     )
     fact_chin = Fact(
-        predicate=Predicate(content="the suspected beard occurred on or below the chin")
+        predicate=Predicate(
+            content="{the_suspected_beard} occurred on or below the chin"
+        ),
+        terms=[suspected_beard],
     )
     fact_ear_line = Fact(
         predicate=Predicate(
             content=(
-                "the suspected beard existed in an uninterrupted line from the front "
+                "{the_suspected_beard} existed in an uninterrupted line from the front "
                 "of one ear to the front of the other ear below the nose"
             )
-        )
+        ),
+        terms=[suspected_beard],
     )
     fact_is_beard = Fact(
         predicate=Predicate(content="{the_suspected_beard} was a beard"),
@@ -71,8 +75,8 @@ def rules() -> list[Rule]:
         name="the fact that the facial hair was a beard",
     )
     fact_wore_beard = Fact(
-        predicate=Predicate(content="{the_defendant} wore the suspected beard"),
-        terms=[defendant],
+        predicate=Predicate(content="{the_defendant} wore {the_suspected_beard}"),
+        terms=[defendant, suspected_beard],
         name="the defendant's act of wearing the suspected beard",
     )
     fact_no_exemption = Fact(
