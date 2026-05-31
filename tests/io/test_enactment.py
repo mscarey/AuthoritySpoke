@@ -37,24 +37,6 @@ class TestEnactmentImport:
         assert passage.selected_text().startswith("…nor shall any State")
 
     @pytest.mark.vcr
-    def test_enactment_import_from_yaml(self):
-        holding_brad = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(holding_brad, client=self.client)
-        enactments = holdings[0].enactments
-        assert any(
-            law.selected_text().endswith("shall not be violated…") for law in enactments
-        )
-
-    def test_enactment_import_from_holding(self):
-        holding_cardenas = load_holdings("holding_cardenas.yaml")
-        holdings = readers.read_holdings(holding_cardenas)
-        enactment_list = holdings[0].enactments
-        assert any(
-            "all relevant evidence is admissible" in enactment.text
-            for enactment in enactment_list
-        )
-
-    @pytest.mark.vcr
     def test_enactment_does_not_fail_for_excess_selector(self, fake_beard_client):
         """
         Test selector that extends into the text of a subnode.

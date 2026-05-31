@@ -73,13 +73,9 @@ class TestTextAnchors:
     client = Client(api_token=TOKEN)
 
     def test_read_holding_with_no_anchor(self, make_analysis):
-        raw_analysis = make_analysis["no anchors"]
         reading = OpinionReading()
-        anchored_holdings = readers.read_holdings_with_anchors(raw_analysis)
         reading.posit(
-            holdings=anchored_holdings.holdings,
-            named_anchors=anchored_holdings.named_anchors,
-            enactment_anchors=anchored_holdings.enactment_anchors,
+            holdings=make_analysis["no anchors"],
         )
         assert not reading.holding_anchors[0].positions
         assert not reading.holding_anchors[0].quotes

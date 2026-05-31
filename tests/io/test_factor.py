@@ -66,17 +66,16 @@ class TestFactorLoad:
             ),
         )
         assert hasattr(fact.predicate.quantity, "dimensionality")
-        data = {
-            "type": "fact",
-            "content": "the distance between {place1} and {place2} was",
-            "sign": "<",
-            "expression": "5 miles",
-            "terms": [
-                {"type": "entity", "name": "the office"},
-                {"type": "entity", "name": "the apartment"},
-            ],
-        }
-        loaded_fact = Fact(**data)
+        loaded_fact = Fact(
+            predicate=Comparison.new(
+                content="the distance between {place1} and {place2} was",
+                sign="<",
+                expression="5 miles",
+            ),
+            terms=TermSequence(
+                [Entity(name="the office"), Entity(name="the apartment")]
+            ),
+        )
         assert loaded_fact.means(fact)
 
     def test_load_fact_with_false(self):
