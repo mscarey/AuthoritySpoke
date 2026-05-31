@@ -1721,46 +1721,6 @@ def raw_factor() -> RawFactor:
 
 
 @pytest.fixture(scope="function")
-def raw_holding() -> RawHolding:
-    return {
-        "bradley_house": {
-            "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-            "outputs": [
-                {
-                    "type": "absence",
-                    "absent": {
-                        "type": "evidence",
-                        "to_effect": {
-                            "type": "fact",
-                            "name": "fact that Bradley committed a crime",
-                            "content": "Bradley committed a crime",
-                        },
-                        "name": "evidence of Bradley's guilt",
-                    },
-                }
-            ],
-        },
-        "stolen watch": {
-            "anchors": {
-                "quotes": [
-                    {"exact": "Mark stole the watch"},
-                    {"exact": "a watch was stolen by Mark"},
-                ]
-            },
-            "outputs": [
-                {"type": "Fact", "content": "{Mark} stole a watch"},
-            ],
-            "inputs": [
-                {
-                    "type": "Evidence",
-                    "to_effect": {"type": "Fact", "content": "{Mark} stole a watch"},
-                }
-            ],
-        },
-    }
-
-
-@pytest.fixture(scope="function")
 def make_context_register() -> ContextRegister:
     context_names = ContextRegister()
     context_names.insert_pair(key=Entity(name="Alice"), value=Entity(name="Craig"))
