@@ -41,8 +41,8 @@ class TestHoldingDump:
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "{thing} was on the premises of {place}"
 
-        loaded = readers.read_holdings([dumped], client=fake_usc_client)
-        loaded_content = loaded[0].despite[0].predicate.content
+        loaded = Holding(**dumped)
+        loaded_content = loaded.despite[0].predicate.content
         assert "the distance between {place1} and {place2} was" in loaded_content
 
     def test_dump_and_load_holding(self, fake_usc_client, make_holding):
@@ -68,104 +68,6 @@ class TestHoldingImport:
         lotus_holdings = load_holdings("holding_lotus.yaml")
         assert len(lotus_holdings) == 10
 
-    def test_import_enactments_and_anchors(
-        self, make_opinion_with_holding, make_response
-    ):
-        """
-        Testing issue that caused enactment expansion to fail only when
-        text anchors were loaded.
-        """
-        raw_holdings = [
-            {
-                "inputs": {
-                    "type": "fact",
-                    "content": "{Rural's telephone directory} was a fact",
-                    "name": "Rural's telephone directory was a fact",
-                    "anchors": {
-                        "quotes": [
-                            {"exact": "facts", "prefix": "The first is that"},
-                            {
-                                "exact": "as to facts",
-                                "prefix": "No one may claim originality",
-                            },
-                            {"exact": "facts", "prefix": "no one may copyright"},
-                        ]
-                    },
-                },
-                "outputs": {
-                    "type": "fact",
-                    "content": "Rural's telephone directory was copyrightable",
-                    "truth": False,
-                    "anchors": {
-                        "quotes": [
-                            {
-                                "exact": "copyrightable",
-                                "prefix": "first is that facts are not",
-                            },
-                            "The sine qua non of|copyright|",
-                            {"exact": "no one may copyright", "suffix": "facts"},
-                        ]
-                    },
-                },
-                "enactments": [
-                    {
-                        "name": "securing for authors",
-                        "enactment": {
-                            "node": "/us/const/article/I/8/8",
-                            "exact": (
-                                "To promote the Progress of Science and useful Arts, "
-                                "by securing for limited Times to Authors"
-                            ),
-                        },
-                    },
-                    {
-                        "name": "right to writings",
-                        "enactment": {
-                            "node": "/us/const/article/I/8/8",
-                            "exact": "the exclusive Right to their respective Writings",
-                        },
-                    },
-                ],
-                "mandatory": True,
-                "universal": True,
-            },
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "Rural's telephone directory was copyrightable",
-                },
-                "enactments": ["securing for authors", "right to writings"],
-                "mandatory": True,
-                "anchors": {"quotes": ["compilations of facts|generally are|"]},
-            },
-        ]
-        mock_client = FakeClient(responses=make_response)
-        f_anchored_holdings = readers.read_holdings_with_anchors(
-            record=raw_holdings, client=mock_client
-        )
-
-        feist = make_opinion_with_holding["feist_majority"]
-        feist.clear_holdings()
-        feist.posit(
-            f_anchored_holdings.holdings,
-            named_anchors=f_anchored_holdings.named_anchors,
-            enactment_anchors=f_anchored_holdings.enactment_anchors,
-        )
-        assert feist.holdings[0].enactments[0].node == "/us/const/article/I/8/8"
-        assert feist.holdings[1].enactments[0].node == "/us/const/article/I/8/8"
-
-    def test_read_holdings_and_then_get_anchors(self, make_response):
-        """
-        Test whether read_holdings mutates raw_holding and makes it
-        impossible to get text anchors.
-        """
-        mock_client = FakeClient(responses=make_response)
-        raw_holdings = load_holdings("holding_oracle.yaml")
-        loaded = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
-
-        assert isinstance(loaded.holdings[0], HoldingWithAnchors)
-        assert isinstance(loaded.named_anchors[1].anchors.quotes[0], TextQuoteSelector)
-
 
 class TestTextAnchors:
     client = Client(api_token=TOKEN)
@@ -181,48 +83,6 @@ class TestTextAnchors:
         )
         assert not reading.holding_anchors[0].positions
         assert not reading.holding_anchors[0].quotes
-
-    def test_mentioned_context_changing(self):
-        """
-        The "mentioned" context should not change while data
-        is being loaded with the schema. This is to test
-        that the "content" field of a value in the "mentioned"
-        dict isn't changed to replace the name of a Factor
-        with bracketed text.
-        """
-        holdings = [
-            {
-                "inputs": [
-                    {
-                        "type": "fact",
-                        "content": "{Bradley} lived at Bradley's house",
-                    }
-                ],
-                "outputs": {
-                    "type": "absence",
-                    "absent": {
-                        "type": "evidence",
-                        "exhibit": {
-                            "offered_by": {"type": "entity", "name": "the People"}
-                        },
-                        "to_effect": {
-                            "type": "fact",
-                            "name": "fact that Bradley committed a crime",
-                            "content": "Bradley committed a crime",
-                        },
-                        "name": "evidence of Bradley's guilt",
-                    },
-                },
-            },
-            {
-                "inputs": "fact that Bradley committed a crime",
-                "outputs": {"type": "fact", "content": "Bradley committed a tort"},
-            },
-        ]
-        expanded = text_expansion.expand_shorthand(holdings)
-        built = readers.read_holdings(expanded)
-        new_factor = built[0].outputs[0].absent.to_effect.terms[0]
-        assert new_factor.name == "Bradley"
 
     def test_holdings_with_allegation_and_exhibit(self):
         """

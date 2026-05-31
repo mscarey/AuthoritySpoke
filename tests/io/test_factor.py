@@ -88,7 +88,7 @@ class TestFactLoad:
 class TestFactorLoad:
     def test_load_factor_marked_reciprocal(self):
         fact = Fact(
-            predicate=Comparison(
+            predicate=Comparison.new(
                 content="the distance between {place1} and {place2} was",
                 sign="<",
                 expression="5 miles",
