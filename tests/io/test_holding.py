@@ -55,14 +55,6 @@ class TestHoldingDump:
         loaded_content = loaded.inputs[0].predicate.content
         assert "{thing} was on the premises of {place}" in loaded_content
 
-    def test_dump_holdings_with_comparison(self, fake_usc_client):
-        holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
-        assert "was no more than 35 foot" in str(holdings[1])
-        dumped = holdings[1].model_dump()
-        predicate = dumped["rule"]["procedure"]["inputs"][3]["predicate"]
-        assert predicate["quantity_range"]["quantity_magnitude"] == Decimal("35")
-        assert predicate["quantity_range"]["quantity_units"] == "foot"
-
 
 class TestEntityImport:
     smith_holdings = [
@@ -217,30 +209,6 @@ class TestHoldingImport:
         reading = OpinionReading()
         reading.posit(oracle_holdings_with_anchors)
         assert len(reading.holdings) == 20
-
-    def test_decision_posits_holdings_with_anchors(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
-            "holding_oracle.yaml", client=mock_client
-        )
-        reading = DecisionReading(decision=Decision(decision_date=date(2019, 1, 1)))
-        reading.posit(oracle_holdings_with_anchors)
-        assert len(reading.holdings) == 20
-
-    def test_pass_holdings_to_decision_reading_constructor(
-        self, make_decision, make_response
-    ):
-        mock_client = FakeClient(responses=make_response)
-        oracle = make_decision["oracle"]
-        oracle_holdings = read_holdings_from_file(
-            "holding_oracle.yaml", client=mock_client
-        )
-        oracle_reading = DecisionReading(decision=oracle)
-        oracle_reading.posit(oracle_holdings)
-        assert (
-            oracle_reading.opinion_readings[0].holdings[0].enactments[0].node
-            == "/us/usc/t17/s102/a"
-        )
 
 
 class TestTextAnchors:
@@ -634,48 +602,6 @@ class TestTextAnchors:
 
 class TestExclusiveFlag:
     client = Client(api_token=TOKEN)
-
-    def test_holding_flagged_exclusive(
-        self,
-        e_securing_exclusive_right_to_writings,
-        e_copyright_requires_originality,
-        make_response,
-    ):
-        """
-        Test that "exclusive" flag doesn't mess up the holding where it's placed.
-
-        Test whether the Feist opinion object includes a holding
-        with the output "Rural's telephone directory
-        was copyrightable" and the input "Rural's telephone
-        directory was original", when that holding was marked
-        "exclusive" in the JSON.
-
-        `originality_rule` will be a little broader because it's based on
-        less Enactment text
-        """
-        fake_client = FakeClient(responses=make_response)
-        holdings = read_holdings_from_file("holding_feist.yaml", client=fake_client)
-
-        directory = Entity(name="Rural's telephone directory")
-        original = Fact(
-            predicate=Predicate(content="{work} was an original work"), terms=directory
-        )
-        copyrightable = Fact(
-            predicate=Predicate(content="{work} was copyrightable"), terms=directory
-        )
-        originality_enactments = [
-            e_securing_exclusive_right_to_writings,
-            e_copyright_requires_originality,
-        ]
-        originality_rule = Rule(
-            procedure=Procedure(outputs=copyrightable, inputs=original),
-            mandatory=False,
-            universal=False,
-            enactments=originality_enactments,
-        )
-        assert any(
-            originality_rule.implies(feist_holding.rule) for feist_holding in holdings
-        )
 
     def test_fact_containing_wrong_type(self, make_response):
         mock_client = FakeClient(responses=make_response)

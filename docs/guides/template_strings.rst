@@ -206,7 +206,7 @@ describes. The template string will still need to end with the word
 “was”. The value of the expression parameter should be an integer or a
 floating point number, not a string to be parsed.
 
-    >>> three_children = Comparison(
+    >>> three_children = Comparison.new(
     ...     content="the number of children in {taxpayer}'s household was",
     ...     sign="=",
     ...     expression=3)
@@ -218,7 +218,7 @@ like :meth:`~nettlesome.predicates.Comparison.implies`
 or :meth:`~nettlesome.predicates.Comparison.contradicts`\,
 but no unit conversion will be available.
 
-    >>> at_least_two_children = Comparison(
+    >>> at_least_two_children = Comparison.new(
     ...     content="the number of children in {taxpayer}'s household was",
     ...     sign=">=",
     ...     expression=2)
@@ -228,9 +228,9 @@ but no unit conversion will be available.
 Comparisons of decimal numbers work similarly.
 
     >>> from decimal import Decimal
-    >>> specific_tax_rate = Comparison(
+    >>> specific_tax_rate = Comparison.new(
     ...     content="{taxpayer}'s marginal income tax rate was", sign="=", expression=Decimal(".3"))
-    >>> tax_rate_over_25 = Comparison(
+    >>> tax_rate_over_25 = Comparison.new(
     ...     content="{taxpayer}'s marginal income tax rate was", sign=">", expression=Decimal(".25"))
     >>> specific_tax_rate.implies(tax_rate_over_25)
     True
@@ -243,7 +243,7 @@ The ``expression`` field of
 a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\.
 
     >>> from datetime import date
-    >>> copyright_date_range = Comparison(
+    >>> copyright_date_range = Comparison.new(
     ...     content="the date when {work} was created was", sign=">=", expression = date(1978,1,1))
     >>> str(copyright_date_range)
     'that the date when {work} was created was at least 1978-01-01'
@@ -252,7 +252,7 @@ a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\
 And :py:class:`~datetime.date`\s and :py:class:`~datetime.date` ranges can be compared with each other,
 similar to how numbers can be compared to number ranges.
 
-    >>> copyright_date_specific = Comparison(
+    >>> copyright_date_specific = Comparison.new(
     ...     content="the date when {work} was created was", sign="=", expression = date(1980,6,20))
     >>> copyright_date_specific.implies(copyright_date_range)
     True
