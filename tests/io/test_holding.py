@@ -197,22 +197,20 @@ class TestHoldingImport:
         assert isinstance(loaded.holdings[0], HoldingWithAnchors)
         assert isinstance(loaded.named_anchors[1].anchors.quotes[0], TextQuoteSelector)
 
-    def test_load_and_posit_holdings_with_anchors(self, make_response):
-        """
-        Test that Opinion.posit can take a HoldingsIndexed as the only argument.
-        Trying to combine several tasks that normally happen together, into a single command.
-        """
-        mock_client = FakeClient(responses=make_response)
-        oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
-            "holding_oracle.yaml", client=mock_client
-        )
-        reading = OpinionReading()
-        reading.posit(oracle_holdings_with_anchors)
-        assert len(reading.holdings) == 20
-
 
 class TestTextAnchors:
     client = Client(api_token=TOKEN)
+
+    def test_load_from_fake_client(self):
+        fake_client = FakeClient.from_file("usc.json")
+        filepath = filepaths.make_filepath(filename="holding_mazza_alaluf.yaml")
+        result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
+        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
+        anchors = result.get_term_anchors(key)
+        assert anchors.quotes[0].exact.startswith(
+            "without respect to whether or not Turismo"
+        )
+        assert len(result.holdings) == 2
 
     def test_read_holding_with_no_anchor(self, make_analysis):
         raw_analysis = make_analysis["no anchors"]

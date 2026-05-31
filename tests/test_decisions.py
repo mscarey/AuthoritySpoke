@@ -283,9 +283,7 @@ class TestPosit:
         reading.posit(oracle_holdings_with_anchors)
         assert len(reading.holdings) == 20
 
-    def test_pass_holdings_to_decision_reading_constructor(
-        self, make_decision
-    ):
+    def test_pass_holdings_to_decision_reading_constructor(self, make_decision):
         oracle = make_decision["oracle"]
         oracle_holdings = list(ORACLE_HOLDINGS)
         oracle_reading = DecisionReading(decision=oracle)
@@ -316,7 +314,8 @@ class TestPosit:
 
         directory = Entity(name="Rural's telephone directory")
         original = Fact(
-            predicate=Predicate(content="{work} was an original work"), terms=[directory]
+            predicate=Predicate(content="{work} was an original work"),
+            terms=[directory],
         )
         copyrightable = Fact(
             predicate=Predicate(content="{work} was copyrightable"), terms=[directory]
