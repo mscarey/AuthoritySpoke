@@ -315,8 +315,9 @@ make calls to the API at
 the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
 the :class:`~authorityspoke.holdings.Holding`\.
 
+    >>> import copy
     >>> from authorityspoke.examples import oracle as oracle_example
-    >>> oracle_holdings = list(oracle_example.HOLDINGS)
+    >>> oracle_holdings = [copy.deepcopy(holding) for holding in oracle_example.HOLDINGS]
     >>> print(oracle_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
