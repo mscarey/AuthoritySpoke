@@ -62,23 +62,23 @@ Loading Holdings from Existing JSON
 
 Now we’re ready to look at the process of describing a
 :class:`~authorityspoke.holdings.Holding` and loading that
-information into AuthoritySpoke. In
-version 0.6, although there’s not yet a web interface for loading this
-data, there is an interface for loading JSON files, and there’s an
-OpenAPI schema specification for the input data (see below).
+information into AuthoritySpoke. Although there’s not yet a web interface
+for loading this data, there is an interface for loading JSON files,
+and there’s an OpenAPI schema specification for the input data (see below).
 
 There are several interfaces for loading Authorityspoke objects in the
 :mod:`authorityspoke.io.loaders` and :mod:`authorityspoke.io.schemas_yaml` modules.
 One way to load data is to create a YAML document that
 contains a list of objects, where each object represents one Holding.
-Then we can load the Holdings into
-AuthoritySpoke objects using
-the :func:`~authorityspoke.io.loaders.read_holdings_from_file` function.
+For this tutorial, we'll use prebuilt Holding objects from
+AuthoritySpoke's ``examples`` package.
 
-    >>> from authorityspoke.io.loaders import read_holdings_from_file
+  >>> import copy
+  >>> from authorityspoke.examples import oracle as oracle_example
+  >>> from authorityspoke.examples import lotus as lotus_example
 
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
-    >>> lotus_holdings = read_holdings_from_file("holding_lotus.yaml", client=legis_client)
+  >>> oracle_holdings = [copy.deepcopy(holding) for holding in oracle_example.HOLDINGS]
+  >>> lotus_holdings = [copy.deepcopy(holding) for holding in lotus_example.HOLDINGS]
 
 If we want to open one of the input YAML files in a text editor
 for comparison, they can be found in the folder
@@ -97,8 +97,7 @@ following sentence from the majority opinion:
    By statute, a work must be “original” to qualify for copyright
    protection. 17 U.S.C. § 102(a).
 
-The ``anchors`` field doesn’t do much yet in AuthoritySpoke version 0.6,
-but in future versions it’ll help link each Holding to the relevant
+The ``anchors`` field can be used to link each Holding to the relevant
 parts of the Opinion.
 
 The Parts of a Holding as a Python Dictionary
@@ -163,7 +162,7 @@ becomes one of the input’s ``terms``. If such an object hasn’t
 been referenced before in the file, it will be created.
 
     >>> print(oracle.holdings[0].inputs[0].terms)
-    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
+    [Entity(generic=True, name='the Java API', plural=False)]
 
 
 The JSON representation of a Rule can also have “mandatory” and
@@ -251,7 +250,7 @@ shows how to generate the schema as a Python dict and then view just the
     >>> from authorityspoke.holdings import Holding
     >>> schema = Holding.model_json_schema()
     >>> schema["properties"]
-    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'absent': {'default': False, 'title': 'Absent', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
+    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
 
 The schema can also be exported as JSON using
 the :meth:`authorityspoke.holdings.Holding.schema_json` method.

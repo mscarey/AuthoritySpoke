@@ -245,8 +245,10 @@ class FactorGroup(Comparable):
             ...     terms=TermSequence([Entity(name="UK"), Entity(name="European Union")])),
             ... Statement(predicate=Predicate(content=content),
             ...     terms=TermSequence([Entity(name="European Union"), Entity(name="Germany")])),
-            ... Statement(predicate=Predicate(content=content),
-            ...     terms=TermSequence([Entity(name="Germany"), Entity(name="UK")], truth=False)]))
+            ... Statement(
+            ...     predicate=Predicate(content=content, truth=False),
+            ...     terms=TermSequence([Entity(name="Germany"), Entity(name="UK")]),
+            ... )])
             >>> explanations_usa_like_uk = nafta.explanations_contradiction(
             ...     brexit,
             ...     context=([Entity(name="USA")], [Entity(name="UK")]))
@@ -293,8 +295,10 @@ class FactorGroup(Comparable):
         ...         terms=[Entity(name="UK"), Entity(name="European Union")]),
         ... Statement(predicate=Predicate(content="{country2} signed a treaty with {country3}"),
         ...         terms=[Entity(name="European Union"), Entity(name="Germany")]),
-        ... Statement(predicate=Predicate(content="{country3} signed a treaty with {country1}"),
-        ...     terms=[Entity(name="Germany"), Entity(name="UK")], truth=False)])
+        ... Statement(
+        ...     predicate=Predicate(content="{country3} signed a treaty with {country1}", truth=False),
+        ...     terms=[Entity(name="Germany"), Entity(name="UK")],
+        ... )])
         >>> nafta.contradicts(brexit)
         True
         """
