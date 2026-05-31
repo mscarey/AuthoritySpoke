@@ -2,8 +2,8 @@ import datetime
 import json
 import os
 from typing import Dict, List, Tuple
-
-from anchorpoint.textselectors import TextQuoteSelector
+from authorityspoke.opinions import HoldingWithAnchors
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
 from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
@@ -1651,27 +1651,49 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_analysis() -> Dict[str, List[RawHolding]]:
+def make_analysis() -> Dict[str, List[HoldingWithAnchors]]:
     """Example user analysis data."""
     return {
         "minimal": [
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "{Bradley} made a minimal holding object",
-                },
-                "anchors": {
-                    "quotes": "upholding searches in |open fields or grounds|around a house"
-                },
-            }
+            HoldingWithAnchors(
+                holding=Holding(
+                    rule=Rule(
+                        procedure=Procedure(
+                            outputs=[
+                                Fact(
+                                    predicate=Predicate(
+                                        content="{Bradley} made a minimal holding object"
+                                    )
+                                )
+                            ]
+                        )
+                    )
+                ),
+                anchors=TextPositionSet(
+                    quotes=[
+                        TextQuoteSelector.from_text(
+                            "upholding searches in |open fields or grounds|around a house"
+                        )
+                    ]
+                ),
+            )
         ],
         "no anchors": [
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "this holding has no text anchors",
-                }
-            }
+            HoldingWithAnchors(
+                holding=Holding(
+                    rule=Rule(
+                        procedure=Procedure(
+                            outputs=[
+                                Fact(
+                                    predicate=Predicate(
+                                        content="this holding has no text anchors"
+                                    )
+                                )
+                            ]
+                        )
+                    )
+                )
+            )
         ],
     }
 

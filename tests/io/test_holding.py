@@ -23,7 +23,7 @@ from authorityspoke.opinions import (
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.loaders import load_holdings, read_holdings_from_file
+from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import text_expansion
 from authorityspoke.rules import Rule
 

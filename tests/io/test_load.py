@@ -4,10 +4,7 @@ import pytest
 
 from authorityspoke import LegisClient
 from authorityspoke.io import filepaths, loaders
-from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.loaders import (
-    read_anchored_holdings_from_file,
-)
+
 
 LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
@@ -30,27 +27,3 @@ class TestHoldingLoad:
         )
         raw_holdings = loaders.load_holdings(filepath=path)
         assert raw_holdings[0]["outputs"]["type"] == "fact"
-
-
-class TestLoadAndRead:
-    client = LegisClient(api_token=LEGISLICE_API_TOKEN)
-
-    @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
-    def test_read_holding_anchors_from_yaml(self):
-        anchored = read_anchored_holdings_from_file(
-            "holding_mazza_alaluf.yaml", client=self.client
-        )
-
-        # holding anchor
-        assert "In any event" in anchored.holdings[1].anchors.quotes[0].suffix
-
-    @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
-    def test_read_enactment_anchors_from_yaml(self):
-        anchored = read_anchored_holdings_from_file(
-            "holding_mazza_alaluf.yaml", client=self.client
-        )
-
-        # enactment anchor
-        key = str(anchored.holdings[1].holding.enactments_despite[0])
-        quotes = anchored.get_enactment_anchors(key).quotes
-        assert "domestic financial" in quotes[0].exact
