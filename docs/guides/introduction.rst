@@ -744,6 +744,9 @@ explanation of why they contradict.
             accustomed to using <the Java API>
           GIVEN the ENACTMENT:
             "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
+          DESPITE the ENACTMENTS:
+            "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work." (/us/usc/t17/s102/b 2013-07-18)
+            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans; familiar symbols or designs; mere variations of typographic ornamentation, lettering, or coloring; mere listing of ingredients or contents." (/us/cfr/t37/s202.1 1992-02-21)
 
 
 That’s a really complicated holding! Good thing we have AuthoritySpoke

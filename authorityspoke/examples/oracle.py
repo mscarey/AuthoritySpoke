@@ -1,11 +1,12 @@
 import copy
-from typing import Literal, TypedDict, cast
+from typing import Literal, NotRequired, TypedDict, cast
 
 from anchorpoint.textselectors import TextQuoteSelector
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import (
     COPYRIGHTABILITY_REQUIREMENT,
     IDEA_EXPRESSION_RULE,
+    SHORT_PHRASES_EXCLUSION_RULE,
 )
 from authorityspoke.facts import AbsenceOfFactor
 from authorityspoke.holdings import HoldingGroup
@@ -48,6 +49,7 @@ class HoldingSpec(TypedDict):
     mandatory: bool
     universal: bool
     enactments: list[str]
+    enactments_despite: NotRequired[list[str]]
     inputs: list[FactorRef]
     despite: list[FactorRef]
     outputs: list[FactorRef]
@@ -504,6 +506,7 @@ HOLDING_SPECS: list[HoldingSpec] = [
         "mandatory": True,
         "universal": False,
         "enactments": ["/us/usc/t17/s102/a"],
+        "enactments_despite": ["/us/usc/t17/s102/b", "/us/cfr/t37/s202.1"],
         "inputs": [
             ("fact", "the Java language was a computer program"),
             (
@@ -704,6 +707,7 @@ def _build_holdings() -> HoldingGroup:
     enactment_by_node = {
         "/us/usc/t17/s102/a": oracle_copyrightability_requirement,
         "/us/usc/t17/s102/b": IDEA_EXPRESSION_RULE,
+        "/us/cfr/t37/s202.1": SHORT_PHRASES_EXCLUSION_RULE,
     }
 
     def make_factor(ref_type: str, fact_name: str):
@@ -734,6 +738,12 @@ def _build_holdings() -> HoldingGroup:
                         passages=[
                             copy.deepcopy(enactment_by_node[node])
                             for node in spec["enactments"]
+                        ]
+                    ),
+                    enactments_despite=EnactmentGroup(
+                        passages=[
+                            copy.deepcopy(enactment_by_node[node])
+                            for node in spec.get("enactments_despite", [])
                         ]
                     ),
                     mandatory=spec["mandatory"],

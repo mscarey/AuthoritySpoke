@@ -498,6 +498,40 @@ IDEA_EXPRESSION_RULE = EnactmentPassage(
     ),
 )
 
+SHORT_PHRASES_EXCLUSION_RULE = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/cfr/t37/s202.1",
+        start_date=date(1992, 2, 21),
+        heading="",
+        text_version=TextVersion(
+            content=(
+                "The following are examples of works not subject to copyright and "
+                "applications for registration of such works cannot be entertained: "
+                "Words and short phrases such as names, titles, and slogans; familiar "
+                "symbols or designs; mere variations of typographic ornamentation, "
+                "lettering, or coloring; mere listing of ingredients or contents."
+            ),
+            url=None,
+            id=None,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/cfr/t37/s202.1",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        positions=[
+            TextPositionSelector(
+                start=0,
+                end=None,
+            )
+        ],
+    ),
+)
+
 COPYRIGHT_REGISTRATION_EVIDENCE_RULE = EnactmentPassage(
     enactment=Enactment(
         node="/us/usc/t17/s410/c",
