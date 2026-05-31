@@ -23,6 +23,17 @@ from authorityspoke.opinions import (
 )
 
 
+class TestAnchor:
+    def test_get_term_anchors(self, make_anchored_holding):
+        anchored = make_anchored_holding["mazza"]
+        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
+        anchors = anchored.get_term_anchors(key)
+        assert anchors.quotes[0].exact.startswith(
+            "without respect to whether or not Turismo"
+        )
+        assert len(anchored.holdings) == 2
+
+
 class TestOpinions:
     def test_opinion_features(self, make_decision):
         assert make_decision["watt"].court.slug == "9th-cir"

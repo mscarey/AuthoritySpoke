@@ -201,17 +201,6 @@ class TestHoldingImport:
 class TestTextAnchors:
     client = Client(api_token=TOKEN)
 
-    def test_load_from_fake_client(self):
-        fake_client = FakeClient.from_file("usc.json")
-        filepath = filepaths.make_filepath(filename="holding_mazza_alaluf.yaml")
-        result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
-        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
-        anchors = result.get_term_anchors(key)
-        assert anchors.quotes[0].exact.startswith(
-            "without respect to whether or not Turismo"
-        )
-        assert len(result.holdings) == 2
-
     def test_read_holding_with_no_anchor(self, make_analysis):
         raw_analysis = make_analysis["no anchors"]
         reading = OpinionReading()

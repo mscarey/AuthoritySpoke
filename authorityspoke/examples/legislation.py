@@ -525,3 +525,85 @@ COPYRIGHT_REGISTRATION_EVIDENCE_RULE = EnactmentPassage(
         ],
     ),
 )
+
+
+STATE_MONEY_TRANSMITTING_LICENSE_PROVISION = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/usc/t18/s1960/b/1",
+        start_date=date(2013, 7, 18),
+        heading="",
+        text_version=TextVersion(
+            content=(
+                'the term "unlicensed money transmitting business" means a money transmitting '
+                "business which affects interstate or foreign commerce in any manner or degree "
+                "and is operated without an appropriate money transmitting license in a State "
+                "where such operation is punishable as a misdemeanor or a felony under State law, "
+                "whether or not the defendant knew that the operation was required to be licensed "
+                "or that the operation was so punishable; fails to comply with the money "
+                "transmitting business registration requirements under section 5330 of title 31, "
+                "United States Code, or regulations prescribed under such section; or otherwise "
+                "involves the transportation or transmission of funds that are known to the "
+                "defendant to have been derived from a criminal offense or are intended to be used "
+                "to promote or support unlawful activity;"
+            ),
+            url=None,
+            id=None,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/usc/t18/s1960/b/1",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact=(
+                    "is operated without an appropriate money transmitting license in a State "
+                    "where such operation is punishable as a misdemeanor or a felony under "
+                    "State law, whether or not the defendant knew that the operation was "
+                    "required to be licensed or that the operation was so punishable"
+                ),
+                prefix="",
+                suffix="",
+            )
+        ]
+    ),
+)
+
+DOMESTIC_FINANCIAL_INSTITUTION_PROVISION = EnactmentPassage(
+    enactment=Enactment(
+        node="/us/usc/t31/s5312/b/1",
+        start_date=date(2013, 7, 18),
+        heading="",
+        text_version=TextVersion(
+            content=(
+                '"domestic financial agency" and "domestic financial institution" apply to '
+                "an action in the United States of a financial agency or institution."
+            ),
+            url=None,
+            id=None,
+        ),
+        end_date=None,
+        first_published=None,
+        earliest_in_db=None,
+        anchors=[],
+        citations=[],
+        name="/us/usc/t31/s5312/b/1",
+        children=[],
+    ),
+    selection=TextPositionSet(
+        quotes=[
+            TextQuoteSelector(
+                exact=(
+                    '"domestic financial agency" and "domestic financial institution" apply '
+                    "to an action in the United States of a financial agency or institution."
+                ),
+                prefix="",
+                suffix="",
+            )
+        ]
+    ),
+)

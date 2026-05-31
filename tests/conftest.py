@@ -20,6 +20,7 @@ from authorityspoke.decisions import DecisionReading
 from authorityspoke.examples.beard_act import rules as beard_act_rules
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
+from authorityspoke.examples.mazza import anchored_holdings as mazza_holdings
 from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
 from authorityspoke.examples.brad import anchored_holdings as brad_holdings
 from authorityspoke.examples.cardenas import anchored_holdings as cardenas_holdings
@@ -1603,20 +1604,7 @@ def make_anchored_holding(make_response, make_decision):
     return {
         "feist": feist_holdings(),
         "lotus": lotus_holdings(),
-        "oracle": oracle_holdings(),
-        "brad": brad_holdings(),
-        "cardenas": cardenas_holdings(),
-        "watt": watt_holdings(),
-    }
-
-
-@pytest.fixture(scope="class")
-def make_anchored_holding_with_yaml(
-    make_response, make_decision
-) -> Dict[str, List[AnchoredHolding]]:
-    return {
-        "feist": feist_holdings(),
-        "lotus": lotus_holdings(),
+        "mazza": mazza_holdings(),
         "oracle": oracle_holdings(),
         "brad": brad_holdings(),
         "cardenas": cardenas_holdings(),
