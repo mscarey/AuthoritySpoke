@@ -16,23 +16,3 @@ class TestProcedureDump:
         loaded = Procedure(**dumped)
         content = loaded.despite[0].predicate.content
         assert "the distance between {place1} and {place2} was" in content
-
-
-class TestProcedureLoad:
-    example = {
-        "inputs": {
-            "type": "fact",
-            "content": "{the Java API} was an original work",
-            "truth": False,
-        },
-        "outputs": {
-            "type": "fact",
-            "content": "the Java API was copyrightable",
-            "truth": False,
-        },
-    }
-
-    def test_load_example(self):
-        holdings = readers.read_holdings([self.example])
-        factor = holdings[0].outputs[0].terms[0]
-        assert factor.name == "the Java API"

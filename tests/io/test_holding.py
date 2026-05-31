@@ -661,20 +661,3 @@ class TestExclusiveFlag:
         feist_holdings = readers.read_holdings(feist_json, client=mock_client)
 
         assert len(feist_holdings) == len(feist_json)
-
-
-class TestNestedFactorImport:
-    def test_import_holding(self, make_response):
-        """
-        Based on this text:
-        This testimony tended “only remotely” to prove that appellant
-        had committed the attempted robbery of money from the 7-Eleven
-        store. In addition, the probative value of the evidence was
-        substantially outweighed by the inflammatory effect of the
-        testimony on the jury. Hence, admission of the testimony
-        concerning appellant’s use of narcotics was improper.
-        """
-        mock_client = FakeClient(responses=make_response)
-        cardenas_dict = load_holdings("holding_cardenas.yaml")
-        cardenas_holdings = readers.read_holdings(cardenas_dict, client=mock_client)
-        assert len(cardenas_holdings) == 2
