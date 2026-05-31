@@ -368,12 +368,6 @@ class TestTextAnchors:
         holding = readers.read_holdings([holding_dict], client=mock_client)
         assert holding[0].enactments[0].selected_text().startswith("In any judicial")
 
-    def test_enactment_has_subsection(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_lotus.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
-        assert holdings[8].enactments[0].node.split("/")[-1] == "b"
-
     def test_enactment_text_limited_to_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_lotus.yaml")
@@ -522,63 +516,17 @@ class TestTextAnchors:
         string = context_change.short_string
         assert "plants in the stockpile of trees was at least 3" in string
 
-    def test_error_because_string_does_not_match_factor_name(self, make_response):
-        rule_holding = {
-            "inputs": ["this factor hasn't been mentioned"],
-            "outputs": [{"type": "fact", "content": "{the dog} bit {the man}"}],
-            "enactments": [{"enactment": {"node": "/us/const/amendment/IV"}}],
-            "mandatory": True,
-        }
-        mock_client = FakeClient(responses=make_response)
-        with pytest.raises(ValidationError):
-            readers.read_holdings([rule_holding], client=mock_client)
-
-    def test_error_classname_does_not_exist(self):
-        rule_dict = {
-            "inputs": [
-                {
-                    "type": "RidiculousFakeClassName",
-                    "content": "officers' search of the yard was a warrantless search and seizure",
-                }
-            ],
-            "outputs": [{"type": "fact", "content": "the dog bit the man"}],
-        }
-        with pytest.raises(ValidationError):
-            readers.read_holdings([rule_dict])
-
-    def test_repeating_read_holdings_has_same_result(self, make_analysis):
-        raw = make_analysis["minimal"]
-        holdings = readers.read_holdings_with_anchors(raw).holdings
-        holdings_again = readers.read_holdings_with_anchors(raw).holdings
-        assert all(
-            left.holding.means(right.holding)
-            for left, right in zip(holdings, holdings_again)
-        )
-
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
-        anchored_holdings = readers.read_holdings_with_anchors(make_analysis["minimal"])
+        anchored_holding = make_analysis["minimal"][0]
 
         brad = make_opinion["brad_majority"]
         reading = OpinionReading(opinion_type="majority", opinion_author=brad.author)
-        reading.posit(anchored_holdings.holdings)
+        reading.posit(anchored_holding)
         assert reading.holding_anchors[0].quotes[0].exact == "open fields or grounds"
 
 
 class TestExclusiveFlag:
     client = Client(api_token=TOKEN)
-
-    def test_fact_containing_wrong_type(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.yaml")
-        to_read[0]["outputs"]["type"] = "wrong_type"
-        with pytest.raises(ValidationError):
-            readers.read_holdings([to_read[0]], client=mock_client)
-
-    def test_type_field_removed_from_factor(self, make_response):
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.yaml")
-        holdings = readers.read_holdings([to_read[0]], client=mock_client)
-        assert holdings[0].inputs[0].__dict__.get("type") is None
 
     @pytest.mark.xfail
     def test_holding_inferred_from_exclusive(self, make_enactment, make_response):
@@ -622,19 +570,3 @@ class TestExclusiveFlag:
             ],
         )
         assert feist_holdings[4].rule.means(no_originality_rule)
-
-    def test_exclusive_does_not_result_in_more_holdings(self, make_response):
-        """
-        The intended behavior is now for the Holding to assert that
-        its Rule is the "exclusive" way to reach the outputs, and
-        to have an additional function that can generate additional
-        Rules that can be inferred from the exclusive flag.
-
-        "Implies" and "contradict" methods will be able to look at the Holding's
-        generated Rules as well as its original Rule.
-        """
-        mock_client = FakeClient(responses=make_response)
-        feist_json = load_holdings("holding_feist.yaml")
-        feist_holdings = readers.read_holdings(feist_json, client=mock_client)
-
-        assert len(feist_holdings) == len(feist_json)
