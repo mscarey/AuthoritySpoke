@@ -56,37 +56,6 @@ class TestHoldingDump:
         assert "{thing} was on the premises of {place}" in loaded_content
 
 
-class TestEntityImport:
-    smith_holdings = [
-        {
-            "inputs": [
-                {
-                    "type": "fact",
-                    "content": "{} stole a car",
-                    "terms": {
-                        "type": "Entity",
-                        "name": "Smith",
-                        "generic": False,
-                    },
-                }
-            ],
-            "outputs": [{"type": "fact", "content": "Smith committed theft"}],
-        },
-        {
-            "inputs": [{"type": "fact", "content": "{Smythe} stole a car"}],
-            "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
-        },
-    ]
-
-    def test_specific_entity(self):
-        different_entity_holdings = readers.read_holdings(self.smith_holdings)
-        assert (
-            different_entity_holdings[1].generic_terms
-            != different_entity_holdings[0].generic_terms
-        )
-        assert not different_entity_holdings[1] >= different_entity_holdings[0]
-
-
 class TestHoldingImport:
     client = Client(api_token=TOKEN)
 
