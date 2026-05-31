@@ -1292,6 +1292,13 @@ class ContextRegister:
             replacements=list(self.reverse_matches.values()),
         )
 
+    def _copy(self) -> ContextRegister:
+        """Shallow-copy self: new dicts, shared Term references."""
+        new = ContextRegister()
+        new._matches = self._matches.copy()
+        new._reverse_matches = self._reverse_matches.copy()
+        return new
+
     def merged_with(
         self, incoming_mapping: ContextRegister
     ) -> Optional[ContextRegister]:
@@ -1307,7 +1314,7 @@ class ContextRegister:
             appears to match to two different :class:`Factor`\s in the other.
             Otherwise returns an updated :class:`ContextRegister` of matches.
         """
-        self_mapping = deepcopy(self)
+        self_mapping = self._copy()
         for in_key, in_value in incoming_mapping.factor_pairs():
             try:
                 self_mapping.insert_pair(key=in_key, value=in_value)
