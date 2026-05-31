@@ -315,8 +315,8 @@ make calls to the API at
 the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
 the :class:`~authorityspoke.holdings.Holding`\.
 
-    >>> from authorityspoke.io.loaders import read_holdings_from_file
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
+    >>> from authorityspoke.examples import oracle as oracle_example
+    >>> oracle_holdings = list(oracle_example.HOLDINGS)
     >>> print(oracle_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -332,13 +332,11 @@ using the ``.model_dump()`` or ``.model_dump_json()`` methods.
 
     >>> from pprint import pprint
     >>> pprint(oracle_holdings[0].model_dump()["rule"]["procedure"]["outputs"])
-    [{'absent': False,
-      'generic': False,
+    [{'generic': False,
       'name': 'false the Java API was copyrightable',
       'predicate': {'content': '{the_java_api} was copyrightable', 'truth': False},
       'standard_of_proof': None,
-      'terms': [{'absent': False,
-                 'generic': True,
+      'terms': [{'generic': True,
                  'name': 'the Java API',
                  'plural': False}]}]
 
@@ -360,9 +358,10 @@ the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke import Decision, DecisionReading
-    >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
-    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.yaml", client=legis_client)
-    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.yaml", client=legis_client)
+    >>> from authorityspoke.examples import oracle as oracle_example
+    >>> from authorityspoke.examples import lotus as lotus_example
+    >>> oracle_holdings_with_anchors = oracle_example.anchored_holdings()
+    >>> lotus_holdings_with_anchors = lotus_example.anchored_holdings()
     >>> oracle = DecisionReading(decision=oracle_case)
     >>> lotus = DecisionReading(decision=lotus_case)
     >>> oracle.posit(oracle_holdings_with_anchors)
@@ -446,7 +445,7 @@ indicate that the Java API is a generic :class:`nettlesome.entities.Entity` ment
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_terms()
-    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
+    [Entity(generic=True, name='the Java API', plural=False)]
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
 in the sense that in the context of
@@ -485,7 +484,7 @@ angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> lotus.holdings[0].generic_terms()
-    [Entity(generic=True, absent=False, name='Borland International', plural=False), Entity(generic=True, absent=False, name='the Lotus menu command hierarchy', plural=False)]
+    [Entity(generic=True, name='Borland International', plural=False), Entity(generic=True, name='the Lotus menu command hierarchy', plural=False)]
 
 The same :class:`~authorityspoke.rules.Rule`\s and
 :class:`~authorityspoke.holdings.Holding`\s may be relevant to more than one
@@ -745,9 +744,6 @@ explanation of why they contradict.
             accustomed to using <the Java API>
           GIVEN the ENACTMENT:
             "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
-          DESPITE the ENACTMENTS:
-            "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
-            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans;…" (/us/cfr/t37/s202.1 1992-02-21)
 
 
 That’s a really complicated holding! Good thing we have AuthoritySpoke
@@ -840,8 +836,9 @@ To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
     >>> from authorityspoke.io.loaders import load_decision_as_reading
+    >>> from authorityspoke.examples import feist as feist_example
     >>> feist = load_decision_as_reading("feist_h.json")
-    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.yaml", client=legis_client))
+    >>> feist.posit(feist_example.anchored_holdings())
 
 
 `Feist Publications, Inc. v. Rural Telephone Service
