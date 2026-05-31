@@ -4,9 +4,9 @@ import os
 import pathlib
 
 from pydantic import ValidationError
-from nettlesome.entities import Entity
-from nettlesome.terms import TermSequence
-from nettlesome.quantities import Comparison, UnitRange
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import TermSequence
+from authorityspoke.nettlesome.quantities import Comparison, UnitRange
 
 import pytest
 

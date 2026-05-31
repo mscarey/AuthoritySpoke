@@ -14,8 +14,8 @@ from anchorpoint.textselectors import (
     TextPositionSelector,
 )
 from legislice.enactments import EnactmentPassage
-from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
-from nettlesome.factors import Factor
+from authorityspoke.nettlesome.terms import Comparable, ContextRegister, Explanation, Term
+from authorityspoke.nettlesome.factors import Factor
 from pydantic import field_validator, BaseModel
 
 from authorityspoke.facts import (

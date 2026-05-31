@@ -17,15 +17,15 @@ from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
 from legislice.types import RawEnactment
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
     Term,
     TermSequence,
 )
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure, RawProcedure
 from authorityspoke.facts import AbsenceOfFactor
 

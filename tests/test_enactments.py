@@ -10,8 +10,8 @@ from legislice.citations import CodeLevel
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
 
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
 
 from pydantic import ValidationError
 import pytest

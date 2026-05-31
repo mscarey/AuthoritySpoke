@@ -15,7 +15,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from pydantic import field_validator, BaseModel
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -23,9 +23,9 @@ from nettlesome.terms import (
     Term,
     TermSequence,
 )
-from nettlesome.factors import Factor
+from authorityspoke.nettlesome.factors import Factor
 from authorityspoke.groups import FactorGroup
-from nettlesome.formatting import indented
+from authorityspoke.nettlesome.formatting import indented
 
 from authorityspoke.facts import (
     FactorOrAbsence,

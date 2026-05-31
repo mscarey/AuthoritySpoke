@@ -1,14 +1,14 @@
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     ContextRegister,
     consistent_with,
     contradicts,
     means,
 )
 
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison
 
 from authorityspoke.facts import Fact
 

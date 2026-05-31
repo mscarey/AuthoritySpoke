@@ -15,10 +15,10 @@ from pydantic import (
 )
 from slugify import slugify
 
-from nettlesome.entities import Entity
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented, wrapped
-from nettlesome.terms import (
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented, wrapped
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -26,8 +26,8 @@ from nettlesome.terms import (
     TermSequence,
     new_context_helper,
 )
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, QuantityRange
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, QuantityRange
 
 
 RawPredicate = Dict[str, Union[str, bool]]

@@ -14,10 +14,10 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.holdings import Holding
 
-from nettlesome.terms import ContextRegister, TermSequence
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
-from nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.statements import Statement
 from authorityspoke.groups import FactorGroup
 
 

@@ -8,7 +8,7 @@ from anchorpoint.textselectors import (
     TextSelectionError,
 )
 
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.facts import Fact, Predicate
 from authorityspoke.examples.brad import anchored_holdings as brad_holdings

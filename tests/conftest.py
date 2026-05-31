@@ -9,11 +9,11 @@ from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
 from legislice.enactments import Enactment
 
-from nettlesome.terms import ContextRegister
-from nettlesome.entities import Entity
-from nettlesome.factors import Factor
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.terms import ContextRegister
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.decisions import DecisionReading

@@ -1,7 +1,7 @@
 import pytest
 
-from nettlesome.terms import ContextRegister
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister
+from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.facts import Fact
 from authorityspoke.examples.watt import ENTITIES as WATT_ENTITIES

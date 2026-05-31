@@ -20,7 +20,6 @@ dependencies = [
     "pyyaml",
     "requests",
     "roman",
-    "nettlesome",
 ]
 
 [build-system]
@@ -35,6 +34,3 @@ dev = [
     "sphinx>=9.1.0",
     "sphinx-autodoc-typehints>=3.10.2",
 ]
-
-[tool.uv.sources]
-nettlesome = { git = "https://github.com/mscarey/nettlesome.git", rev = "fix-keyerror" }

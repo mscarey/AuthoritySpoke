@@ -6,12 +6,12 @@ import os
 from dotenv import load_dotenv
 from legislice.download import Client
 from legislice.groups import EnactmentGroup
-from nettlesome.terms import ContextRegister, TermSequence
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_, UnitRange
-from nettlesome.statements import Statement
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_, UnitRange
+from authorityspoke.nettlesome.statements import Statement
 import pytest
 
 from authorityspoke.facts import Exhibit, Fact

@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Tuple, Sequence, Union
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
 from legislice.types import RawEnactment
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading

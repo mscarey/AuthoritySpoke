@@ -4,9 +4,9 @@ from justopinion.decisions import Decision
 from justopinion import CAPClient, Opinion
 from legislice import Enactment
 from legislice.download import Client as LegisClient
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison
 
 from .decisions import DecisionReading
 from .facts import Fact, Exhibit, Evidence, Allegation, Pleading

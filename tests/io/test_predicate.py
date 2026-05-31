@@ -1,11 +1,11 @@
 from datetime import date
 from decimal import Decimal
 
-from nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.predicates import Predicate
 
 import pytest
 
-from nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.quantities import Comparison, Q_
 
 
 class TestPredicateLoad:

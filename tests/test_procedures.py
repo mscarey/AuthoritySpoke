@@ -4,11 +4,11 @@ import pytest
 
 from pydantic import ValidationError
 
-from nettlesome.terms import ContextRegister, Explanation, TermSequence
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister, Explanation, TermSequence
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_
 
 from authorityspoke.facts import AbsenceOfFactor, Fact
 from authorityspoke.procedures import Procedure

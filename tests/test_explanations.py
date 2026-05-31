@@ -1,6 +1,6 @@
-from nettlesome.terms import ContextRegister, means
-from nettlesome.entities import Entity
-from nettlesome import Predicate
+from authorityspoke.nettlesome.terms import ContextRegister, means
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome import Predicate
 
 from authorityspoke import Fact
 from authorityspoke.io.text_expansion import expand_shorthand

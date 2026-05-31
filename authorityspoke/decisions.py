@@ -17,8 +17,8 @@ from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
 from justopinion.citations import CAPCitation
 
-from nettlesome.terms import Comparable, ContextRegister, Explanation
-from nettlesome.factors import Factor
+from authorityspoke.nettlesome.terms import Comparable, ContextRegister, Explanation
+from authorityspoke.nettlesome.factors import Factor
 from pydantic import BaseModel
 
 from authorityspoke.holdings import Holding, HoldingGroup

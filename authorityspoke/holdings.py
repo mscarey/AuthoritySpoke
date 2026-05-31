@@ -18,7 +18,7 @@ from typing import Optional, Sequence, Union
 
 from legislice.enactments import Enactment
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -28,8 +28,8 @@ from nettlesome.terms import (
     contradicts,
     new_context_helper,
 )
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented, wrapped
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented, wrapped
 from authorityspoke.groups import FactorGroup
 
 from pydantic import field_validator, model_validator, BaseModel

@@ -2,8 +2,8 @@ import operator
 
 import pytest
 
-from nettlesome.terms import ContextRegister, means
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister, means
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
 
 from authorityspoke.facts import Fact

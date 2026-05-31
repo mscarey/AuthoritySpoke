@@ -1,6 +1,6 @@
 import logging
 
-from nettlesome import Entity
+from authorityspoke.nettlesome import Entity
 
 from authorityspoke.facts import Fact, Predicate, Exhibit
 
