@@ -14,10 +14,11 @@ from nettlesome.quantities import Comparison, Q_, UnitRange
 from nettlesome.statements import Statement
 import pytest
 
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Exhibit, Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
+from tests.conftest import fake_beard_client
 
 load_dotenv()
 
@@ -1166,3 +1167,75 @@ class TestStatuteRules:
         )
         combined = loan_without_exceptions + elements_of_offense
         assert combined
+
+
+class TestLoadRules:
+    """
+    Tests loading Rules, possibly for linking to legislation without
+    reference to any Opinion or Holding.
+    """
+
+    client = Client(api_token=TOKEN)
+
+    def test_loading_rules(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert (
+            beard_rules[0].outputs[0].predicate.content
+            == "{the_suspected_beard} was a beard"
+        )
+
+    def test_imported_rule_is_type_rule(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert isinstance(beard_rules[0], Rule)
+
+    def test_rule_short_string(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert beard_rules[0].short_string.lower().startswith("the rule")
+
+    def test_rule_with_exhibit_as_context_factor(self, make_beard_rule_with_python):
+        rules = make_beard_rule_with_python
+        exhibit = rules[6].inputs[0].terms[2]
+        assert isinstance(exhibit, Exhibit)
+
+    def test_read_rules_without_regime(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert beard_rules[0].inputs[0].short_string == (
+            "the fact that <the suspected beard> was facial hair"
+        )
+
+    def test_correct_context_after_loading_rules(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        elements_of_offense = beard_rules[11]
+        assert len(elements_of_offense.despite) == 1
+        assert (
+            elements_of_offense.inputs[2].generic_terms()[1].name
+            == "the Department of Beards"
+        )
+
+    def test_load_any_enactments(self, make_beard_rule_with_python):
+        """Test bug where holding's enactment's aren't loaded."""
+        beard_rules = make_beard_rule_with_python
+        expected = "facial hair no shorter than 5 millimetres"
+        assert expected in beard_rules[0].enactments[0].selected_text()
+
+    @pytest.mark.vcr
+    def test_generic_terms_after_adding_rules(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        loan_is_transfer = beard_rules[7]
+        elements_of_offense = beard_rules[11]
+        loan_without_exceptions = (
+            loan_is_transfer
+            + elements_of_offense.inputs[1]
+            + elements_of_offense.inputs[2]
+            + elements_of_offense.enactments[1]
+        )
+        loan_establishes_offense = loan_without_exceptions + elements_of_offense
+        assert str(loan_establishes_offense.outputs[0]) == (
+            "the fact that <the defendant> committed the offense of improper "
+            "transfer of beardcoin"
+        )
+        assert len(loan_establishes_offense.despite) == 1
+        assert (
+            loan_establishes_offense.inputs[0].generic_terms()[-1].name
+            == "the Department of Beards"
+        )

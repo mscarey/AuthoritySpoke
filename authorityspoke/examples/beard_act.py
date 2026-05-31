@@ -78,7 +78,7 @@ def rules() -> list[Rule]:
     fact_no_exemption = Fact(
         predicate=Predicate(
             content=(
-                "the office of {the_Department_of_Beards} granted an exemption "
+                "the office of {the_department_of_beards} granted an exemption "
                 "authorizing the defendant's act of wearing the suspected beard"
             ),
             truth=False,
@@ -98,19 +98,21 @@ def rules() -> list[Rule]:
     fact_defendant_exemption = Fact(
         predicate=Predicate(
             content=(
-                "the Department of Beards granted an exemption authorizing the "
+                "{the_department_of_beards} granted an exemption authorizing the "
                 "defendant's act of wearing the suspected beard"
             )
         ),
-        name="the Department of Beards granted the defendant's beard exemption",
+        terms=[department],
+        name="{the_department_of_beards} granted the defendant's beard exemption",
     )
     fact_general_exemption = Fact(
         predicate=Predicate(
             content=(
-                "the Department of Beards granted an exemption from the prohibition "
+                "{the_department_of_beards} granted an exemption from the prohibition "
                 "of wearing beards"
             )
-        )
+        ),
+        terms=[department],
     )
     defendant_beardcoin = Exhibit(
         offered_by=defendant,
@@ -136,56 +138,56 @@ def rules() -> list[Rule]:
     purchase_transfer = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was {the_defendant}'s purchase of any "
-                "beardcoin from {the_counterparty}"
+                "{the_beardcoin_transaction} was {the_defendant}'s purchase of {defendant_beardcoin} "
+                "from {the_counterparty}"
             )
         ),
-        terms=[transaction, defendant, counterparty],
+        terms=[transaction, defendant, counterparty, defendant_beardcoin],
     )
     counterparty_purchase = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was the counterparty's purchase of any "
-                "beardcoin from the defendant"
+                "{the_beardcoin_transaction} was {the_counterparty}'s purchase of {defendant_beardcoin} "
+                "from {the_defendant}"
             )
         ),
-        terms=[transaction],
+        terms=[transaction, counterparty, defendant_beardcoin, defendant],
     )
     defendant_loan = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was the defendant's loan of any beardcoin "
-                "to the counterparty"
+                "{the_beardcoin_transaction} was {the_defendant}'s loan of {defendant_beardcoin} "
+                "to {the_counterparty}"
             )
         ),
-        terms=[transaction],
+        terms=[transaction, defendant, counterparty, defendant_beardcoin],
     )
     defendant_lease = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was the defendant's lease of any beardcoin "
-                "to the counterparty"
+                "{the_beardcoin_transaction} was {the_defendant}'s lease of {defendant_beardcoin} "
+                "to {the_counterparty}"
             )
         ),
-        terms=[transaction],
+        terms=[transaction, defendant, defendant_beardcoin, counterparty],
     )
     defendant_gift = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was the defendant's gift of any beardcoin "
-                "to the counterparty"
+                "{the_beardcoin_transaction} was {the_defendant}'s gift of {defendant_beardcoin} "
+                "to {the_counterparty}"
             )
         ),
-        terms=[transaction],
+        terms=[transaction, defendant, defendant_beardcoin, counterparty],
     )
     defendant_receipt = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was the defendant's receipt of any "
-                "beardcoin from the counterparty"
+                "{the_beardcoin_transaction} was {the_defendant}'s receipt of {defendant_beardcoin} "
+                "from {the_counterparty}"
             )
         ),
-        terms=[transaction],
+        terms=[transaction, defendant, defendant_beardcoin, counterparty],
     )
     licensed_repurchase = Fact(
         predicate=Predicate(
@@ -196,9 +198,9 @@ def rules() -> list[Rule]:
     absent_licensed_repurchase = AbsenceOfFactor(absent=licensed_repurchase)
     counterparty_not_department = Fact(
         predicate=Predicate(
-            content="{the_counterparty} was the Department of Beards", truth=False
+            content="{the_counterparty} was {the_department_of_beards}", truth=False
         ),
-        terms=[counterparty],
+        terms=[counterparty, department],
     )
     counterfeit_beardcoin = Fact(
         predicate=Predicate(content="any beardcoin was counterfeit")
@@ -228,11 +230,11 @@ def rules() -> list[Rule]:
     barber_purchase = Fact(
         predicate=Predicate(
             content=(
-                "{the_beardcoin_transaction} was {the_barber}'s purchase of any "
-                "beardcoin from {the_customer}"
+                "{the_beardcoin_transaction} was {the_barber}'s purchase of {defendant_beardcoin} "
+                "from {the_customer}"
             )
         ),
-        terms=[transaction, barber, customer],
+        terms=[transaction, barber, customer, defendant_beardcoin],
     )
     barber_removed_beard = Fact(
         predicate=Predicate(
@@ -245,10 +247,11 @@ def rules() -> list[Rule]:
     barber_licensed = Fact(
         predicate=Predicate(
             content=(
-                "the Department of Beards licensed the barber to purchase beardcoins "
+                "{the_department_of_beards} licensed the barber to purchase beardcoins "
                 "from customers"
             )
-        )
+        ),
+        terms=[department],
     )
 
     return [
