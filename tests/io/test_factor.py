@@ -5,11 +5,12 @@ import pathlib
 from pydantic import ValidationError
 from nettlesome.entities import Entity
 from nettlesome.terms import TermSequence
-from nettlesome.quantities import Comparison
+from nettlesome.quantities import Comparison, UnitRange
 
 import pytest
 
 from authorityspoke.facts import Fact, Exhibit, Evidence
+
 from authorityspoke.io import readers
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
@@ -109,20 +110,23 @@ class TestFactDump:
 
 class TestExhibitLoad:
     def test_load_exhibit_with_bracketed_names(self):
-        fact_data = {
-            "content": "the distance that {officer} pursued {suspect} was >= 5 miles",
-            "terms": [
-                {"type": "Entity", "name": "Officer Lin"},
-                {"type": "Entity", "name": "Al"},
-            ],
-        }
-        exhibit_data = {
-            "offered_by": {"type": "Entity", "name": "Officer Lin"},
-            "form": "testimony",
-            "statement": fact_data,
-            "statement_attribution": {"name": "Officer Lin"},
-        }
-        exhibit = Exhibit(**exhibit_data)
+        fact_data = Fact(
+            predicate=Comparison(
+                content="the distance that {officer} pursued {suspect} was",
+                quantity_range=UnitRange(
+                    quantity_magnitude=Decimal("5"), quantity_units="mile", sign=">="
+                ),
+            ),
+            terms=TermSequence(root=[Entity(name="Officer Lin"), Entity(name="Al")]),
+        )
+        exhibit_data = Exhibit(
+            offered_by=Entity(name="Officer Lin"),
+            form="testimony",
+            statement=fact_data,
+            statement_attribution=Entity(name="Officer Lin"),
+        )
+        dumped = exhibit_data.model_dump()
+        exhibit = Exhibit(**dumped)
         assert str(exhibit) == (
             "the testimony attributed to <Officer Lin>, "
             "asserting the fact that the distance that <Officer Lin> "
