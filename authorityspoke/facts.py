@@ -16,7 +16,7 @@ from pydantic import (
 from slugify import slugify
 
 from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.factors import Factor, AbsenceOf
 from authorityspoke.nettlesome.formatting import indented, wrapped
 from authorityspoke.nettlesome.terms import (
     Comparable,
@@ -664,56 +664,10 @@ class Allegation(Factor, BaseModel):
         return super().__str__().format(string).replace("Allegation", "allegation")
 
 
-class AbsenceOfFactor(Comparable, BaseModel):
-    generic: bool = False
+class AbsenceOfFactor(AbsenceOf):
+    """Absence of a Factor specific to the AuthoritySpoke layer."""
+
     absent: Fact | Evidence | Exhibit | Pleading | Allegation
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("absent",)
-
-    def __str__(self):
-        return f"absence of {str(self.absent)}"
-
-    def _explanations_implication(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
-        if not isinstance(other, Comparable):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "implication with other Comparable objects or None."
-            )
-
-        reversed_explanation = explanation.with_context(explanation.context.reversed())
-        if isinstance(other, self.__class__):
-            test = other.absent._implies_if_present(self.absent, reversed_explanation)
-        else:
-            test = other._contradicts_if_present(self.absent, reversed_explanation)
-        yield from (
-            register.with_context(register.context.reversed()) for register in test
-        )
-
-    def _explanations_contradiction(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
-        if not isinstance(other, Comparable):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "contradiction with other Factor objects or None."
-            )
-        # No contradiction between absences of any two Comparables
-        if not isinstance(other, self.__class__):
-            if not isinstance(other, Term):
-                explanation_reversed = explanation.reversed_context()
-                yield from other._explanations_contradiction(
-                    self, explanation=explanation_reversed
-                )
-            elif isinstance(other, self.absent.__class__):
-                explanation_reversed = explanation.with_context(
-                    explanation.context.reversed()
-                )
-                test = other._implies_if_present(self.absent, explanation_reversed)
-                for new_explanation in test:
-                    yield new_explanation.with_context(
-                        new_explanation.context.reversed()
-                    )
 
 
 FactorOrAbsence = Union[Fact, AbsenceOfFactor, Exhibit, Pleading, Allegation, Evidence]

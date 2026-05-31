@@ -1,16 +1,5 @@
-"""AuthoritySpoke specialization of nettlesome FactorGroup."""
+"""AuthoritySpoke re-export of nettlesome FactorGroup."""
 
-from authorityspoke.facts import AbsenceOfFactor
-from authorityspoke.nettlesome.groups import (
-    FactorGroup as NettlesomeFactorGroup,
-    unique_explanations,
-)
-
-
-class FactorGroup(NettlesomeFactorGroup):
-    """A FactorGroup that accepts AuthoritySpoke's AbsenceOfFactor."""
-
-    absence_class = AbsenceOfFactor
-
+from authorityspoke.nettlesome.groups import FactorGroup, unique_explanations
 
 __all__ = ["FactorGroup", "unique_explanations"]
