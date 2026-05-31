@@ -1,7 +1,5 @@
 """Groups of comparable Terms."""
 
-# pyright: reportIncompatibleVariableOverride=false
-
 from __future__ import annotations
 
 from copy import deepcopy

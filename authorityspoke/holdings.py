@@ -666,8 +666,17 @@ class HoldingGroup(FactorGroup):
 
     term_class = Holding
 
-    def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
+    def __init__(
+        self,
+        holdings: Union[Sequence[Holding], Holding] = (),
+        *,
+        sequence: Optional[Union[Sequence[Holding], Holding]] = None,
+    ):
         """Validate that HoldingGroup is created from a sequence of Holdings."""
+        if sequence is not None:
+            if holdings != ():
+                raise TypeError("Use either 'holdings' or 'sequence', not both.")
+            holdings = sequence
         if isinstance(holdings, Iterable):
             holdings = tuple(holdings)
         else:
