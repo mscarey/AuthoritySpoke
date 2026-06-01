@@ -1,29 +1,44 @@
 import datetime
 import json
 import os
-from typing import Any, Dict, List, Text, Tuple
-
-from anchorpoint.textselectors import TextQuoteSelector
+from typing import Dict, List, Tuple
+from authorityspoke.opinions import HoldingWithAnchors
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
 from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
 from legislice.enactments import Enactment
 
-from nettlesome.terms import ContextRegister
-from nettlesome.entities import Entity
-from nettlesome.factors import Factor
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.terms import ContextRegister
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.decisions import DecisionReading
-from authorityspoke.facts import Allegation, Fact, build_fact, Evidence, RawFactor
+from authorityspoke.examples.beard_act import rules as beard_act_rules
+from authorityspoke.examples.feist import anchored_holdings as feist_holdings
+from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
+from authorityspoke.examples.mazza import anchored_holdings as mazza_holdings
+from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
+from authorityspoke.examples.brad import anchored_holdings as brad_holdings
+from authorityspoke.examples.cardenas import anchored_holdings as cardenas_holdings
+from authorityspoke.examples.watt import anchored_holdings as watt_holdings
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Allegation,
+    Fact,
+    build_fact,
+    Evidence,
+    RawFactor,
+)
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
-from authorityspoke.opinions import Opinion, OpinionReading, AnchoredHoldings
+from authorityspoke.opinions import OpinionReading
 from authorityspoke.rules import Procedure, Rule
 
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
 
 load_dotenv()
@@ -233,183 +248,184 @@ def make_entity() -> Dict[str, Entity]:
 
 @pytest.fixture(scope="class")
 def make_predicate() -> Dict[str, Predicate]:
-
     return {
-        "p1": Predicate(content="$place was a motel"),
-        "p1_again": Predicate(content="$place was a motel"),
-        "p2": Predicate(content="$person operated and lived at $place"),
-        "p2_reflexive": Predicate(content="$person operated and lived at $person"),
+        "p1": Predicate(content="{place} was a motel"),
+        "p1_again": Predicate(content="{place} was a motel"),
+        "p2": Predicate(content="{person} operated and lived at {place}"),
+        "p2_reflexive": Predicate(content="{person} operated and lived at {person}"),
         "p2_no_truth": Predicate(
-            content="$person operated and lived at $place", truth=None
+            content="{person} operated and lived at {place}", truth=None
         ),
         "p2_false": Predicate(
-            content="$person operated and lived at $place", truth=False
+            content="{person} operated and lived at {place}", truth=False
         ),
-        "p3": Predicate(content="$place was ${person}’s abode"),
-        "p3_false": Predicate(content="$place was ${person}’s abode", truth=False),
-        "p4": Predicate(content="$thing was on the premises of $place"),
-        "p5": Predicate(content="$thing was a stockpile of Christmas trees"),
-        "p6": Predicate(content="$thing was among some standing trees"),
-        "p7": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p3": Predicate(content="{place} was {person}’s abode"),
+        "p3_false": Predicate(content="{place} was {person}’s abode", truth=False),
+        "p4": Predicate(content="{thing} was on the premises of {place}"),
+        "p5": Predicate(content="{thing} was a stockpile of Christmas trees"),
+        "p6": Predicate(content="{thing} was among some standing trees"),
+        "p7": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             truth=False,
             sign=">",
             expression=Q_("35 feet"),
         ),
-        "p7_obverse": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p7_obverse": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             truth=True,
             sign="<=",
             expression=Q_("35 feet"),
         ),
-        "p7_opposite": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p7_opposite": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             truth=True,
             sign=">",
             expression=Q_("35 feet"),
         ),
-        "p7_not_equal": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p7_not_equal": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             truth=True,
             sign="<>",
             expression=Q_("35 feet"),
         ),
-        "p7_true": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p7_true": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             truth=True,
             sign="<",
             expression=Q_("35 feet"),
         ),
-        "p8": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">=",
             expression=Q_("20 feet"),
         ),
-        "p8_no_truth": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_no_truth": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             truth=None,
             sign=">=",
             expression=Q_("20 feet"),
         ),
-        "p8_exact": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_exact": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign="==",
             expression=Q_("25 feet"),
         ),
-        "p8_less": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_less": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign="<=",
             expression=Q_("20 feet"),
         ),
-        "p8_meters": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_meters": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">=",
             expression=Q_("10 meters"),
         ),
-        "p8_int": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_int": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">=",
             expression=20,
         ),
-        "p8_float": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_float": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">=",
             expression=20.0,
         ),
-        "p8_higher_int": Comparison(
-            content="the distance between $place1 and $place2 was",
+        "p8_higher_int": Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">=",
             expression=30,
         ),
-        "p9": Comparison(
-            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
+        "p9": Comparison.new(
+            content="the distance between {thing} and a parking area used by personnel and patrons of {place} was",
             sign="<=",
             expression=Q_("5 feet"),
         ),
-        "p9_exact": Comparison(
-            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
+        "p9_exact": Comparison.new(
+            content="the distance between {thing} and a parking area used by personnel and patrons of {place} was",
             sign="=",
             expression=Q_("5 feet"),
         ),
-        "p9_miles": Comparison(
-            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
+        "p9_miles": Comparison.new(
+            content="the distance between {thing} and a parking area used by personnel and patrons of {place} was",
             sign="<=",
             expression=Q_("5 miles"),
         ),
-        "p9_more": Comparison(
-            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
+        "p9_more": Comparison.new(
+            content="the distance between {thing} and a parking area used by personnel and patrons of {place} was",
             sign=">",
             expression=Q_("5 feet"),
         ),
-        "p9_acres": Comparison(
-            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
+        "p9_acres": Comparison.new(
+            content="the distance between {thing} and a parking area used by personnel and patrons of {place} was",
             sign="<=",
             expression=Q_("5 acres"),
         ),
-        "p10": Predicate(content="$thing was within the curtilage of $place"),
+        "p10": Predicate(content="{thing} was within the curtilage of {place}"),
         "p10_false": Predicate(
-            content="$thing was within the curtilage of $place", truth=False
+            content="{thing} was within the curtilage of {place}", truth=False
         ),
-        "p11": Predicate(content="$act was a warrantless search and seizure"),
+        "p11": Predicate(content="{act} was a warrantless search and seizure"),
         "p12": Predicate(
-            content="$act was performed by federal law enforcement officers"
+            content="{act} was performed by federal law enforcement officers"
         ),
-        "p13": Predicate(content="$act constituted an intrusion upon $place"),
-        "p14": Predicate(content="$person sought to preserve $thing as private"),
-        "p15": Predicate(content="$thing was in an area adjacent to $place"),
-        "p16": Predicate(content="$thing was in an area accessible to the public"),
+        "p13": Predicate(content="{act} constituted an intrusion upon {place}"),
+        "p14": Predicate(content="{person} sought to preserve {thing} as private"),
+        "p15": Predicate(content="{thing} was in an area adjacent to {place}"),
+        "p16": Predicate(content="{thing} was in an area accessible to the public"),
         "p17": Predicate(
-            content="In $act, several law enforcement officials meticulously went through $thing"
+            content="In {act}, several law enforcement officials meticulously went through {thing}"
         ),
-        "p18": Comparison(
-            content="the length of time that $act continued was",
+        "p18": Comparison.new(
+            content="the length of time that {act} continued was",
             sign=">=",
             expression=Q_("385 minutes"),
         ),
-        "p19": Predicate(content="$act continued after night fell"),
+        "p19": Predicate(content="{act} continued after night fell"),
         # Use the irrelevant predicates/factors to make sure they don't affect an outcome.
-        "p_irrelevant_0": Predicate(content="$person was a clown"),
-        "p_irrelevant_1": Predicate(content="$person was a bear"),
-        "p_irrelevant_2": Predicate(content="$place was a circus"),
-        "p_irrelevant_3": Predicate(content="$person performed at $place"),
-        "p_crime": Predicate(content="$person committed a crime"),
-        "p_murder": Predicate(content="$shooter murdered $victim"),
-        "p_murder_whether": Predicate(content="$shooter murdered $victim", truth=None),
-        "p_murder_false": Predicate(content="$shooter murdered $victim", truth=False),
+        "p_irrelevant_0": Predicate(content="{person} was a clown"),
+        "p_irrelevant_1": Predicate(content="{person} was a bear"),
+        "p_irrelevant_2": Predicate(content="{place} was a circus"),
+        "p_irrelevant_3": Predicate(content="{person} performed at {place}"),
+        "p_crime": Predicate(content="{person} committed a crime"),
+        "p_murder": Predicate(content="{shooter} murdered {victim}"),
+        "p_murder_whether": Predicate(
+            content="{shooter} murdered {victim}", truth=None
+        ),
+        "p_murder_false": Predicate(content="{shooter} murdered {victim}", truth=False),
         "p_irrelevant": Predicate(
-            content="$evidence is relevant to show $fact", truth=False
+            content="{evidence} is relevant to show {fact}", truth=False
         ),
-        "p_relevant": Predicate(content="$evidence is relevant to show $fact"),
+        "p_relevant": Predicate(content="{evidence} is relevant to show {fact}"),
         "p_relevant_whether": Predicate(
-            content="$evidence is relevant to show $fact", truth=None
+            content="{evidence} is relevant to show {fact}", truth=None
         ),
-        "p_shooting": Predicate(content="$shooter shot $victim"),
-        "p_shooting_self": Predicate(content="$shooter shot $shooter"),
-        "p_no_shooting": Predicate(content="$shooter shot $victim", truth=False),
-        "p_shooting_whether": Predicate(content="$shooter shot $victim", truth=None),
-        "p_no_crime": Predicate(content="$person1 committed a crime", truth=False),
+        "p_shooting": Predicate(content="{shooter} shot {victim}"),
+        "p_shooting_self": Predicate(content="{shooter} shot {shooter}"),
+        "p_no_shooting": Predicate(content="{shooter} shot {victim}", truth=False),
+        "p_shooting_whether": Predicate(content="{shooter} shot {victim}", truth=None),
+        "p_no_crime": Predicate(content="{person1} committed a crime", truth=False),
         "p_three_entities": Predicate(
-            content="$planner told $intermediary to hire $shooter"
+            content="{planner} told {intermediary} to hire {shooter}"
         ),
-        "p_small_weight": Comparison(
-            content="the amount of gold $person possessed was",
+        "p_small_weight": Comparison.new(
+            content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("1 gram"),
         ),
-        "p_large_weight": Comparison(
-            content="the amount of gold $person possessed was",
+        "p_large_weight": Comparison.new(
+            content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         ),
-        "p_friends": Predicate(content="$person1 and $person2 were friends"),
-        "p_reliable": Predicate(content="$evidence was reliable"),
-        "p_quantity=3": Comparison(
+        "p_friends": Predicate(content="{person1} and {person2} were friends"),
+        "p_reliable": Predicate(content="{evidence} was reliable"),
+        "p_quantity=3": Comparison.new(
             content="The number of mice was", sign="==", expression=3
         ),
-        "p_quantity>=4": Comparison(
+        "p_quantity>=4": Comparison.new(
             content="The number of mice was", sign=">=", expression=4
         ),
-        "p_quantity>5": Comparison(
+        "p_quantity>5": Comparison.new(
             content="The number of mice was", sign=">", expression=5
         ),
         "p_no_context": Predicate(content="context was included", truth=False),
@@ -580,7 +596,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
 @pytest.fixture(scope="class")
 def make_exhibit(
     make_entity, make_predicate, make_factor, watt_factor, make_complex_fact
-) -> Dict[str, Exhibit]:
+) -> Dict[str, Exhibit | AbsenceOfFactor]:
     e = make_entity
     f = make_factor
     w = watt_factor
@@ -615,8 +631,12 @@ def make_exhibit(
         "no_shooting_witness_unknown_testimony": Exhibit(
             offered_by=al, form="testimony", statement=f["f_no_shooting"]
         ),
-        "no_shooting_witness_unknown_absent_testimony": Exhibit(
-            offered_by=al, form="testimony", statement=f["f_no_shooting"], absent=True
+        "no_shooting_witness_unknown_absent_testimony": AbsenceOfFactor(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=f["f_no_shooting"],
+            )
         ),
         "no_shooting_different_witness_testimony": Exhibit(
             offered_by=al,
@@ -636,12 +656,13 @@ def make_exhibit(
             statement=w["f8"],
             statement_attribution=e["craig"],
         ),
-        "reciprocal_testimony_absent": Exhibit(
-            offered_by=al,
-            form="testimony",
-            statement=w["f8"],
-            statement_attribution=e["craig"],
-            absent=True,
+        "reciprocal_testimony_absent": AbsenceOfFactor(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=w["f8"],
+                statement_attribution=e["craig"],
+            )
         ),
         "reciprocal_testimony_less": Exhibit(
             offered_by=al,
@@ -655,12 +676,13 @@ def make_exhibit(
             statement=w["f8_meters"],
             statement_attribution=e["craig"],
         ),
-        "reciprocal_testimony_specific_absent": Exhibit(
-            offered_by=al,
-            form="testimony",
-            statement=w["f8_meters"],
-            statement_attribution=e["craig"],
-            absent=True,
+        "reciprocal_testimony_specific_absent": AbsenceOfFactor(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=w["f8_meters"],
+                statement_attribution=e["craig"],
+            )
         ),
         "relevant_murder_testimony": Exhibit(
             offered_by=al,
@@ -823,7 +845,7 @@ def make_complex_rule(
 @pytest.fixture(scope="class")
 def make_evidence(
     make_predicate, make_factor, watt_factor, make_exhibit
-) -> Dict[str, Evidence]:
+) -> Dict[str, Evidence | AbsenceOfFactor]:
     p = make_predicate
     f = make_factor
     w = watt_factor
@@ -834,8 +856,10 @@ def make_evidence(
         "no_shooting": Evidence(
             exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
         ),
-        "no_shooting_absent": Evidence(
-            exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"], absent=True
+        "no_shooting_absent": AbsenceOfFactor(
+            absent=Evidence(
+                exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
+            )
         ),
         "no_shooting_entity_order": Evidence(
             exhibit=x["no_shooting_entity_order_testimony"],
@@ -845,15 +869,11 @@ def make_evidence(
             exhibit=x["no_shooting_witness_unknown_testimony"],
             to_effect=f["f_no_crime"],
         ),
-        "no_shooting_witness_unknown_absent": Evidence(
-            exhibit=x["no_shooting_witness_unknown_testimony"],
-            to_effect=f["f_no_crime"],
-            absent=True,
-        ),
-        # Here the Exhibit is absent, not the Evidence. Pointless distinction?
-        "no_shooting_witness_unknown_absent_exhibit": Evidence(
-            exhibit=x["no_shooting_witness_unknown_absent_testimony"],
-            to_effect=f["f_no_crime"],
+        "no_shooting_witness_unknown_absent": AbsenceOfFactor(
+            absent=Evidence(
+                exhibit=x["no_shooting_witness_unknown_testimony"],
+                to_effect=f["f_no_crime"],
+            )
         ),
         "no_shooting_no_effect_entity_order": Evidence(
             exhibit=x["no_shooting_entity_order_testimony"]
@@ -868,15 +888,16 @@ def make_evidence(
         "crime": Evidence(
             exhibit=x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True
         ),
-        "crime_absent": Evidence(
-            exhibit=x["generic_exhibit"],
-            to_effect=f["f_watt_crime"],
-            absent=True,
-            generic=True,
+        "crime_absent": AbsenceOfFactor(
+            absent=Evidence(
+                exhibit=x["generic_exhibit"],
+                to_effect=f["f_watt_crime"],
+                generic=True,
+            )
         ),
         "generic": Evidence(exhibit=x["generic_exhibit"], generic=True),
-        "generic_absent": Evidence(
-            exhibit=x["generic_exhibit"], absent=True, generic=True
+        "generic_absent": AbsenceOfFactor(
+            absent=Evidence(exhibit=x["generic_exhibit"], generic=True)
         ),
     }
 
@@ -927,17 +948,6 @@ def make_response() -> Dict[str, Dict]:
 @pytest.fixture(scope="module")
 def fake_usc_client() -> FakeClient:
     return FakeClient.from_file("usc.json")
-
-
-@pytest.fixture(scope="module")
-def beard_response() -> Dict[str, Dict]:
-    """Mock api responses"""
-    this_directory = os.path.dirname(os.path.abspath(__file__))
-    parent_directory = os.path.dirname(this_directory)
-    responses_filepath = parent_directory + "/example_data/responses/beard_act.json"
-    with open(responses_filepath, "r") as f:
-        responses = json.load(f)
-    return responses
 
 
 @pytest.fixture(scope="module")
@@ -1065,7 +1075,7 @@ def e_in_no_case(make_response):
 @pytest.fixture(scope="module")
 def e_method_of_operation(make_response):
     enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
-    passage = nactment.select(TextQuoteSelector(exact="method of operation"))
+    passage = enactment.select(TextQuoteSelector(exact="method of operation"))
     return passage
 
 
@@ -1089,6 +1099,28 @@ def e_preexisting_material(make_response):
 
 
 @pytest.fixture(scope="class")
+def make_problem_procedure(
+    make_evidence, make_factor, watt_factor
+) -> Dict[str, Procedure]:
+    e = make_evidence
+    f = watt_factor
+    m = make_factor
+
+    return {
+        "c3": Procedure(
+            outputs=([e["crime_absent"]]),
+            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
+            despite=(f["f16"]),
+        ),
+        "c3_fewer_inputs": Procedure(
+            outputs=([e["crime_absent"]]),
+            inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
+            despite=(f["f16"]),
+        ),
+    }
+
+
+@pytest.fixture(scope="class")
 def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedure]:
     e = make_evidence
     f = watt_factor
@@ -1100,11 +1132,6 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
-        ),
-        "c3": Procedure(
-            outputs=(e["crime_absent"]),
-            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
-            despite=(f["f16"]),
         ),
         "c4": Procedure(
             outputs=(f["f13"]),
@@ -1246,11 +1273,6 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_far_means_no_curtilage": Procedure(
             outputs=(f["f10_false"],), inputs=(f["f8"]), despite=(f["f7"])
         ),
-        "c3_fewer_inputs": Procedure(
-            outputs=(e["crime_absent"]),
-            inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
-            despite=(f["f16"]),
-        ),
         "c_output_distance_less": Procedure(outputs=(f["f9"]), inputs=(f["f1"])),
         "c_output_farther_different_entity": Procedure(
             outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
@@ -1259,7 +1281,9 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
 
 
 @pytest.fixture(scope="class")
-def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
+def real_holding(
+    make_procedure, make_problem_procedure, e_search_clause
+) -> Dict[str, Rule]:
     """These holdings can be changed in case they don't accurately reflect
     what's in real cases, or in case there are API improvements that
     allow them to become more accurate. I'll try not to write any tests
@@ -1275,7 +1299,11 @@ def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
             rule=Rule(procedure=c["c2"], enactments=e_search_clause, mandatory=True)
         ),
         "h3": Holding(
-            rule=Rule(procedure=c["c3"], enactments=e_search_clause, mandatory=True)
+            rule=Rule(
+                procedure=make_problem_procedure["c3"],
+                enactments=e_search_clause,
+                mandatory=True,
+            )
         ),
         "h4": Holding(
             rule=Rule(procedure=c["c4"], enactments=e_search_clause, mandatory=True)
@@ -1285,14 +1313,14 @@ def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
 
 @pytest.fixture(scope="class")
 def make_rule(
-    make_procedure, e_fourth_a, e_search_clause, e_due_process_5
+    make_procedure, make_problem_procedure, e_fourth_a, e_search_clause, e_due_process_5
 ) -> Dict[str, Rule]:
     c = make_procedure
 
     return {
         "h1": Rule(procedure=c["c1"], enactments=e_search_clause),
         "h2": Rule(procedure=c["c2"], enactments=e_search_clause),
-        "h3": Rule(procedure=c["c3"], enactments=e_search_clause),
+        "h3": Rule(procedure=make_problem_procedure["c3"], enactments=e_search_clause),
         "h1_again": Rule(procedure=c["c1"], enactments=e_search_clause),
         "h1_entity_order": Rule(
             procedure=c["c1_entity_order"], enactments=e_search_clause
@@ -1417,12 +1445,19 @@ def make_rule(
             mandatory=True,
             universal=False,
         ),
-        "h3_ALL": Rule(procedure=c["c3"], enactments=e_search_clause, universal=True),
+        "h3_ALL": Rule(
+            procedure=make_problem_procedure["c3"],
+            enactments=e_search_clause,
+            universal=True,
+        ),
         "h3_fewer_inputs": Rule(
-            procedure=c["c3_fewer_inputs"], enactments=e_search_clause
+            procedure=make_problem_procedure["c3_fewer_inputs"],
+            enactments=e_search_clause,
         ),
         "h3_fewer_inputs_ALL": Rule(
-            procedure=c["c3_fewer_inputs"], enactments=e_search_clause, universal=True
+            procedure=make_problem_procedure["c3_fewer_inputs"],
+            enactments=e_search_clause,
+            universal=True,
         ),
         "h_near_means_curtilage": Rule(
             procedure=c["c_near_means_curtilage"], enactments=e_search_clause
@@ -1485,12 +1520,15 @@ def make_rule(
 
 
 @pytest.fixture(scope="class")
-def make_beard_rule(beard_response) -> List[Rule]:
+def make_beard_rule() -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
-    client = FakeClient(responses=beard_response)
-    beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-    holdings = readers.read_holdings(beard_dictionary, client=client)
-    return [holding.rule for holding in holdings]
+    return beard_act_rules()
+
+
+@pytest.fixture(scope="class")
+def make_beard_rule_with_python() -> List[Rule]:
+    """Rules from the "Beard Tax Act" example statutes."""
+    return beard_act_rules()
 
 
 @pytest.fixture(scope="class")
@@ -1563,14 +1601,15 @@ def make_decision():
 
 @pytest.fixture(scope="class")
 def make_anchored_holding(make_response, make_decision):
-    client_without_api_access = FakeClient(responses=make_response)
-    holdings = {}
-    for name in make_decision.keys():
-        holdings[name] = loaders.read_anchored_holdings_from_file(
-            f"holding_{name}.yaml",
-            client=client_without_api_access,
-        )
-    return holdings
+    return {
+        "feist": feist_holdings(),
+        "lotus": lotus_holdings(),
+        "mazza": mazza_holdings(),
+        "oracle": oracle_holdings(),
+        "brad": brad_holdings(),
+        "cardenas": cardenas_holdings(),
+        "watt": watt_holdings(),
+    }
 
 
 @pytest.fixture(scope="class")
@@ -1612,27 +1651,49 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_analysis() -> Dict[str, List[RawHolding]]:
+def make_analysis() -> Dict[str, List[HoldingWithAnchors]]:
     """Example user analysis data."""
     return {
         "minimal": [
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "{Bradley} made a minimal holding object",
-                },
-                "anchors": {
-                    "quotes": "upholding searches in |open fields or grounds|around a house"
-                },
-            }
+            HoldingWithAnchors(
+                holding=Holding(
+                    rule=Rule(
+                        procedure=Procedure(
+                            outputs=[
+                                Fact(
+                                    predicate=Predicate(
+                                        content="{Bradley} made a minimal holding object"
+                                    )
+                                )
+                            ]
+                        )
+                    )
+                ),
+                anchors=TextPositionSet(
+                    quotes=[
+                        TextQuoteSelector.from_text(
+                            "upholding searches in |open fields or grounds|around a house"
+                        )
+                    ]
+                ),
+            )
         ],
         "no anchors": [
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "this holding has no text anchors",
-                }
-            }
+            HoldingWithAnchors(
+                holding=Holding(
+                    rule=Rule(
+                        procedure=Procedure(
+                            outputs=[
+                                Fact(
+                                    predicate=Predicate(
+                                        content="this holding has no text anchors"
+                                    )
+                                )
+                            ]
+                        )
+                    )
+                )
+            )
         ],
     }
 
@@ -1656,42 +1717,6 @@ def raw_factor() -> RawFactor:
                 },
             ],
         }
-    }
-
-
-@pytest.fixture(scope="function")
-def raw_holding() -> RawHolding:
-    return {
-        "bradley_house": {
-            "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-            "outputs": {
-                "type": "evidence",
-                "to_effect": {
-                    "type": "fact",
-                    "name": "fact that Bradley committed a crime",
-                    "content": "Bradley committed a crime",
-                },
-                "name": "evidence of Bradley's guilt",
-                "absent": True,
-            },
-        },
-        "stolen watch": {
-            "anchors": {
-                "quotes": [
-                    {"exact": "Mark stole the watch"},
-                    {"exact": "a watch was stolen by Mark"},
-                ]
-            },
-            "outputs": [
-                {"type": "Fact", "content": "{Mark} stole a watch"},
-            ],
-            "inputs": [
-                {
-                    "type": "Evidence",
-                    "to_effect": {"type": "Fact", "content": "{Mark} stole a watch"},
-                }
-            ],
-        },
     }
 
 

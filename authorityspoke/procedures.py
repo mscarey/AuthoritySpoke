@@ -15,7 +15,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from pydantic import field_validator, BaseModel
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -23,11 +23,14 @@ from nettlesome.terms import (
     Term,
     TermSequence,
 )
-from nettlesome.factors import Factor
-from nettlesome.groups import FactorGroup
-from nettlesome.formatting import indented
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.formatting import indented
 
-from authorityspoke.facts import Fact, Allegation, Pleading, Exhibit, Evidence
+from authorityspoke.facts import (
+    FactorOrAbsence,
+    AbsenceOfFactor,
+)
 from authorityspoke.facts import RawFactor
 
 
@@ -82,9 +85,9 @@ class Procedure(Comparable, BaseModel):
         other :class:`Procedure`.
     """
 
-    outputs: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]]
-    inputs: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]] = []
-    despite: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]] = []
+    outputs: List[FactorOrAbsence]
+    inputs: List[FactorOrAbsence] = []
+    despite: List[FactorOrAbsence] = []
     name: str = ""
     absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
@@ -253,7 +256,6 @@ class Procedure(Comparable, BaseModel):
         return len(self.generic_terms())
 
     def __str__(self):
-
         text = "RESULT:"
         for f in self.outputs:
             text += "\n" + indented(f.wrapped_string)
@@ -308,9 +310,12 @@ class Procedure(Comparable, BaseModel):
             can be used for comparing objects using :meth:`consistent_with`
         """
         result: List[Term] = []
-        result.extend(self.outputs)
-        result.extend(self.inputs)
-        result.extend(self.despite)
+        for group in (self.outputs, self.inputs, self.despite):
+            for factor in group:
+                if isinstance(factor, Term):
+                    result.append(factor)
+                else:
+                    result.append(factor.absent)
         return TermSequence(result)
 
     def generic_terms_by_str(self) -> Dict[str, Term]:
@@ -652,7 +657,7 @@ class Procedure(Comparable, BaseModel):
     def explanations_same_meaning(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: Explanation | ContextRegister | None = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that could cause self to have the same meaning as other."""
 
@@ -773,7 +778,7 @@ class Procedure(Comparable, BaseModel):
                 + "'outputs', consider making a separate 'exclusive' Rule "
                 + "for each output."
             )
-        if self.outputs[0].absent:
+        if isinstance(self.outputs[0], AbsenceOfFactor):
             raise ValueError(
                 "The 'exclusive' attribute is not allowed for Holdings "
                 + "with an 'absent' 'output' Factor. This would indicate "

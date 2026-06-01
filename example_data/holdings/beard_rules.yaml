@@ -180,9 +180,10 @@
   mandatory: true
 - inputs:
     - beardcoin transfer
-    - type: fact
-      content: the beardcoin transaction was a licensed beardcoin repurchase
-      absent: true
+    - type: absence
+      absent:
+        type: fact
+        content: the beardcoin transaction was a licensed beardcoin repurchase
     - type: fact
       content: the counterparty was the Department of Beards
       truth: false

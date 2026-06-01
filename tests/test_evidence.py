@@ -1,4 +1,4 @@
-from nettlesome.terms import TermSequence
+from authorityspoke.nettlesome.terms import TermSequence
 
 from authorityspoke.facts import Fact, build_fact, Evidence, Exhibit
 from authorityspoke import Entity
@@ -10,7 +10,7 @@ class TestEvidence:
             exhibit=Exhibit(offered_by=Entity(name="Al"), form="testimony"),
             to_effect=watt_factor["f2"],
         )
-        assert not e.absent
+        assert e.exhibit.offered_by.name == "Al"
 
     def test_default_len_based_on_unique_entity_slots(self, make_entity, make_factor):
         """same as e["no_shooting"]"""
@@ -83,11 +83,11 @@ class TestEvidenceSameMeaning:
         """Test the entire _registers_for_interchangeable_context function."""
 
         hit = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
         )
         hit2 = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[
                 Entity(name="Joker"),
                 Entity(name="Batman"),

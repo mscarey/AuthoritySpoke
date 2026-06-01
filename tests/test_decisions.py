@@ -7,13 +7,29 @@ from pydantic import ValidationError
 import pytest
 
 from authorityspoke.decisions import Decision, DecisionReading, Opinion
-from authorityspoke.io.loaders import read_anchored_holdings_from_file
+from authorityspoke.examples.feist import HOLDINGS as FEIST_HOLDINGS
+from authorityspoke.examples.oracle import HOLDINGS as ORACLE_HOLDINGS
+from authorityspoke import Entity
+from authorityspoke.facts import Fact, Predicate
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 
 
 class TestDecision:
     def test_decision_string(self, make_decision):
         decision = make_decision["cardenas"]
         assert str(decision) == "People v. Cardenas, 31 Cal. 3d 897 (1982-07-08)"
+
+    def test_decision_has_anchors(self, make_decision_with_holding):
+        decision = make_decision_with_holding["brad"]
+        assert (
+            "no Warrants shall issue"
+            in decision.opinion_readings[0]
+            .anchored_holdings.holdings[5]
+            .holding.enactments[0]
+            .selection.quotes[0]
+            .suffix
+        )
 
     def test_decision_no_opinions(self):
         decision = Decision(decision_date=date(2000, 2, 2))
@@ -70,19 +86,15 @@ class TestDecision:
         assert reading.opinion_readings[0].opinion_author.lower() == hamley
         assert reading.opinion_readings[0].holdings[0].means(make_holding["h1"])
 
-    def test_decision_posits_holding(self, fake_usc_client, make_decision):
-        lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
-        )
+    def test_decision_posits_holding(self, make_decision, make_anchored_holding):
+        lotus_analysis = make_anchored_holding["lotus"]
         lotus_reading = DecisionReading(decision=make_decision["lotus"])
         lotus_reading.posit(lotus_analysis)
         assert len(lotus_reading.majority.holdings) == len(lotus_analysis.holdings)
         assert str(lotus_reading).startswith("Reading for Lotus Development Corp.")
 
-    def test_decision_with_opinion_reading_posits_holding(self, fake_usc_client):
-        lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
-        )
+    def test_decision_with_opinion_reading_posits_holding(self, make_anchored_holding):
+        lotus_analysis = make_anchored_holding["lotus"]
         decision_reading = DecisionReading(
             decision=Decision(decision_date=date(2000, 2, 2)),
             opinion_readings=[OpinionReading(opinion_type="plurality")],
@@ -90,10 +102,10 @@ class TestDecision:
         decision_reading.posit(lotus_analysis)
         assert len(decision_reading.holdings) == len(lotus_analysis.holdings)
 
-    def test_error_decision_with_no_majority_posits_holding(self, fake_usc_client):
-        lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
-        )
+    def test_error_decision_with_no_majority_posits_holding(
+        self, make_anchored_holding
+    ):
+        lotus_analysis = make_anchored_holding["lotus"]
         reading1 = OpinionReading(opinion_type="plurality")
         reading2 = OpinionReading(opinion_type="concurring")
         decision_reading = DecisionReading(
@@ -262,3 +274,62 @@ class TestContradiction:
         oracle = make_decision_with_holding["oracle"]
         holding = oracle.holdings[0].negated()
         assert oracle.contradicts(holding)
+
+
+class TestPosit:
+    def test_decision_posits_holdings_with_anchors(self, make_anchored_holding):
+        oracle_holdings_with_anchors = make_anchored_holding["oracle"]
+        reading = DecisionReading(decision=Decision(decision_date=date(2019, 1, 1)))
+        reading.posit(oracle_holdings_with_anchors)
+        assert len(reading.holdings) == 20
+
+    def test_pass_holdings_to_decision_reading_constructor(self, make_decision):
+        oracle = make_decision["oracle"]
+        oracle_holdings = list(ORACLE_HOLDINGS)
+        oracle_reading = DecisionReading(decision=oracle)
+        oracle_reading.posit(oracle_holdings)
+        assert (
+            oracle_reading.opinion_readings[0].holdings[0].enactments[0].node
+            == "/us/usc/t17/s102/a"
+        )
+
+    def test_holding_flagged_exclusive(
+        self,
+        e_securing_exclusive_right_to_writings,
+        e_copyright_requires_originality,
+    ):
+        """
+        Test that "exclusive" flag doesn't mess up the holding where it's placed.
+
+        Test whether the Feist opinion object includes a holding
+        with the output "Rural's telephone directory
+        was copyrightable" and the input "Rural's telephone
+        directory was original", when that holding was marked
+        "exclusive" in the JSON.
+
+        `originality_rule` will be a little broader because it's based on
+        less Enactment text
+        """
+        holdings = FEIST_HOLDINGS
+
+        directory = Entity(name="Rural's telephone directory")
+        original = Fact(
+            predicate=Predicate(content="{work} was an original work"),
+            terms=[directory],
+        )
+        copyrightable = Fact(
+            predicate=Predicate(content="{work} was copyrightable"), terms=[directory]
+        )
+        originality_enactments = [
+            e_securing_exclusive_right_to_writings,
+            e_copyright_requires_originality,
+        ]
+        originality_rule = Rule(
+            procedure=Procedure(outputs=copyrightable, inputs=original),
+            mandatory=False,
+            universal=False,
+            enactments=originality_enactments,
+        )
+        assert any(
+            originality_rule.implies(feist_holding.rule) for feist_holding in holdings
+        )

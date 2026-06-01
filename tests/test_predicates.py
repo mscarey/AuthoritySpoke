@@ -1,36 +1,35 @@
 from datetime import date
 from decimal import Decimal
-from typing import Type
 import pytest
 import sympy
 from sympy import Interval, oo
 
 
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_, Quantity
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_, Quantity
 
 
 class TestComparisons:
     def test_comparison_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
-            _ = Comparison(
+            _ = Comparison.new(
                 content="the height of {} was {}",
                 sign=">>",
                 expression=Q_("160 centimeters"),
             )
 
     def test_comparison_interval(self):
-        comparison = Comparison(
-            content="the distance between $place1 and $place2 was",
+        comparison = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("20 miles"),
         )
         assert comparison.interval == Interval(Decimal("20"), oo, left_open=True)
 
     def test_comparison_not_equal(self):
-        comparison = Comparison(
-            content="the distance between $place1 and $place2 was",
+        comparison = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign="!=",
             expression=Q_("20 miles"),
         )
@@ -43,14 +42,14 @@ class TestPredicates:
     def test_no_sign_allowed_for_predicate(self):
         with pytest.raises(TypeError):
             Predicate(
-                "the date when $work was created was",
+                "the date when {work} was created was",
                 sign=">=",
                 expression=date(1978, 1, 1),
             )
 
     def test_term_positions(self):
         predicate = Predicate(
-            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="{organizer1} and {organizer2} planned for {player1} to play {game} with {player2}."
         )
         assert predicate.term_positions() == {
             "organizer1": {0, 1},
@@ -62,7 +61,7 @@ class TestPredicates:
 
     def test_term_positions_with_repetition(self):
         predicate = Predicate(
-            content="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+            content="{organizer1} and {organizer2} planned for {organizer1} to play {game} with {organizer2}."
         )
         assert predicate.term_positions() == {
             "organizer1": {0, 1},
@@ -72,7 +71,7 @@ class TestPredicates:
 
     def test_term_permutations(self):
         predicate = Predicate(
-            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="{organizer1} and {organizer2} planned for {player1} to play {game} with {player2}."
         )
         assert predicate.term_index_permutations() == [
             (0, 1, 2, 3, 4),
@@ -83,7 +82,7 @@ class TestPredicates:
 
     def test_term_permutations_with_repetition(self):
         predicate = Predicate(
-            content="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+            content="{organizer1} and {organizer2} planned for {organizer1} to play {game} with {organizer2}."
         )
         assert predicate.term_index_permutations() == [
             (0, 1, 2),
@@ -102,8 +101,8 @@ class TestPredicates:
         assert isinstance(make_predicate["p7"].quantity, Quantity)
 
     def test_string_for_date_as_expression(self):
-        copyright_date_range = Comparison(
-            content="the date when $work was created was",
+        copyright_date_range = Comparison.new(
+            content="the date when {work} was created was",
             sign=">=",
             expression=date(1978, 1, 1),
         )
@@ -127,19 +126,19 @@ class TestPredicates:
         assert len(make_predicate["p7"]) == 2
 
     def test_str_for_predicate_with_number_quantity(self, make_predicate):
-        assert "distance between $place1 and $place2 was at least 20" in str(
+        assert "distance between {place1} and {place2} was at least 20" in str(
             make_predicate["p8_int"]
         )
-        assert "distance between $place1 and $place2 was at least 20" in str(
+        assert "distance between {place1} and {place2} was at least 20" in str(
             make_predicate["p8_float"]
         )
-        assert "distance between $place1 and $place2 was at least 20 foot" in str(
+        assert "distance between {place1} and {place2} was at least 20 foot" in str(
             make_predicate["p8"]
         )
 
     def test_template_singular_by_default(self):
-        predicate = Predicate(content="$people were in $city")
-        assert str(predicate.template) == 'StatementTemplate("$people was in $city")'
+        predicate = Predicate(content="{people} were in {city}")
+        assert str(predicate.template) == 'StatementTemplate("{people} was in {city}")'
 
     @pytest.mark.parametrize(
         "context, expected",
@@ -156,7 +155,7 @@ class TestPredicates:
     )
     def test_make_str_plural(self, context, expected):
         phrase = (
-            "$thing were names, towns, and telephone numbers of telephone subscribers"
+            "{thing} were names, towns, and telephone numbers of telephone subscribers"
         )
         predicate = Predicate(content=phrase)
         with_context = predicate._content_with_terms(context)
@@ -164,7 +163,7 @@ class TestPredicates:
 
     def test_str_not_equal(self, make_predicate):
         assert (
-            "the distance between $place1 and $place2 was not equal to 35 foot"
+            "the distance between {place1} and {place2} was not equal to 35 foot"
             in str(make_predicate["p7_not_equal"])
         )
 
@@ -215,19 +214,19 @@ class TestSameMeaning:
 
     def test_term_placeholders_do_not_change_result(self):
         left = Predicate(
-            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="{organizer1} and {organizer2} planned for {player1} to play {game} with {player2}."
         )
         right = Predicate(
-            content="$promoter1 and $promoter2 planned for $player1 to play $chess with $player2."
+            content="{promoter1} and {promoter2} planned for {player1} to play {chess} with {player2}."
         )
         assert left.means(right)
 
     def test_term_positions_change_result(self):
         left = Predicate(
-            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="{organizer1} and {organizer2} planned for {player1} to play {game} with {player2}."
         )
         right = Predicate(
-            content="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+            content="{organizer1} and {organizer2} planned for {organizer1} to play {game} with {organizer2}."
         )
         assert not left.means(right)
 
@@ -255,16 +254,16 @@ class TestImplication:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Comparison(content="The number of mice was", sign=">", expression=4)
-        more = Comparison(content="The number of mice was", sign=">=", expression=5)
+        less = Comparison.new(content="The number of mice was", sign=">", expression=4)
+        more = Comparison.new(content="The number of mice was", sign=">=", expression=5)
         assert not less.implies(more)
 
     def test_no_contradiction_inconsistent_dimensions(self):
-        equal = Comparison(
-            content="${defendant}'s sentence was", sign="=", expression="8 years"
+        equal = Comparison.new(
+            content="{defendant}'s sentence was", sign="=", expression="8 years"
         )
-        less = Comparison(
-            content="${defendant}'s sentence was", sign="<=", expression="10 parsecs"
+        less = Comparison.new(
+            content="{defendant}'s sentence was", sign="<=", expression="10 parsecs"
         )
         assert not equal.contradicts(less)
         assert not equal.implies(less)
@@ -287,13 +286,13 @@ class TestImplication:
         assert not make_predicate["p7_true"] > watt_factor["f7"]
 
     def test_implication_due_to_dates(self):
-        copyright_date_range = Comparison(
-            content="the date when $work was created was",
+        copyright_date_range = Comparison.new(
+            content="the date when {work} was created was",
             sign=">=",
             expression=date(1978, 1, 1),
         )
-        copyright_date_specific = Comparison(
-            content="the date when $work was created was",
+        copyright_date_specific = Comparison.new(
+            content="the date when {work} was created was",
             sign="=",
             expression=date(1980, 6, 20),
         )
@@ -348,13 +347,13 @@ class TestContradiction:
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])
 
     def test_contradictory_date_ranges(self):
-        later = Comparison(
-            content="the date $dentist became a licensed dentist was",
+        later = Comparison.new(
+            content="the date {dentist} became a licensed dentist was",
             sign=">",
             expression=date(2010, 1, 1),
         )
-        earlier = Comparison(
-            content="the date $dentist became a licensed dentist was",
+        earlier = Comparison.new(
+            content="the date {dentist} became a licensed dentist was",
             sign="<",
             expression=date(1990, 1, 1),
         )
@@ -362,14 +361,14 @@ class TestContradiction:
         assert earlier.contradicts(later)
 
     def test_no_contradiction_without_truth_value(self):
-        later = Comparison(
-            content="the date $dentist became a licensed dentist was",
+        later = Comparison.new(
+            content="the date {dentist} became a licensed dentist was",
             sign=">",
             expression=date(2010, 1, 1),
             truth=None,
         )
-        earlier = Comparison(
-            content="the date $dentist became a licensed dentist was",
+        earlier = Comparison.new(
+            content="the date {dentist} became a licensed dentist was",
             sign="<",
             expression=date(1990, 1, 1),
         )
@@ -377,13 +376,13 @@ class TestContradiction:
         assert not earlier.contradicts(later)
 
     def test_no_contradiction_date_and_time_period(self):
-        later = Comparison(
-            content="the date $dentist became a licensed dentist was",
+        later = Comparison.new(
+            content="the date {dentist} became a licensed dentist was",
             sign=">",
             expression=date(2010, 1, 1),
         )
-        earlier = Comparison(
-            content="the date $dentist became a licensed dentist was",
+        earlier = Comparison.new(
+            content="the date {dentist} became a licensed dentist was",
             sign="<",
             expression="2000 years",
         )
@@ -391,13 +390,13 @@ class TestContradiction:
         assert not earlier.contradicts(later)
 
     def test_no_contradiction_irrelevant_quantities(self):
-        more_cows = Comparison(
-            content="the number of cows $person owned was",
+        more_cows = Comparison.new(
+            content="the number of cows {person} owned was",
             sign=">",
             expression=10,
         )
-        fewer_horses = Comparison(
-            content="the number of horses $person owned was",
+        fewer_horses = Comparison.new(
+            content="the number of horses {person} owned was",
             sign="<",
             expression=3,
         )
@@ -405,48 +404,50 @@ class TestContradiction:
         assert not fewer_horses.contradicts(more_cows)
 
     def test_no_contradiction_of_predicate(self):
-        more_cows = Comparison(
-            content="the number of cows $person owned was",
+        more_cows = Comparison.new(
+            content="the number of cows {person} owned was",
             sign=">",
             expression=10,
         )
-        no_cows = Predicate(content="the number of cows $person owned was", truth=False)
+        no_cows = Predicate(
+            content="the number of cows {person} owned was", truth=False
+        )
         assert not more_cows.contradicts(no_cows)
         assert not no_cows.contradicts(more_cows)
 
 
 class TestQuantities:
     def test_does_not_exclude_other_quantity(self):
-        comparison = Comparison(
-            content="the distance between $place1 and $place2 was",
+        comparison = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("20 miles"),
         )
-        comparison_opposite = Comparison(
-            content="the distance between $place1 and $place2 was",
+        comparison_opposite = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign="<",
             expression=Q_("30 miles"),
         )
         assert not comparison.contradicts(comparison_opposite)
 
     def test_convert_quantity_of_Comparison(self):
-        comparison = Comparison(
-            content="the distance between $place1 and $place2 was",
+        comparison = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("20 miles"),
         )
-        comparison_km = Comparison(
-            content="the distance between $place1 and $place2 was",
+        comparison_km = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">",
             expression=Q_("30 kilometers"),
         )
         assert comparison > comparison_km
 
     def test_quantity_comparison_to_predicate(self):
-        distance = Comparison(
-            content="the distance between $place1 and $place2 was",
+        distance = Comparison.new(
+            content="the distance between {place1} and {place2} was",
             sign=">",
             expression="20 miles",
         )
-        predicate = Predicate(content="the distance between $place1 and $place2 was")
+        predicate = Predicate(content="the distance between {place1} and {place2} was")
         assert not distance >= predicate

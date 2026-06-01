@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 
 from anchorpoint.textselectors import (
@@ -6,21 +8,35 @@ from anchorpoint.textselectors import (
     TextSelectionError,
 )
 
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.facts import Fact, Predicate
+from authorityspoke.examples.brad import anchored_holdings as brad_holdings
+from authorityspoke.examples.watt import anchored_holdings as watt_holdings
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import loaders, readers
-from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.opinions import (
     AnchoredHoldings,
-    Opinion,
-    FactorIndex,
     OpinionReading,
     TermWithAnchors,
 )
+
+
+class TestAnchor:
+    def test_get_term_anchors(self, make_anchored_holding):
+        anchored = make_anchored_holding["mazza"]
+        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
+        anchors = anchored.get_term_anchors(key)
+        assert anchors.quotes[0].exact.startswith(
+            "without respect to whether or not Turismo"
+        )
+        assert len(anchored.holdings) == 2
+        key = "the fact that <Turismo Costa Brava> was a money transmitting business"
+        assert (
+            "Turismo conducted substantial money transmitting business"
+            in anchored.get_term_anchors(key).quotes[0].exact
+        )
 
 
 class TestOpinions:
@@ -177,20 +193,15 @@ class TestOpinionHoldings:
                 context=(Entity(name="House on Haunted Hill"), "nonexistent factor"),
             )
 
-    def test_new_context_creates_equal_rule(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_new_context_creates_equal_rule(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
-        client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
-        watt.posit(readers.read_holdings(watt_raw, client=client))
+        watt.posit(copy.deepcopy(watt_holdings().holdings))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.yaml")
-        brad.posit(readers.read_holdings(brad_raw, client=client))
+        brad.posit(copy.deepcopy(brad_holdings().holdings))
 
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
@@ -201,37 +212,26 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_getting_factors_from_opinion(
-        self, make_opinion_with_holding, make_response
-    ):
-        client = FakeClient(responses=make_response)
-
+    def test_getting_factors_from_opinion(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
-        holdings_to_posit = readers.read_holdings(watt_raw, client=client)
+        holdings_to_posit = copy.deepcopy(watt_holdings().holdings)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
         assert "proof of Wattenburg's guilt" in factors.keys()
 
-    def test_new_context_inferring_factors_to_change(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_new_context_inferring_factors_to_change(self, make_opinion_with_holding):
         """
         This changes watt's holdings; may break tests below.
         """
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
 
-        client = FakeClient(responses=make_response)
-
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
-        watt.posit(readers.read_holdings(watt_raw, client=client))
+        watt.posit(copy.deepcopy(watt_holdings().holdings))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.yaml")
-        brad.posit(readers.read_holdings(brad_raw, client=client))
+        brad.posit(copy.deepcopy(brad_holdings().holdings))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -247,10 +247,10 @@ class TestOpinionHoldings:
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         elephants = Fact(
-            predicate="$animal was an elephant", terms=Entity(name="the elephant")
+            predicate="{animal} was an elephant", terms=Entity(name="the elephant")
         )
         mouseholes = Fact(
-            predicate=Predicate(content="$animal hides in mouseholes", truth=False),
+            predicate=Predicate(content="{animal} hides in mouseholes", truth=False),
             terms=Entity(name="the elephant"),
         )
         procedure = Procedure(inputs=elephants, outputs=mouseholes)
@@ -288,7 +288,7 @@ class TestOpinionFactors:
         anchors = TextPositionSet(quotes=quote_selector)
         fact = Fact(
             predicate=Predicate(
-                content="$product possessed at least some minimal degree of creativity"
+                content="{product} possessed at least some minimal degree of creativity"
             ),
             terms=[api],
         )
@@ -337,16 +337,12 @@ class TestImplication:
         assert not watt >= brad
         assert not watt.implies(brad.holdings)
 
-    def test_posit_list_of_holdings_and_imply(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_posit_list_of_holdings_and_imply(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         watt.clear_holdings()
         brad.clear_holdings()
-        client = FakeClient(responses=make_response)
-        some_rules_raw = loaders.load_holdings(filename="holding_watt.yaml")
-        some_rules = readers.read_holdings(some_rules_raw, client=client)
+        some_rules = copy.deepcopy(watt_holdings().holdings)
         for case in (watt, brad):
             case.clear_holdings()
             case.posit(some_rules[:3])

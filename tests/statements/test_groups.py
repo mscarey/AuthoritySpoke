@@ -1,14 +1,14 @@
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     ContextRegister,
     consistent_with,
     contradicts,
     means,
 )
 
-from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison
 
 from authorityspoke.facts import Fact
 
@@ -133,15 +133,15 @@ class TestImplication:
 
 class TestContradiction:
     def test_contradiction_of_group(self):
-        lived_at = Predicate(content="$person lived at $residence")
+        lived_at = Predicate(content="{person} lived at {residence}")
         bob_lived = Fact(
             predicate=lived_at, terms=[Entity(name="Bob"), Entity(name="Bob's house")]
         )
         carl_lived = Fact(
             predicate=lived_at, terms=[Entity(name="Carl"), Entity(name="Carl's house")]
         )
-        distance_long = Comparison(
-            content="the distance from the center of $city to $residence was",
+        distance_long = Comparison.new(
+            content="the distance from the center of {city} to {residence} was",
             sign=">=",
             expression="50 miles",
         )
@@ -149,8 +149,8 @@ class TestContradiction:
             predicate=distance_long,
             terms=[Entity(name="Houston"), Entity(name="Bob's house")],
         )
-        distance_short = Comparison(
-            content="the distance from the center of $city to $residence was",
+        distance_short = Comparison.new(
+            content="the distance from the center of {city} to {residence} was",
             sign="<=",
             expression="10 kilometers",
         )
@@ -208,22 +208,22 @@ class TestUnion:
 
 
 class TestConsistent:
-    predicate_less_specific = Comparison(
-        content="${vehicle}'s speed was",
+    predicate_less_specific = Comparison.new(
+        content="{vehicle}'s speed was",
         sign="<",
         expression="30 miles per hour",
     )
-    predicate_less_general = Comparison(
-        content="${vehicle}'s speed was",
+    predicate_less_general = Comparison.new(
+        content="{vehicle}'s speed was",
         sign="<",
         expression="60 miles per hour",
     )
-    predicate_more = Comparison(
-        content="${vehicle}'s speed was",
+    predicate_more = Comparison.new(
+        content="{vehicle}'s speed was",
         sign=">",
         expression="55 miles per hour",
     )
-    predicate_farm = Predicate(content="$person had a farm")
+    predicate_farm = Predicate(content="{person} had a farm")
     slower_specific_statement = Fact(
         predicate=predicate_less_specific, terms=Entity(name="the car")
     )

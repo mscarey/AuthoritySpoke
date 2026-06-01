@@ -1,6 +1,6 @@
-from nettlesome.terms import ContextRegister, means, Explanation
-from nettlesome.entities import Entity
-from nettlesome import Predicate
+from authorityspoke.nettlesome.terms import ContextRegister, means
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome import Predicate
 
 from authorityspoke import Fact
 from authorityspoke.io.text_expansion import expand_shorthand
@@ -10,22 +10,22 @@ class TestContext:
     al = expand_shorthand({"content": "{Al} sold {the bull} to {Betty}."})
     alice = expand_shorthand({"content": "{Alice} sold {the cow} to {Bob}."})
 
-    predicate = Predicate(content="$seller sold $item to $buyer")
+    predicate = Predicate(content="{seller} sold {item} to {buyer}")
     fact_al = Fact(
         predicate=predicate,
-        terms={
-            "seller": Entity(name="Al"),
-            "item": Entity(name="the bull"),
-            "buyer": Entity(name="Betty"),
-        },
+        terms=[
+            Entity(name="Al"),
+            Entity(name="the bull"),
+            Entity(name="Betty"),
+        ],
     )
     fact_alice = Fact(
         predicate=predicate,
-        terms={
-            "seller": Entity(name="Alice"),
-            "item": Entity(name="the cow"),
-            "buyer": Entity(name="Bob"),
-        },
+        terms=[
+            Entity(name="Alice"),
+            Entity(name="the cow"),
+            Entity(name="Bob"),
+        ],
     )
 
     def test_impossible_register(self):

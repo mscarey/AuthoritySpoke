@@ -2,7 +2,6 @@ from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
 import os
-from typing import Type
 from legislice.enactments import Enactment
 
 import pytest
@@ -15,11 +14,11 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.holdings import Holding
 
-from nettlesome.terms import ContextRegister, TermSequence
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
-from nettlesome.statements import Statement
-from nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.statements import Statement
+from authorityspoke.groups import FactorGroup
 
 
 load_dotenv()
@@ -96,7 +95,6 @@ class TestHolding:
         inferred = exclusive_holding.inferred_from_exclusive[0]
         lower = "absence of the fact that <Borland International> infringed the copyright in <the Lotus menu command hierarchy>".lower()
         assert inferred.outputs[0].short_string.lower() == lower
-        assert inferred.outputs[0].absent
 
     def test_infer_from_not_exclusive(self, make_holding):
         """
@@ -111,7 +109,7 @@ class TestHolding:
     def test_get_evidence_by_name_from_holding(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         holding = watt.holdings[4]
-        assert holding.outputs[0].exhibit.name == "proof of Wattenburg's guilt"
+        assert holding.outputs[0].absent.exhibit.name == "proof of Wattenburg's guilt"
         factor = holding.get_factor_by_name("proof of Wattenburg's guilt")
         assert factor.name == "proof of Wattenburg's guilt"
 
@@ -189,7 +187,6 @@ class TestSameMeaning:
 
 class TestImplication:
     def test_undecided_holding_no_implication_more_inputs(self, make_holding):
-
         """h2 beind undecided doesn't imply that a version of
         h2 with more supporting factors is undecided"""
 
@@ -199,7 +196,6 @@ class TestImplication:
         )
 
     def test_undecided_holding_no_implication_fewer_inputs(self, make_holding):
-
         """h2_irrelevant_inputs being undecided does not imply that h2
         is undecided. If courts SOMEtimes MAY use the procedure in h2,
         it may or may not be decided whether any court has been allowed
@@ -213,21 +209,18 @@ class TestImplication:
         )
 
     def test_no_undecided_holding_implication_by_MUST(self, make_holding):
-
         """If it's undecided whether courts MUST follow the procedure in h2,
         it still could be decided that they MAY do so"""
 
         assert not make_holding["h2_MUST_undecided"] >= make_holding["h2_undecided"]
 
     def test_no_undecided_holding_implication_of_MUST(self, make_holding):
-
         """If it's undecided whether courts MAY follow the procedure in h2,
         the rule that they MUST do so still could have been decided to be not valid."""
 
         assert not make_holding["h2_undecided"] >= make_holding["h2_MUST_undecided"]
 
     def test_no_undecided_holding_implication_with_ALL(self, make_holding):
-
         """If it's undecided whether courts ALWAYS MAY follow the procedure in h2,
         it still could be decided (in the negative) whether they ALWAYS MAY
         follow a version with fewer supporting inputs."""
@@ -291,17 +284,17 @@ class TestImplication:
             inputs=FactorGroup(
                 [
                     Fact(
-                        predicate="${work} was copyrightable",
+                        predicate="{work} was copyrightable",
                         terms=Entity(name="the birthday song"),
                     ),
                     Fact(
-                        predicate="$person copied constituent elements of $work that were original",
+                        predicate="{person} copied constituent elements of {work} that were original",
                         terms=[Entity(name="Eve"), Entity(name="the birthday song")],
                     ),
                 ]
             ),
             outputs=Fact(
-                predicate="$person infringed the copyright in $work",
+                predicate="{person} infringed the copyright in {work}",
                 terms=[Entity(name="Eve"), Entity(name="the birthday song")],
             ),
             enactments=e_copyright_protection,
@@ -325,8 +318,8 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(
-            predicate=Predicate(content="$person was a person"),
-            terms=Entity(name="Alice"),
+            predicate=Predicate(content="{person} was a person"),
+            terms=TermSequence(root=(Entity(name="Alice"),)),
         ).implies(make_holding["h1"])
 
     def test_cannot_check_if_holding_implies_factor(self, make_holding, make_factor):
@@ -345,7 +338,6 @@ class TestContradiction:
         assert make_holding["h2"] >= make_holding["h2_invalid"].negated()
 
     def test_contradicts_if_valid(self, make_holding):
-
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]
         )
@@ -354,7 +346,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_invalid_holding(self, make_holding):
-
         """
         In the current design, Holding.contradicts calls implies;
         implies calls Rule.contradicts.
@@ -403,7 +394,6 @@ class TestContradiction:
         )
 
     def test_invalidity_of_implying_holding_contradicts_implied(self, make_holding):
-
         # You NEVER MUST follow X
         # will contradict
         # You SOMEtimes MUST follow Y
@@ -417,7 +407,6 @@ class TestContradiction:
         )
 
     def test_contradiction_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
-
         # You ALWAYS MUST follow X
         # will contradict
         # You NEVER MUST follow Y
@@ -431,7 +420,6 @@ class TestContradiction:
         )
 
     def test_contradiction_with_ALL_MUST_and_invalid_ALL_MAY(self, make_holding):
-
         # You ALWAYS MUST follow X
         # will contradict
         # You MAY NOT ALWAYS follow Y
@@ -483,7 +471,6 @@ class TestContradiction:
             _ = make_holding["h1"].contradicts(ContextRegister({}))
 
     def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
-
         # You ALWAYS MUST follow X
         # will contradict
         # You MAY NOT ALWAYS follow Y

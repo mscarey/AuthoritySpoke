@@ -1,17 +1,18 @@
+import copy
 from decimal import Decimal
 import os
 import pathlib
 
 from pydantic import ValidationError
-from nettlesome.entities import Entity
-from nettlesome.terms import TermSequence
-from nettlesome.quantities import Comparison
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import TermSequence
+from authorityspoke.nettlesome.quantities import Comparison, UnitRange
 
 import pytest
 
 from authorityspoke.facts import Fact, Exhibit, Evidence
-from authorityspoke.io.name_index import index_names
-from authorityspoke.io import readers
+from authorityspoke.examples import cardenas as cardenas_example
+
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.text_expansion import expand_shorthand
@@ -52,45 +53,12 @@ class TestFactLoad:
     }
     story_data = {"content": "The number of castles {the king} had was > 3"}
 
-    def test_import_fact_with_entity_name_containing_another(self):
-        expanded = expand_shorthand(self.house_data)
-        record, mentioned = index_names(expanded)
-
-        assert mentioned["Alice's house"]["type"] == "Entity"
-
-    def test_import_predicate_with_quantity(self):
-        record = expand_shorthand(self.story_data)
-        record, mentioned = index_names(record)
-        expanded = readers.expand_factor(record, mentioned)
-        story = Fact(**expanded)
-
-        assert len(story.predicate) == 1
-        assert story.predicate.content.startswith("The number of castles")
-        assert story.predicate.sign == ">"
-        assert story.predicate.quantity == 3
-
-    def test_make_fact_from_string(self, watt_factor):
-        fact_float_data = {
-            "content": "the distance between $person0 and $person1 was >= 20.1",
-            "terms": [
-                {"type": "Entity", "name": "Ann"},
-                {"type": "Entity", "name": "Lee"},
-            ],
-        }
-        record = expand_shorthand(fact_float_data)
-        record, mentioned = index_names(record)
-        expanded = readers.expand_factor(record, mentioned)
-
-        fact_float_more = Fact(**expanded)
-        fact_float_less = watt_factor["f8_int"]
-        assert fact_float_more >= fact_float_less
-
 
 class TestFactorLoad:
     def test_load_factor_marked_reciprocal(self):
         fact = Fact(
-            predicate=Comparison(
-                content="the distance between $place1 and $place2 was",
+            predicate=Comparison.new(
+                content="the distance between {place1} and {place2} was",
                 sign="<",
                 expression="5 miles",
             ),
@@ -99,17 +67,16 @@ class TestFactorLoad:
             ),
         )
         assert hasattr(fact.predicate.quantity, "dimensionality")
-        data = {
-            "type": "fact",
-            "content": "the distance between ${place1} and ${place2} was",
-            "sign": "<",
-            "expression": "5 miles",
-            "terms": [
-                {"type": "entity", "name": "the office"},
-                {"type": "entity", "name": "the apartment"},
-            ],
-        }
-        loaded_fact = Fact(**data)
+        loaded_fact = Fact(
+            predicate=Comparison.new(
+                content="the distance between {place1} and {place2} was",
+                sign="<",
+                expression="5 miles",
+            ),
+            terms=TermSequence(
+                [Entity(name="the office"), Entity(name="the apartment")]
+            ),
+        )
         assert loaded_fact.means(fact)
 
     def test_load_fact_with_false(self):
@@ -118,12 +85,10 @@ class TestFactorLoad:
         assert str(fact) == "the fact it was false that pigs flew"
 
     def test_import_facts_with_factor_schema(self):
-        loaded = load_holdings("holding_cardenas.yaml")
-        holdings = readers.read_holdings(loaded)
+        holdings = copy.deepcopy(list(cardenas_example.HOLDINGS))
         factor = holdings[0].inputs[1].fact
         assert (
-            factor.predicate.content
-            == "${the_defendant} committed an attempted robbery"
+            factor.predicate.content == "{the_defendant} committed an attempted robbery"
         )
 
 
@@ -144,20 +109,23 @@ class TestFactDump:
 
 class TestExhibitLoad:
     def test_load_exhibit_with_bracketed_names(self):
-        fact_data = {
-            "content": "the distance that $officer pursued $suspect was >= 5 miles",
-            "terms": [
-                {"type": "Entity", "name": "Officer Lin"},
-                {"type": "Entity", "name": "Al"},
-            ],
-        }
-        exhibit_data = {
-            "offered_by": {"type": "Entity", "name": "Officer Lin"},
-            "form": "testimony",
-            "statement": fact_data,
-            "statement_attribution": {"name": "Officer Lin"},
-        }
-        exhibit = Exhibit(**exhibit_data)
+        fact_data = Fact(
+            predicate=Comparison(
+                content="the distance that {officer} pursued {suspect} was",
+                quantity_range=UnitRange(
+                    quantity_magnitude=Decimal("5"), quantity_units="mile", sign=">="
+                ),
+            ),
+            terms=TermSequence(root=[Entity(name="Officer Lin"), Entity(name="Al")]),
+        )
+        exhibit_data = Exhibit(
+            offered_by=Entity(name="Officer Lin"),
+            form="testimony",
+            statement=fact_data,
+            statement_attribution=Entity(name="Officer Lin"),
+        )
+        dumped = exhibit_data.model_dump()
+        exhibit = Exhibit(**dumped)
         assert str(exhibit) == (
             "the testimony attributed to <Officer Lin>, "
             "asserting the fact that the distance that <Officer Lin> "

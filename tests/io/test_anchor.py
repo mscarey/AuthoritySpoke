@@ -1,4 +1,4 @@
-import pytest
+from authorityspoke.opinions import TermWithAnchors
 
 
 class TestCollectAnchors:
@@ -40,3 +40,23 @@ class TestCollectAnchors:
             "anchors": "qualify for copyright protection. |17 U.S.C. § 102(a)|.",
         },
     }
+
+    def test_load_absent_term(self):
+        name = "the Java API was essentially the only way to express the idea that it embodied"
+        data = {
+            "anchors": {
+                "quotes": "|concepts of merger| and scenes a faire are affirmative defenses "
+            },
+            "term": {
+                "absent": {
+                    "name": name,
+                    "type": "fact",
+                    "predicate": {
+                        "content": "{the_java_api} was essentially the only way to express the idea that it embodied"
+                    },
+                    "terms": [{"name": "the Java API", "type": "Entity"}],
+                },
+            },
+        }
+        result = TermWithAnchors(**data)
+        assert result.term.absent.name == name

@@ -2,9 +2,9 @@ import operator
 
 import pytest
 
-from nettlesome.terms import ContextRegister, means
-from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.terms import ContextRegister, means
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.groups import FactorGroup
 
 from authorityspoke.facts import Fact
 
@@ -36,11 +36,11 @@ class TestContextRegisters:
 
     def test_cannot_update_context_register_from_lists(self):
         left = Fact(
-            predicate="$shooter shot $victim",
+            predicate="{shooter} shot {victim}",
             terms=[Entity(name="Alice"), Entity(name="Bob")],
         )
         right = Fact(
-            predicate="$shooter shot $victim",
+            predicate="{shooter} shot {victim}",
             terms=[Entity(name="Craig"), Entity(name="Dan")],
         )
         update = left.update_context_register(
@@ -191,7 +191,7 @@ class TestLikelyContext:
         """
         lotus = make_opinion_with_holding["lotus_majority"]
         oracle = make_opinion_with_holding["oracle_majority"]
-        left = FactorGroup(lotus.holdings[7].inputs[:2])
+        left = lotus.holdings[7].inputs[:2]
         right = FactorGroup(
             [oracle.holdings[3].outputs[0], oracle.holdings[3].inputs[0]]
         )

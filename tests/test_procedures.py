@@ -2,29 +2,36 @@ from copy import deepcopy
 import logging
 import pytest
 
-from nettlesome.terms import ContextRegister, Explanation, TermSequence
-from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
+from pydantic import ValidationError
 
-from authorityspoke.facts import Fact
+from authorityspoke.nettlesome.terms import ContextRegister, Explanation, TermSequence
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_
+
+from authorityspoke.facts import AbsenceOfFactor, Fact
 from authorityspoke.procedures import Procedure
 
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_make_procedure_with_evidence_output(self, make_evidence):
         e = make_evidence
         c3 = Procedure(outputs=[e["crime_absent"]])
         assert "absence of <the evidence" in str(c3)
+
+    def test_make_procedure_with_absent_evidence_output(self, make_evidence):
+        e = make_evidence
+        c3 = Procedure(outputs=[AbsenceOfFactor(absent=e["crime"])])
+        assert "absence of <the evidence of" in str(c3)
 
     def test_make_procedure_with_output_without_context(self, make_predicate):
         no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
@@ -55,32 +62,32 @@ class TestProcedures:
             Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
 
     def test_cannot_add_entity_as_input(self, make_factor):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
-    def test_generic_terms(self, make_entity, make_procedure, make_evidence):
+    def test_generic_terms(self, make_entity, make_problem_procedure, make_evidence):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
         e = make_entity
-        factors = make_procedure["c3"].generic_terms()
+        factors = make_problem_procedure["c3"].generic_terms()
         for factor in (
             e["motel"],
             e["tree_search"],
             e["trees"],
             e["watt"],
-            make_evidence["crime_absent"],
+            make_evidence["crime_absent"].absent,
         ):
             assert factor in factors
 
-    def test_type_of_terms(self, make_procedure):
-        assert isinstance(make_procedure["c3"].terms, TermSequence)
+    def test_type_of_terms(self, make_problem_procedure):
+        assert isinstance(make_problem_procedure["c3"].terms, TermSequence)
 
-    def test_repr(self, make_procedure):
-        rep = repr(make_procedure["c3"])
-        assert "Predicate(content='$person committed" in rep
+    def test_repr(self, make_problem_procedure):
+        rep = repr(make_problem_procedure["c3"])
+        assert "Predicate(content='{person} committed" in rep
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -135,6 +142,7 @@ class TestProcedureImplication:
         c1_order = make_procedure["c1_entity_order"]
         assert f["f2"] in c1_easy.inputs
         assert f["f1"] not in c1_easy.inputs
+        assert c1_order.inputs_group.implies(f["f2"])
 
     def test_factor_implication_with_exact_quantity(self, watt_factor, make_procedure):
         """This test is mostly to demonstrate the relationships
@@ -166,7 +174,7 @@ class TestProcedureImplication:
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
-        Because both procedures have a form of "the distance between $place1 and $place2 was"
+        Because both procedures have a form of "the distance between {place1} and {place2} was"
         factor and those factors are reciprocal, the entities of one of them in reversed
         order can be used as the entities of the other, and one will still imply the other.
         (But if there had been more than two entities, only the first two would have been
@@ -246,9 +254,10 @@ class TestProcedureImplication:
         p = make_procedure
         assert p["c2_irrelevant_outputs"].implies_all_to_all(p["c2"])
 
-    def test_fewer_inputs_implies_all_to_all(self, make_procedure):
-        c = make_procedure
-        assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])
+    def test_fewer_inputs_implies_all_to_all(self, make_problem_procedure):
+        assert make_problem_procedure["c3_fewer_inputs"].implies_all_to_all(
+            make_problem_procedure["c3"]
+        )
 
     def test_all_to_all_implies_reciprocal(self, make_procedure, caplog):
         """
@@ -299,13 +308,13 @@ class TestProcedureUnion:
         assert procedure_from_union.means(procedure_from_adding)
 
 
-p_small_weight = Comparison(
-    content="the amount of gold $person possessed was",
+p_small_weight = Comparison.new(
+    content="the amount of gold {person} possessed was",
     sign="<",
     expression=Q_("1 gram"),
 )
-p_large_weight = Comparison(
-    content="the amount of gold $person possessed was",
+p_large_weight = Comparison.new(
+    content="the amount of gold {person} possessed was",
     sign=">=",
     expression=Q_("100 kilograms"),
 )
@@ -388,12 +397,12 @@ class TestFactorGroups:
         """Test part of the process of checking contradiction."""
         rural = Entity(name="Rural's telephone directory")
         compilation = Predicate(
-            content="${rural_s_telephone_directory} was a compilation of facts"
+            content="{rural_s_telephone_directory} was a compilation of facts"
         )
-        idea = Predicate(content="${rural_s_telephone_directory} was an idea")
+        idea = Predicate(content="{rural_s_telephone_directory} was an idea")
         copyrightable = Fact(
             predicate=Predicate(
-                content="${rural_s_telephone_directory} was copyrightable"
+                content="{rural_s_telephone_directory} was copyrightable"
             ),
             terms=rural,
         )
@@ -418,5 +427,5 @@ class TestEvolve:
     def test_evolve_context_to_absent(self, make_procedure):
         procedure = make_procedure["c1"]
         evolved = deepcopy(procedure)
-        evolved.outputs[0].absent = True
+        evolved.outputs[0] = AbsenceOfFactor(absent=evolved.outputs[0])
         assert procedure.outputs[0].contradicts(evolved.outputs[0])

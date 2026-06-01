@@ -1,6 +1,38 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[project]
+name = "AuthoritySpoke"
+version = "0.10.0"
+description = "Reading legal authority for the last time"
+readme = "README.rst"
+requires-python = ">=3.14"
+dependencies = [
+    "pint>=0.25.3",
+    "pydantic>=2.13.3",
+    "python-slugify>=8.0.4",
+    "sympy>=1.14.0",
+    "anchorpoint>=0.7.0",
+    "eyecite~=2.6.3",
+    "justopinion==0.4.0",
+    "legislice==0.8.1",
+    "lxml>=4.9.1",
+    "python-dotenv",
+    "python-ranges>=0.2.1",
+    "python-slugify",
+    "pyyaml",
+    "requests",
+    "roman",
+    "bidict>=0.23.1",
+    "python-constraint2>=2.5.0",
 ]
-build-backend = "setuptools.build_meta"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=7.1.0",
+    "pytest>=9.0.3",
+    "pytest-recording>=0.13.4",
+    "sphinx>=9.1.0",
+    "sphinx-autodoc-typehints>=3.10.2",
+]

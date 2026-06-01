@@ -18,7 +18,7 @@ from typing import Optional, Sequence, Union
 
 from legislice.enactments import Enactment
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -28,11 +28,11 @@ from nettlesome.terms import (
     contradicts,
     new_context_helper,
 )
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented, wrapped
-from nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented, wrapped
+from authorityspoke.groups import FactorGroup
 
-from pydantic import field_validator, model_validator, BaseModel, validator
+from pydantic import field_validator, model_validator, BaseModel
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule, RawRule
@@ -503,8 +503,8 @@ class Holding(Comparable, BaseModel):
         return []
 
     def explanations_same_meaning(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation | ContextRegister | None = None
+    ) -> Iterator[Explanation]:
         """Yield contexts that would cause self and other to have same meaning."""
         if (
             isinstance(other, self.__class__)
@@ -666,15 +666,24 @@ class HoldingGroup(FactorGroup):
 
     term_class = Holding
 
-    def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
+    def __init__(
+        self,
+        holdings: Union[Sequence[Holding], Holding] = (),
+        *,
+        sequence: Optional[Union[Sequence[Holding], Holding]] = None,
+    ):
         """Validate that HoldingGroup is created from a sequence of Holdings."""
+        if sequence is not None:
+            if holdings != ():
+                raise TypeError("Use either 'holdings' or 'sequence', not both.")
+            holdings = sequence
         if isinstance(holdings, Iterable):
             holdings = tuple(holdings)
         else:
             holdings = (holdings,)
         if any(not isinstance(holding, Holding) for holding in holdings):
             raise TypeError("All objects in HoldingGroup must be type Holding.")
-        self.sequence = holdings
+        super().__init__(sequence=holdings)
 
     def _explanations_implication_of_holding(
         self, other: Holding, context: Explanation

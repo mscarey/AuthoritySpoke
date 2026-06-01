@@ -10,14 +10,16 @@ from legislice.citations import CodeLevel
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
 
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
 
 from pydantic import ValidationError
 import pytest
 
+from authorityspoke.examples import oracle
+from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.facts import Fact
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
 
 
@@ -53,13 +55,11 @@ class TestEnactments:
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
     def test_passage_from_imported_statute(self, fake_usc_client):
-        oracle = loaders.load_decision("oracle_h.json")
-        oracle_decision = Decision(**oracle)
+        oracle_decision = Decision(**loaders.load_decision("oracle_h.json"))
         reading = DecisionReading(decision=oracle_decision)
-        loaded = loaders.load_holdings("holding_oracle.yaml")
-        holdings = readers.read_holdings(loaded, client=fake_usc_client)
+        holdings = oracle.HOLDINGS
         reading.posit(holdings)
-        despite_text = str(list(reading.holdings)[5])
+        despite_text = str(list(reading.holdings)[12])
         assert "In no case does copyright protection " in despite_text
 
     def test_chapeau_and_subsections_from_uslm_code(self, fake_beard_client):
@@ -70,7 +70,7 @@ class TestEnactments:
         assert "/us/const/amendment/IV" in str(e_search_clause)
 
     def test_unequal_to_statement(self, watt_factor, e_copyright):
-        stole_predicate = Predicate(content="$defendant stole $object")
+        stole_predicate = Predicate(content="{defendant} stole {object}")
         stole_fact = Fact(
             predicate=stole_predicate,
             terms=[Entity(name="Alice"), Entity(name="the gold bar")],
@@ -219,7 +219,7 @@ class TestEnactments:
 
     def test_cannot_add_enactment_to_statement(self, e_search_clause):
         statement = Fact(
-            predicate=Predicate(content="$person committed a murder"),
+            predicate=Predicate(content="{person} committed a murder"),
             terms=Entity(name="Al"),
         )
         with pytest.raises(TypeError):
@@ -227,7 +227,7 @@ class TestEnactments:
 
     def test_cannot_add_statement_to_enactment(self, e_search_clause):
         statement = Fact(
-            predicate=Predicate(content="$person committed a murder"),
+            predicate=Predicate(content="{person} committed a murder"),
             terms=Entity(name="Al"),
         )
         with pytest.raises(ValidationError):
@@ -321,8 +321,5 @@ class TestTextSelection:
             "|may|possess the requisite originality"
             ]
         """
-        client = FakeClient.from_file("usc.json")
-        holdings = loaders.read_anchored_holdings_from_file(
-            "holding_feist.yaml", client=client
-        )
+        holdings = feist_holdings()
         assert len(holdings.holdings[6].anchors.quotes) == 2

@@ -12,22 +12,22 @@ from typing import Any, ClassVar, Dict, Iterator
 from typing import Optional, Sequence, Tuple, Union
 
 from pydantic import field_validator, BaseModel, ValidationError
-from pydantic.class_validators import validator
 
 from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
 from legislice.types import RawEnactment
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
     Term,
     TermSequence,
 )
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure, RawProcedure
+from authorityspoke.facts import AbsenceOfFactor
 
 RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 
@@ -153,7 +153,7 @@ class Rule(Comparable, BaseModel):
     ) -> Optional[Rule]:
         """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
-            if isinstance(other, Factor):
+            if isinstance(other, (Factor, AbsenceOfFactor)):
                 return self.with_factor(other)
             if isinstance(other, (Enactment, EnactmentPassage)):
                 return self.with_enactment(other)
@@ -228,9 +228,13 @@ class Rule(Comparable, BaseModel):
         for input_factor in self.inputs:
             result = deepcopy(self)
             next_input = deepcopy(input_factor)
-            next_input.absent = not next_input.absent
+            if isinstance(next_input, AbsenceOfFactor):
+                next_input = next_input.absent
+            else:
+                next_input = AbsenceOfFactor(absent=next_input)
             next_output = deepcopy(self.outputs[0])
-            next_output.absent = True
+            if not isinstance(next_output, AbsenceOfFactor):
+                next_output = AbsenceOfFactor(absent=next_output)
             result.set_inputs(next_input)
             result.set_outputs(next_output)
             result.mandatory = not self.mandatory
@@ -538,8 +542,10 @@ class Rule(Comparable, BaseModel):
         return True
 
     def explanations_same_meaning(
-        self, other: Optional[Factor], context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Optional[Factor],
+        context: Explanation | ContextRegister | None = None,
+    ) -> Iterator[Explanation]:
         """Find context matches that would result in self and other meaning the same."""
         if (
             isinstance(other, Rule)

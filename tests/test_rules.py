@@ -1,28 +1,24 @@
 from copy import deepcopy
 import logging
 import os
-from typing import Type
 
 
 from dotenv import load_dotenv
 from legislice.download import Client
 from legislice.groups import EnactmentGroup
-from nettlesome.terms import ContextRegister, means
-from nettlesome.entities import Entity
-from nettlesome.terms import Explanation
-from nettlesome.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
-from nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_, UnitRange
+from authorityspoke.nettlesome.statements import Statement
 import pytest
 
-
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Exhibit, Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import loaders, readers
-from authorityspoke.io.fake_enactments import FakeClient
+from tests.conftest import fake_beard_client
 
 load_dotenv()
 
@@ -91,9 +87,11 @@ class TestRules:
         with pytest.raises(TypeError):
             make_holding["h1"].new_context([make_predicate["p1"], make_predicate["p2"]])
 
-    def test_new_context_choose_factor_to_replace_by_name(self, make_beard_rule):
-        transfer_rule = make_beard_rule[11]
-        barber_rule = make_beard_rule[-1]
+    def test_new_context_choose_factor_to_replace_by_name(
+        self, make_beard_rule_with_python
+    ):
+        transfer_rule = make_beard_rule_with_python[11]
+        barber_rule = make_beard_rule_with_python[-1]
         defendant = transfer_rule.generic_terms()[0]
         counterparty = transfer_rule.generic_terms()[2]
         defendant_rule = barber_rule.new_context(
@@ -148,6 +146,44 @@ class TestRules:
     def test_add_enactment_typeerror(self, make_holding):
         with pytest.raises(TypeError):
             make_holding["h1"].rule.add_enactment(make_holding["h2"])
+
+
+class TestPydanticRoundTrip:
+    def test_fact_round_trip_from_dict(self, watt_factor):
+        original = watt_factor["f2"]
+        dumped = original.model_dump()
+
+        reloaded = Fact.model_validate(dumped)
+
+        assert reloaded == original
+        assert str(reloaded) == str(original)
+
+    def test_procedure_round_trip_from_json(self, make_rule):
+        original = make_rule["h3"].procedure
+        dumped_json = original.model_dump_json()
+
+        reloaded = Procedure.model_validate_json(dumped_json)
+
+        assert reloaded == original
+        assert str(reloaded) == str(original)
+
+    def test_rule_round_trip_from_json(self, make_rule):
+        original = make_rule["h2"]
+        dumped_json = original.model_dump_json()
+
+        reloaded = Rule.model_validate_json(dumped_json)
+
+        assert reloaded.means(original)
+        assert str(reloaded) == str(original)
+
+    def test_holding_round_trip_from_dict(self, make_holding):
+        original = make_holding["h2_despite_due_process"]
+        dumped = original.model_dump()
+
+        reloaded = Holding.model_validate(dumped)
+
+        assert reloaded.means(original)
+        assert str(reloaded) == str(original)
 
 
 class TestSameMeaning:
@@ -350,9 +386,9 @@ class TestImplication:
         )
 
     def test_implication_interchangeable_terms(self):
-        ate_together = Predicate(content="$person1 ate at $place with $person2")
-        shot = Predicate(content="$attacker shot $victim")
-        murder = Predicate(content="$attacker murdered $victim")
+        ate_together = Predicate(content="{person1} ate at {place} with {person2}")
+        shot = Predicate(content="{attacker} shot {victim}")
+        murder = Predicate(content="{attacker} murdered {victim}")
 
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
@@ -388,8 +424,8 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_rule):
         assert not Statement(
-            predicate=Predicate(content="$person was a person"),
-            terms=Entity(name="Alice"),
+            predicate=Predicate(content="{person} was a person"),
+            terms=TermSequence(root=(Entity(name="Alice"),)),
         ).implies(make_rule["h1"])
 
     def test_not_implied_by_procedure(self, make_procedure, make_rule):
@@ -414,7 +450,6 @@ class TestContradiction:
         assert not make_rule["h2_output_absent_false"].contradicts(make_rule["h2"])
 
     def test_contradicts_if_valid_some_vs_all(self, make_rule):
-
         """
         This test and the one below show that you can change whether two
         holdings contradict one another by exchanging the SOME/MAY from one
@@ -440,7 +475,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_some_vs_all_no_contradiction(self, make_rule):
-
         """
         This test and the one above show that you can change whether two
         holdings contradict one another by exchanging the SOME/MAY from one
@@ -466,7 +500,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_all_vs_some(self, make_rule):
-
         """
         The assertion here is:
         In ALL cases where the distance between A and B is less than 35 feet
@@ -689,11 +722,11 @@ class TestAddition:
         fact_not_original = Rule(
             procedure=Procedure(
                 inputs=Fact(
-                    predicate=Predicate(content="$work was a fact"), terms=context
+                    predicate=Predicate(content="{work} was a fact"), terms=context
                 ),
                 outputs=Fact(
                     predicate=Predicate(
-                        content="$work was an original work", truth=False
+                        content="{work} was an original work", truth=False
                     ),
                     terms=context,
                 ),
@@ -704,13 +737,13 @@ class TestAddition:
             procedure=Procedure(
                 inputs=Fact(
                     predicate=Predicate(
-                        content="$work was an original work", truth=False
+                        content="{work} was an original work", truth=False
                     ),
                     terms=three,
                 ),
                 outputs=Fact(
                     predicate=Predicate(
-                        content="${work} was copyrightable", truth=False
+                        content="{work} was copyrightable", truth=False
                     ),
                     terms=three,
                 ),
@@ -818,9 +851,10 @@ class TestAddition:
         result = accept_relevance_testimony_ALL + accept_murder_fact_ALL
         assert result.universal is True
 
-    def test_add_universal_to_universal_irrelevant(self, make_procedure):
-
-        result = make_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
+    def test_add_universal_to_universal_irrelevant(
+        self, make_problem_procedure, make_procedure
+    ):
+        result = make_problem_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
         assert result is None
 
     def test_rule_requiring_more_enactments_will_add(
@@ -1013,56 +1047,71 @@ class TestStatuteRules:
 
     client = Client(api_token=TOKEN)
 
-    def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
-        client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[0]["inputs"][1][
-            "content"
-        ] = "the length of the suspected beard was = 8 millimetres"
-        longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
-        assert make_beard_rule[0].implies(longer_hair_rule[0])
+    def test_greater_than_implies_equal(self, make_beard_rule_with_python):
+        longer_hair_rule = deepcopy(make_beard_rule_with_python[0])
+        longer_hair_rule.set_inputs(
+            [
+                longer_hair_rule.inputs[0],
+                Fact(
+                    predicate=Comparison(
+                        content="the length of {the_suspected_beard} was",
+                        quantity_range=UnitRange(
+                            sign="==",
+                            quantity_magnitude=8,
+                            quantity_units="millimetres",
+                        ),
+                    ),
+                    terms=[Entity(name="the suspected beard")],
+                ),
+                longer_hair_rule.inputs[2],
+            ]
+        )
+        assert make_beard_rule_with_python[0].implies(longer_hair_rule)
 
-    def test_reset_inputs_to_create_contradiction(
-        self, beard_response, make_beard_rule
-    ):
+    def test_reset_inputs_to_create_contradiction(self, make_beard_rule_with_python):
         """Test missing 'False' truth value in output of long_means_not_beard"""
-        ear_rule = make_beard_rule[1]
-        client = FakeClient(responses=beard_response)
-        beard_rule_data = loaders.load_holdings("beard_rules.yaml")[:2]
-        changed_holdings = readers.read_holdings(beard_rule_data, client=client)
-        long_means_not_beard = changed_holdings[1]
+        ear_rule = make_beard_rule_with_python[1]
+        long_means_not_beard = deepcopy(make_beard_rule_with_python[1])
         long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
         fact = Fact(
-            content="the length of ${the_suspected_beard} was >= 12 inches",
+            predicate=Comparison(
+                content="the length of {the_suspected_beard} was",
+                quantity_range=UnitRange(
+                    sign=">=", quantity_magnitude=12, quantity_units="inches"
+                ),
+            ),
             terms=[Entity(name="the suspected beard")],
         )
         long_means_not_beard.set_inputs(fact)
-        long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
-        long_means_not_beard.rule.mandatory = True
+        long_means_not_beard.set_outputs([long_means_not_beard.outputs[0].negated()])
+        long_means_not_beard.mandatory = True
         assert long_means_not_beard.contradicts(ear_rule)
 
-    def test_greater_than_contradicts_not_greater(
-        self, beard_response, make_beard_rule
-    ):
-        client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[1]["inputs"][1][
-            "content"
-        ] = "the length of the suspected beard was >= 12 inches"
-        beard_dictionary[1]["outputs"][0]["truth"] = False
-        beard_dictionary[1]["mandatory"] = True
-        long_hair_is_not_a_beard = readers.read_holdings(
-            [beard_dictionary[1]], client=client
+    def test_greater_than_contradicts_not_greater(self, make_beard_rule_with_python):
+        long_hair_is_not_a_beard = deepcopy(make_beard_rule_with_python[1])
+        long_hair_is_not_a_beard.set_inputs(
+            [
+                long_hair_is_not_a_beard.inputs[0],
+                Fact(
+                    predicate=Comparison(
+                        content="the length of {the_suspected_beard} was",
+                        quantity_range=UnitRange(
+                            sign=">=", quantity_magnitude=12, quantity_units="inches"
+                        ),
+                    ),
+                    terms=[Entity(name="the suspected beard")],
+                ),
+                long_hair_is_not_a_beard.inputs[2],
+            ]
         )
-        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard[0])
+        long_hair_is_not_a_beard.set_outputs(
+            [long_hair_is_not_a_beard.outputs[0].negated()]
+        )
+        long_hair_is_not_a_beard.mandatory = True
+        assert make_beard_rule_with_python[1].contradicts(long_hair_is_not_a_beard)
 
-    def test_contradictory_fact_about_beard_length(
-        self, fake_beard_client, make_beard_rule
-    ):
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        long_means_not_beard = readers.read_holdings(
-            beard_dictionary[1], client=fake_beard_client
-        )[0].rule
+    def test_contradictory_fact_about_beard_length(self, make_beard_rule_with_python):
+        long_means_not_beard = deepcopy(make_beard_rule_with_python[1])
         long_means_not_beard.set_despite(
             [long_means_not_beard.inputs[0], long_means_not_beard.inputs[2]]
         )
@@ -1070,8 +1119,8 @@ class TestStatuteRules:
         long_means_not_beard.set_outputs([long_means_not_beard.outputs[0].negated()])
         long_means_not_beard.mandatory = True
 
-        assert make_beard_rule[1].contradicts(long_means_not_beard)
-        assert long_means_not_beard.contradicts(make_beard_rule[1])
+        assert make_beard_rule_with_python[1].contradicts(long_means_not_beard)
+        assert long_means_not_beard.contradicts(make_beard_rule_with_python[1])
 
     @pytest.mark.parametrize(
         (
@@ -1097,57 +1146,57 @@ class TestStatuteRules:
         facial_hair_uninterrupted,
         outcome,
         fake_beard_client,
-        make_beard_rule,
+        make_beard_rule_with_python,
     ):
         beard = Entity(name="a facial feature")
 
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
-        was_facial_hair = Predicate(content="$thing was facial hair")
-        fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=beard)
+        was_facial_hair = Predicate(content="{thing} was facial hair")
+        fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=[beard])
         hypothetical = Rule(
             procedure=Procedure(
                 inputs=[
                     fact_was_facial_hair,
                     Fact(
-                        predicate=Comparison(
-                            content="the length of $thing was",
+                        predicate=Comparison.new(
+                            content="the length of {thing} was",
                             sign=">=",
                             expression=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
                         ),
-                        terms=beard,
+                        terms=[beard],
                     ),
                     Fact(
                         predicate=Predicate(
-                            content="$thing occurred on or below the chin",
+                            content="{thing} occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
-                        terms=beard,
+                        terms=[beard],
                     ),
                     Fact(
                         predicate=Predicate(
-                            content="$thing existed in an uninterrupted line from the front "
+                            content="{thing} existed in an uninterrupted line from the front "
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
-                        terms=beard,
+                        terms=[beard],
                     ),
                 ],
                 outputs=Fact(
-                    predicate=Predicate(content="$thing was a beard"), terms=beard
+                    predicate=Predicate(content="{thing} was a beard"), terms=[beard]
                 ),
             ),
             enactments=sec_4,
         )
 
-        meets_chin_test = make_beard_rule[0].implies(hypothetical)
-        meets_ear_test = make_beard_rule[1].implies(hypothetical)
+        meets_chin_test = make_beard_rule_with_python[0].implies(hypothetical)
+        meets_ear_test = make_beard_rule_with_python[1].implies(hypothetical)
         assert outcome == meets_chin_test or meets_ear_test
 
-    def test_adding_definition_of_transfer(self, make_beard_rule):
-        loan_is_transfer = make_beard_rule[7]
-        elements_of_offense = make_beard_rule[11]
+    def test_adding_definition_of_transfer(self, make_beard_rule_with_python):
+        loan_is_transfer = make_beard_rule_with_python[7]
+        elements_of_offense = make_beard_rule_with_python[11]
         loan_without_exceptions = (
             loan_is_transfer
             + elements_of_offense.inputs[1]
@@ -1156,3 +1205,75 @@ class TestStatuteRules:
         )
         combined = loan_without_exceptions + elements_of_offense
         assert combined
+
+
+class TestLoadRules:
+    """
+    Tests loading Rules, possibly for linking to legislation without
+    reference to any Opinion or Holding.
+    """
+
+    client = Client(api_token=TOKEN)
+
+    def test_loading_rules(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert (
+            beard_rules[0].outputs[0].predicate.content
+            == "{the_suspected_beard} was a beard"
+        )
+
+    def test_imported_rule_is_type_rule(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert isinstance(beard_rules[0], Rule)
+
+    def test_rule_short_string(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert beard_rules[0].short_string.lower().startswith("the rule")
+
+    def test_rule_with_exhibit_as_context_factor(self, make_beard_rule_with_python):
+        rules = make_beard_rule_with_python
+        exhibit = rules[6].inputs[0].terms[2]
+        assert isinstance(exhibit, Exhibit)
+
+    def test_read_rules_without_regime(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        assert beard_rules[0].inputs[0].short_string == (
+            "the fact that <the suspected beard> was facial hair"
+        )
+
+    def test_correct_context_after_loading_rules(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        elements_of_offense = beard_rules[11]
+        assert len(elements_of_offense.despite) == 1
+        assert (
+            elements_of_offense.inputs[2].generic_terms()[1].name
+            == "the Department of Beards"
+        )
+
+    def test_load_any_enactments(self, make_beard_rule_with_python):
+        """Test bug where holding's enactment's aren't loaded."""
+        beard_rules = make_beard_rule_with_python
+        expected = "facial hair no shorter than 5 millimetres"
+        assert expected in beard_rules[0].enactments[0].selected_text()
+
+    @pytest.mark.vcr
+    def test_generic_terms_after_adding_rules(self, make_beard_rule_with_python):
+        beard_rules = make_beard_rule_with_python
+        loan_is_transfer = beard_rules[7]
+        elements_of_offense = beard_rules[11]
+        loan_without_exceptions = (
+            loan_is_transfer
+            + elements_of_offense.inputs[1]
+            + elements_of_offense.inputs[2]
+            + elements_of_offense.enactments[1]
+        )
+        loan_establishes_offense = loan_without_exceptions + elements_of_offense
+        assert str(loan_establishes_offense.outputs[0]) == (
+            "the fact that <the defendant> committed the offense of improper "
+            "transfer of beardcoin"
+        )
+        assert len(loan_establishes_offense.despite) == 1
+        assert (
+            loan_establishes_offense.inputs[0].generic_terms()[-1].name
+            == "the Department of Beards"
+        )

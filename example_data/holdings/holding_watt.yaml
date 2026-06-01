@@ -26,7 +26,7 @@
   - type: fact
     content: the stockpile of trees was among some standing trees
   - type: fact
-    content: the distance between $place1 and $place2 was > 35 feet
+    content: the distance between {place1} and {place2} was > 35 feet
     terms:
     - type: entity
       name: the stockpile of trees
@@ -39,7 +39,7 @@
       personnel and patrons of Hideaway Lodge was <= 5 feet
   despite:
   - type: fact
-    content: the distance between $place1 and $place2 was >= 20 feet
+    content: the distance between {place1} and {place2} was >= 20 feet
     terms:
     - type: entity
       name: the stockpile of trees
@@ -78,7 +78,7 @@
   mandatory: true
 - inputs:
   - type: fact
-    content: Hideaway Lodge was Wattenburg’s abode
+    content: Hideaway Lodge was Wattenburg's abode
   - type: fact
     content: the stockpile of trees was on the premises of Hideaway Lodge
   - type: fact
@@ -126,19 +126,20 @@
   - type: fact
     content: the stockpile of trees was in an area accessible to the public
   - type: fact
-    content: the distance between the $place1 and $place2 was >= 20 feet
+    content: the distance between the {place1} and {place2} was >= 20 feet
     terms:
     - type: entity
       name: the stockpile of trees
     - type: entity
       name: Hideaway Lodge
   outputs:
-  - type: evidence
-    exhibit: proof of Wattenburg's guilt
-    to_effect:
-      type: fact
-      content: Wattenburg committed a crime
-    absent: true
+  - type: absence
+    absent:
+      type: evidence
+      exhibit: proof of Wattenburg's guilt
+      to_effect:
+        type: fact
+        content: Wattenburg committed a crime
   enactments:
   - search clause
   mandatory: true
