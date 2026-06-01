@@ -3,7 +3,7 @@
 from abc import ABC
 from copy import deepcopy
 import functools
-from itertools import permutations, zip_longest
+from itertools import zip_longest
 import logging
 import operator
 import textwrap
@@ -12,7 +12,7 @@ from typing import List, NamedTuple, Optional, Sequence, Tuple, Union
 from typing import KeysView, ValuesView, ItemsView
 
 import bidict
-from constraint import Problem
+from constraint import AllDifferentConstraint, Problem
 from pydantic import RootModel, ConfigDict, field_validator
 
 
@@ -963,10 +963,18 @@ class Comparable(ABC):
         if not (unused_self and unused_other):
             yield context
         else:
-            for permutation in permutations(unused_other):
+            n_pairs = min(len(unused_self), len(unused_other))
+            problem = Problem()
+            for i in range(n_pairs):
+                problem.addVariable(i, list(reversed(range(len(unused_other)))))
+            if n_pairs > 1:
+                problem.addConstraint(AllDifferentConstraint())
+            for solution in problem.getSolutionIter():
                 incoming = ContextRegister()
-                for key, value in zip(unused_self, permutation):
-                    incoming.insert_pair(key=key, value=value)
+                for i, key_factor in enumerate(unused_self[:n_pairs]):
+                    incoming.insert_pair(
+                        key=key_factor, value=unused_other[solution[i]]
+                    )
                 merged_context = context.merged_with(incoming)
                 if merged_context:
                     yield merged_context
