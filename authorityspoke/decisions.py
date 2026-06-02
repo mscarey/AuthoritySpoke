@@ -13,7 +13,11 @@ import operator
 from typing import Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import (
+    TextQuoteSelector,
+    TextPositionSelector,
+    TextSequence,
+)
 from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
 from justopinion.citations import CAPCitation
 
@@ -89,13 +93,11 @@ class DecisionReading(BaseModel, Comparable):
             str,
             TextPositionSelector,
             TextQuoteSelector,
-            Sequence[
-                Union[str, Tuple[int, int], TextQuoteSelector, TextPositionSelector]
-            ],
+            Sequence[Union[str, TextQuoteSelector, TextPositionSelector]],
         ],
         opinion_type: str = "",
         opinion_author: str = "",
-    ) -> Optional[str]:
+    ) -> Optional[TextSequence]:
         r"""
         Get text using a :class:`.TextQuoteSelector`.
 

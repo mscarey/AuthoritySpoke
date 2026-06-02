@@ -11,7 +11,7 @@ dependencies = [
     "sympy>=1.14.0",
     "anchorpoint>=0.7.0",
     "eyecite~=2.6.3",
-    "justopinion==0.4.0",
+    "justopinion",
     "legislice==0.8.1",
     "lxml>=4.9.1",
     "python-dotenv",
@@ -36,3 +36,5 @@ dev = [
     "sphinx>=9.1.0",
     "sphinx-autodoc-typehints>=3.10.2",
 ]
+[tool.uv.sources]
+nettlesome = { git = "https://github.com/mscarey/justopinion.git", rev = "use-uv" }

@@ -69,7 +69,7 @@ requires-dist = [
     { name = "anchorpoint", specifier = ">=0.7.0" },
     { name = "bidict", specifier = ">=0.23.1" },
     { name = "eyecite", specifier = "~=2.6.3" },
-    { name = "justopinion", specifier = "==0.4.0" },
+    { name = "justopinion" },
     { name = "legislice", specifier = "==0.8.1" },
     { name = "lxml", specifier = ">=4.9.1" },
     { name = "pint", specifier = ">=0.25.3" },
