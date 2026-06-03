@@ -53,8 +53,8 @@ def new_context_helper(func: Callable):
     def wrapper(
         factor: Comparable,
         changes: ContextMemo,
-        terms_to_replace: Optional[Sequence[Term]] = None,
-        source: Optional[Term] = None,
+        terms_to_replace: Optional[Sequence["Term"]] = None,
+        source: Optional["Term"] = None,
     ) -> Comparable:
         expanded_changes = ContextRegister.create(
             changes=changes,
@@ -488,9 +488,9 @@ class Comparable(ABC):
                 + "implication with other Comparable objects or None."
             )
 
-        if other.__dict__.get("absent"):
-            if isinstance(other.absent, self.__class__):
-                yield from self._contradicts_if_present(other.absent, explanation)
+        if other_absent := other.__dict__.get("absent"):
+            if isinstance(other_absent, self.__class__):
+                yield from self._contradicts_if_present(other_absent, explanation)
         else:
             yield from self._implies_if_present(other, explanation)
 
@@ -526,9 +526,9 @@ class Comparable(ABC):
 
     def explanations_implied_by(
         self,
-        other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
-    ) -> Iterator[Explanation]:
+        other: Self,
+        context: None | "ContextRegister" | "Explanation" = None,
+    ) -> Iterator["Explanation"]:
         """Generate explanations for how other may imply self."""
         context = context = Explanation.from_context(
             context=context, current=self, incoming=other
@@ -537,16 +537,16 @@ class Comparable(ABC):
             yield new.with_match(FactorMatch(other, operator.ge, self))
 
     def _explanations_same_meaning(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         if self.__class__ == other.__class__ and self.generic == other.generic:
             yield from self._means_if_concrete(other, explanation)
 
     def explanations_same_meaning(
         self,
-        other: Comparable,
-        context: Optional[Union[Explanation, ContextRegister]] = None,
-    ) -> Iterator[Explanation]:
+        other: Self,
+        context: None | "ContextRegister" | "Explanation" = None,
+    ) -> Iterator["Explanation"]:
         """Generate ways to match contexts of self and other so they mean the same."""
         context = context = Explanation.from_context(
             context=context, current=self, incoming=other
@@ -555,8 +555,8 @@ class Comparable(ABC):
             yield new.with_match(FactorMatch(self, means, other))
 
     def _implies_if_present(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent.
 
@@ -569,11 +569,11 @@ class Comparable(ABC):
             if not self.generic:
                 yield from self._implies_if_concrete(other, explanation)
 
-    def generic_terms(self) -> List[Term]:
+    def generic_terms(self) -> List["Term"]:
         """Get Terms that can be replaced without changing ``self``'s meaning."""
         return list(self.generic_terms_by_str().values())
 
-    def generic_terms_by_str(self) -> Dict[str, Term]:
+    def generic_terms_by_str(self) -> Dict[str, "Term"]:
         r"""
         Index Terms that can be replaced without changing ``self``'s meaning.
 
@@ -582,14 +582,14 @@ class Comparable(ABC):
             generic :class:`.Factor`\s as keys and the :class:`.Factor`\s
             themselves as values.
         """
-        generics: Dict[str, Term] = {}
+        generics: Dict[str, "Term"] = {}
         for factor in self.term_sequence:
             if factor is not None:
                 for generic in factor.generic_terms():
                     generics[generic.short_string] = generic
         return generics
 
-    def get_factor(self, query: str) -> Optional[Term]:
+    def get_factor(self, query: str) -> Optional["Term"]:
         """
         Search for Comparable with str or name matching query.
 
@@ -602,7 +602,7 @@ class Comparable(ABC):
             result = self.get_factor_by_name(query)
         return result
 
-    def get_factor_by_name(self, name: str) -> Optional[Term]:
+    def get_factor_by_name(self, name: str) -> Optional["Term"]:
         """
         Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified ``name``.
 
@@ -616,7 +616,7 @@ class Comparable(ABC):
                 return value
         return None
 
-    def get_factor_by_str(self, query: str) -> Optional[Term]:
+    def get_factor_by_str(self, query: str) -> Optional["Term"]:
         """
         Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
 
@@ -630,7 +630,7 @@ class Comparable(ABC):
         return None
 
     def implied_by(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: Self | None, context: Optional["ContextRegister"] = None
     ):
         r"""
         Find whether other implies self.
@@ -649,7 +649,7 @@ class Comparable(ABC):
         return any(self.explanations_implied_by(other, context=context))
 
     def implies(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: Self | None, context: Optional["ContextRegister"] = None
     ) -> bool:
         r"""
         Test whether ``self`` implies ``other``.
@@ -681,8 +681,8 @@ class Comparable(ABC):
         )
 
     def _implies_if_concrete(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
 
@@ -702,12 +702,12 @@ class Comparable(ABC):
             ):
                 yield explanation.with_context(new_context)
 
-    def implies_same_context(self, other: Comparable) -> bool:
+    def implies_same_context(self, other: Self) -> bool:
         """Check if self would imply other if their generic terms are matched in order."""
         same_context = self.make_same_context(other)
         return self.implies(other, context=same_context)
 
-    def contradicts_same_context(self, other: Comparable) -> bool:
+    def contradicts_same_context(self, other: Self) -> bool:
         """
         Check if self contradicts other if Terms with the same name always match.
 
@@ -716,7 +716,7 @@ class Comparable(ABC):
         same_context = self.make_same_context(other)
         return self.contradicts(other, context=same_context)
 
-    def make_same_context(self, other: Comparable):
+    def make_same_context(self, other: Self):
         """Make ContextRegister assuming all terms in self correspond to the same terms in other."""
         result = ContextRegister()
         for key in self.generic_terms():
@@ -726,8 +726,8 @@ class Comparable(ABC):
         return result
 
     def likely_contexts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Iterator["ContextRegister"]:
         r"""
         Generate contexts that match Terms from Factors with corresponding meanings.
 
@@ -755,8 +755,8 @@ class Comparable(ABC):
         yield context
 
     def _likely_context_from_implication(
-        self, other: Comparable, context: ContextRegister
-    ) -> Optional[ContextRegister]:
+        self, other: Self, context: "ContextRegister"
+    ) -> Optional["ContextRegister"]:
         new_context = None
         if self.implies(other, context=context) or other.implies(
             self, context=context.reversed()
@@ -767,8 +767,8 @@ class Comparable(ABC):
         return None
 
     def _likely_context_from_meaning(
-        self, other: Comparable, context: ContextRegister
-    ) -> Optional[ContextRegister]:
+        self, other: Self, context: "ContextRegister"
+    ) -> Optional["ContextRegister"]:
         new_context = None
         if self.means(other, context=context) or other.means(
             self, context=context.reversed()
@@ -778,7 +778,7 @@ class Comparable(ABC):
             return new_context
         return None
 
-    def make_generic(self) -> Comparable:
+    def make_generic(self) -> "Comparable":
         """
         Get a copy of ``self`` except ensure ``generic`` is ``True``.
 
@@ -793,7 +793,7 @@ class Comparable(ABC):
         return result
 
     def means(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: "Self" | None, context: Optional["ContextRegister"] = None
     ) -> bool:
         r"""
         Test whether ``self`` and ``other`` have identical meanings.
@@ -823,8 +823,8 @@ class Comparable(ABC):
         )
 
     def _means_if_concrete(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         """
         Test equality based on :attr:`terms`.
 
@@ -844,7 +844,7 @@ class Comparable(ABC):
                 yield explanation.with_context(new_context)
 
     @new_context_helper
-    def new_context(self, changes: ContextRegister) -> Comparable:
+    def new_context(self, changes: "ContextRegister") -> Self:
         r"""
         Create new :class:`Comparable`, replacing keys of ``changes`` with values.
 
@@ -870,8 +870,8 @@ class Comparable(ABC):
         return self.__dict__.copy()
 
     def possible_contexts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Iterator["ContextRegister"]:
         r"""
         Get permutations of generic Factor assignments not ruled out by the known context.
 
@@ -911,8 +911,8 @@ class Comparable(ABC):
                     yield merged_context
 
     def _registers_for_interchangeable_context(
-        self, matches: ContextRegister
-    ) -> Iterator[ContextRegister]:
+        self, matches: "ContextRegister"
+    ) -> Iterator["ContextRegister"]:
         r"""
         Find possible combination of interchangeable :attr:`terms`.
 
@@ -923,13 +923,13 @@ class Comparable(ABC):
         """
         yield matches
 
-    def term_permutations(self) -> Iterator[TermSequence]:
+    def term_permutations(self) -> Iterator["TermSequence"]:
         """Generate permutations of context factors that preserve same meaning."""
         yield self.term_sequence
 
     def _update_context_from_factors(
-        self, other: Comparable, context: ContextRegister
-    ) -> Optional[ContextRegister]:
+        self, other: Self, context: "ContextRegister"
+    ) -> Optional["ContextRegister"]:
         """
         Update context produce a likely way self corresponds to other.
 
@@ -944,10 +944,10 @@ class Comparable(ABC):
 
     def update_context_register(
         self,
-        other: Optional[Comparable],
-        context: ContextRegister,
+        other: Optional[Self],
+        context: "ContextRegister",
         comparison: Callable,
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator["ContextRegister"]:
         r"""
         Find ways to update ``self_mapping`` to allow relationship ``comparison``.
 
@@ -983,7 +983,7 @@ class Comparable(ABC):
 
 
 def consistent_with(
-    left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
+    left: Comparable, right: Comparable, context: Optional["ContextRegister"] = None
 ) -> bool:
     """
     Call :meth:`.Factor.consistent_with` as function alias.
@@ -1065,9 +1065,9 @@ class ContextRegister:
     def __init__(self):
         """Index Comparables on each side by names of Comparables on the other side."""
         self._bd: bidict.bidict = bidict.bidict()
-        self._terms: Dict[str, Term] = {}
+        self._terms: Dict[str, "Term"] = {}
 
-    def __getitem__(self, item: str) -> Term:
+    def __getitem__(self, item: str) -> "Term":
         return self._terms[self._bd[item]]
 
     def __len__(self):
@@ -1096,21 +1096,21 @@ class ContextRegister:
         return self.matches == other.matches
 
     @property
-    def matches(self) -> Dict[str, Term]:
+    def matches(self) -> dict[str, "Term"]:
         """Get names of ``self``'s Terms matched to ``other``'s Terms."""
         return {k: self._terms[v] for k, v in self._bd.items()}
 
     @property
-    def reverse_matches(self) -> Dict[str, Term]:
+    def reverse_matches(self) -> dict[str, "Term"]:
         """Get names of ``other``'s Terms matched to ``self``'s Terms."""
         return {v: self._terms[k] for k, v in self._bd.items()}
 
     @classmethod
     def _from_lists(
         cls,
-        to_replace: Sequence[Term],
-        replacements: Sequence[Term],
-    ) -> ContextRegister:
+        to_replace: Sequence["Term"],
+        replacements: Sequence["Term"],
+    ) -> "ContextRegister":
         pairs = zip(to_replace, replacements)
         new = cls()
         for pair in pairs:
@@ -1120,11 +1120,11 @@ class ContextRegister:
     @classmethod
     def from_lists(
         cls,
-        to_replace: Sequence[Union[Term, str]],
-        replacements: Sequence[Union[Term, str]],
+        to_replace: Sequence[Union["Term", str]],
+        replacements: Sequence[Union["Term", str]],
         current: Optional[Comparable] = None,
         incoming: Optional[Comparable] = None,
-    ) -> ContextRegister:
+    ) -> "ContextRegister":
         """Make new ContextRegister from two lists of Comparables."""
         terms_to_replace = expand_strings_from_source(
             to_expand=to_replace, source=current
@@ -1140,7 +1140,7 @@ class ContextRegister:
     @classmethod
     def from_changes_and_current(
         cls,
-        changes: Sequence[Union[str, Term]],
+        changes: Sequence[Union[str, "Term"]],
         current: Comparable,
         incoming: Optional[Comparable] = None,
     ):
@@ -1157,11 +1157,11 @@ class ContextRegister:
     @classmethod
     def create(
         cls,
-        changes: ContextMemo,
+        changes: "ContextMemo",
         current: Optional[Comparable] = None,
         incoming: Optional[Comparable] = None,
-        terms_to_replace: Optional[Sequence[Term]] = None,
-    ) -> ContextRegister:
+        terms_to_replace: Optional[Sequence["Term"]] = None,
+    ) -> "ContextRegister":
         """Convert changes to ``factor``, expressed as built-in Python objects, to a ContextRegister."""
         if isinstance(changes, ContextRegister):
             return changes
@@ -1201,7 +1201,7 @@ class ContextRegister:
         )
 
     def assigns_same_value_to_key_factor(
-        self, other: ContextRegister, key_factor: Comparable
+        self, other: "ContextRegister", key_factor: Comparable
     ) -> bool:
         """Check if both ContextRegisters assign same value to the key for this factor."""
         self_value = self.get_factor(key_factor)
@@ -1209,18 +1209,18 @@ class ContextRegister:
             return False
         return self_value.compare_keys(other.get_factor(key_factor))
 
-    def check_match(self, key: Term, value: Term) -> bool:
+    def check_match(self, key: "Term", value: "Term") -> bool:
         """Test if key and value are in ``matches`` as corresponding to one another."""
         if self.get(key.key) is None:
             return False
         return self[key.key].compare_keys(value)
 
-    def factor_pairs(self) -> Iterator[Tuple[Term, Term]]:
+    def factor_pairs(self) -> Iterator[Tuple["Term", "Term"]]:
         """Get pairs of corresponding Comparables."""
         for k, v in self._bd.items():
             yield (self._terms[k], self._terms[v])
 
-    def means(self, other: ContextRegister) -> bool:
+    def means(self, other: "ContextRegister") -> bool:
         """Determine if self and other have the same Factor matches."""
         if not isinstance(other, ContextRegister):
             return False
@@ -1240,7 +1240,7 @@ class ContextRegister:
         """Get value corresponding to the key ``query``."""
         return self.get(query.short_string)
 
-    def get_reverse_factor(self, query: Term) -> Optional[Term]:
+    def get_reverse_factor(self, query: "Term") -> Optional["Term"]:
         """Get key corresponding to the value ``query``."""
         key_str = self._bd.inverse.get(query.short_string)
         if key_str is None:
@@ -1259,7 +1259,7 @@ class ContextRegister:
         """Get values from ``matches`` mapping."""
         return self.matches.values()
 
-    def insert_pair(self, key: Term, value: Term) -> None:
+    def insert_pair(self, key: "Term", value: "Term") -> None:
         """Add a pair of corresponding Comparables."""
         for comp in (key, value):
             if not isinstance(comp, Term):
@@ -1278,7 +1278,7 @@ class ContextRegister:
         self._terms[key.short_string] = key
         self._terms[value.short_string] = value
 
-    def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
+    def replace_keys(self, replacements: "ContextRegister") -> "ContextRegister":
         """
         Construct new :class:`ContextRegister` by replacing keys.
 
@@ -1291,14 +1291,14 @@ class ContextRegister:
             result.insert_pair(key=replacements[k_str], value=self._terms[v_str])
         return result
 
-    def reversed(self) -> ContextRegister:
+    def reversed(self) -> "ContextRegister":
         """Swap keys for values and vice versa."""
         new = ContextRegister()
         new._bd = bidict.bidict(self._bd.inverse)
         new._terms = self._terms.copy()
         return new
 
-    def _copy(self) -> ContextRegister:
+    def _copy(self) -> "ContextRegister":
         """Shallow-copy self: new bidict and terms dict, shared Term references."""
         new = ContextRegister()
         new._bd = self._bd.copy()
@@ -1306,8 +1306,8 @@ class ContextRegister:
         return new
 
     def merged_with(
-        self, incoming_mapping: ContextRegister
-    ) -> Optional[ContextRegister]:
+        self, incoming_mapping: "ContextRegister"
+    ) -> Optional["ContextRegister"]:
         r"""
         Create a new merged :class:`ContextRegister`\.
 
@@ -1407,10 +1407,10 @@ class Explanation:
     @classmethod
     def from_context(
         cls,
-        context: Optional[Union[ContextMemo, Explanation]] = None,
+        context: Optional[Union["ContextMemo", "Explanation"]] = None,
         current: Optional[Comparable] = None,
         incoming: Optional[Comparable] = None,
-    ) -> Explanation:
+    ) -> "Explanation":
         """Return new Explanation with self as context but no reasons."""
         if isinstance(context, Explanation):
             return context
@@ -1422,7 +1422,7 @@ class Explanation:
             )
         return Explanation(reasons=[], context=context or ContextRegister())
 
-    def means(self, other: Explanation) -> bool:
+    def means(self, other: "Explanation") -> bool:
         """Test if both Explanations have the same context and reasons."""
         if not isinstance(other, Explanation):
             return False
@@ -1435,7 +1435,7 @@ class Explanation:
             for reason in self.reasons
         )
 
-    def operate(self, left: Comparable, right: Comparable) -> Iterator[Explanation]:
+    def operate(self, left: Comparable, right: Comparable) -> Iterator["Explanation"]:
         """Generate further explanations for applying self.operation to a new Factor pair."""
         if self.operation == operator.ge:
             yield from left.explanations_implication(right, self)
@@ -1450,11 +1450,11 @@ class Explanation:
                 f"Can't apply self.operation '{self.operation}' as function."
             )
 
-    def reversed_context(self) -> Explanation:
+    def reversed_context(self) -> "Explanation":
         """Make new copy of self, swapping keys and values of context."""
         return self.with_context(self.context.reversed())
 
-    def with_match(self, match: FactorMatch) -> Explanation:
+    def with_match(self, match: FactorMatch) -> "Explanation":
         """Add a pair of compared objects that has been found to satisfy operation, given context."""
         new_matches = self.reasons + [match]
         return Explanation(
@@ -1463,7 +1463,7 @@ class Explanation:
             operation=self.operation,
         )
 
-    def with_context(self, context: ContextRegister) -> Explanation:
+    def with_context(self, context: ContextRegister) -> "Explanation":
         """Make new copy of self, replacing context."""
         return Explanation(
             reasons=self.reasons,
@@ -1480,7 +1480,7 @@ class Term(Comparable):
     a :class:`~nettlesome.predicates.StatementTemplate`\.
     """
 
-    def _borrow_generic_context(self, other: Term) -> Term:
+    def _borrow_generic_context(self, other: Self) -> Self:
         self_factors = list(self.recursive_terms.values())
         other_factors = list(other.recursive_terms.values())
         changes = ContextRegister()
@@ -1493,8 +1493,8 @@ class Term(Comparable):
         return True
 
     def add(
-        self, other: Term, context: Optional[ContextRegister] = None
-    ) -> Optional[Term]:
+        self, other: Self, context: Optional[ContextRegister] = None
+    ) -> Optional[Self]:
         """
         Get a term that combines the meaning of self and other, if possible.
 
@@ -1513,7 +1513,7 @@ class Term(Comparable):
             return other._borrow_generic_context(self)
         return None
 
-    def __add__(self, other: Term) -> Optional[Comparable]:
+    def __add__(self, other: Self) -> Optional[Comparable]:
         return self.add(other)
 
     def explanations_consistent_with(
@@ -1581,19 +1581,19 @@ class Term(Comparable):
             yield explanation.with_context(new_context)
         yield from super()._implies_if_present(other, explanation)
 
-    def _generic_register(self, other: Term) -> ContextRegister:
+    def _generic_register(self, other: Self) -> ContextRegister:
         register = ContextRegister()
         register.insert_pair(self, other)
         return register
 
-    def generic_terms_by_str(self) -> Dict[str, Term]:
+    def generic_terms_by_str(self) -> Dict[str, "Term"]:
         """Get all generic Terms found in this Term, indexed by their string keys."""
         if self.generic:
             return {self.key: self}
         return super().generic_terms_by_str()
 
     @property
-    def recursive_terms(self) -> Dict[str, Term]:
+    def recursive_terms(self) -> Dict[str, "Term"]:
         r"""
         Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
@@ -1649,7 +1649,7 @@ class TermSequence(RootModel):
 
     def ordered_comparison(
         self,
-        other: TermSequence,
+        other: "TermSequence",
         operation: Callable,
         context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
@@ -1709,7 +1709,7 @@ class TermSequence(RootModel):
 # using information from the Factors being compared.
 ContextMemo = Union[
     ContextRegister,
-    List[Union[str, Term]],
-    Tuple[List[Union[str, Term]], List[Union[str, Term]]],
+    Sequence[Union[str, Term]],
+    Tuple[Sequence[Union[str, Term]], Sequence[Union[str, Term]]],
     Dict[str, Union[str, Term]],
 ]
