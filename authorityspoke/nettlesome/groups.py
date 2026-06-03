@@ -241,19 +241,19 @@ class FactorGroup(Comparable, RootModel):
     def _explanations_contradiction(
         self,
         other: Comparable,
-        explanation: Explanation,
+        context: Explanation,
     ) -> Iterator[Explanation]:
         """Find contexts that would cause ``self`` to contradict ``other``."""
 
-        explanation.operation = contradicts
+        context.operation = contradicts
 
         if isinstance(other, FactorGroup):
             for other_factor in other:
                 yield from self._explain_contradicts_factor(
-                    other_factor, explanation=explanation
+                    other_factor, explanation=context
                 )
         else:
-            yield from self._explain_contradicts_factor(other, explanation=explanation)
+            yield from self._explain_contradicts_factor(other, explanation=context)
 
     @unique_explanations
     def explanations_contradiction(
@@ -294,7 +294,7 @@ class FactorGroup(Comparable, RootModel):
         context = Explanation.from_context(
             context=context, current=self, incoming=other
         )
-        yield from self._explanations_contradiction(other=other, explanation=context)
+        yield from self._explanations_contradiction(other=other, context=context)
 
     def contradicts(
         self,

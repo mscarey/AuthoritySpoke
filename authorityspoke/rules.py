@@ -422,7 +422,7 @@ class Rule(Comparable, BaseModel):
 
     def explanations_contradiction(
         self, other, context: Optional[Union[ContextRegister, Explanation]] = None
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         """Find context matches that would result in a contradiction with other."""
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)

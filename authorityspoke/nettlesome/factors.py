@@ -47,7 +47,7 @@ class AbsenceOf(Comparable, BaseModel):
         )
 
     def _explanations_contradiction(
-        self, other: Comparable, explanation: Explanation
+        self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
         if not isinstance(other, Comparable):
             raise TypeError(
@@ -57,14 +57,12 @@ class AbsenceOf(Comparable, BaseModel):
         # No contradiction between absences of any two Comparables
         if not isinstance(other, self.__class__):
             if not isinstance(other, Term):
-                explanation_reversed = explanation.reversed_context()
+                explanation_reversed = context.reversed_context()
                 yield from other._explanations_contradiction(
-                    self, explanation=explanation_reversed
+                    self, context=explanation_reversed
                 )
             elif isinstance(other, self.absent.__class__):
-                explanation_reversed = explanation.with_context(
-                    explanation.context.reversed()
-                )
+                explanation_reversed = context.with_context(context.context.reversed())
                 test = other._implies_if_present(self.absent, explanation_reversed)
                 for new_explanation in test:
                     yield new_explanation.with_context(
