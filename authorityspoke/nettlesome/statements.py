@@ -66,8 +66,8 @@ class Statement(Factor, BaseModel):
         terms: Optional[
             Union[
                 TermSequence,
-                Mapping[str, Union[Entity, "Statement", "Assertion"]],
-                Sequence[Union[Entity, "Statement", "Assertion"]],
+                Mapping[str, Term],
+                Sequence[Term | None],
             ]
         ] = None,
         truth: Optional[bool] = True,
@@ -94,7 +94,13 @@ class Statement(Factor, BaseModel):
             terms = predicate.template.get_term_sequence_from_mapping(
                 cast(Mapping[str, Term], terms)
             )
-        return cls(predicate=predicate, terms=terms or TermSequence(), generic=generic)
+        if isinstance(terms, TermSequence):
+            return cls(predicate=predicate, terms=terms, generic=generic)
+        if terms is None:
+            return cls(predicate=predicate, terms=TermSequence(), generic=generic)
+        return cls(
+            predicate=predicate, terms=TermSequence(root=tuple(terms)), generic=generic
+        )
 
     @field_validator("terms", mode="before")
     @classmethod

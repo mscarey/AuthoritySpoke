@@ -8,7 +8,7 @@ import logging
 import operator
 import textwrap
 from typing import Any, Callable, ClassVar, Dict, Iterator
-from typing import List, NamedTuple, Optional, Sequence, Tuple, Union
+from typing import List, NamedTuple, Optional, Self, Sequence, Tuple, Union
 from typing import KeysView, ValuesView, ItemsView
 
 import bidict
@@ -72,29 +72,6 @@ def new_context_helper(func: Callable):
     return wrapper
 
 
-def expand_string_from_source(
-    term: Union[str, Term], source: Comparable | None
-) -> Term:
-    """Replace ``term`` with the real term it references, if ``term`` is a string reference."""
-    if isinstance(term, str):
-        if source is not None:
-            result: Optional[Term] = source.get_factor(term)
-        else:
-            result = None
-    else:
-        return term
-    if result is None:
-        raise ValueError(f'Unable to find replacement term for text "{term}"')
-    return result
-
-
-def expand_strings_from_source(
-    to_expand: Sequence[Union[str, Term]], source: Optional[Comparable]
-) -> List[Term]:
-    """Make list of Terms by replacing strings with the real Terms they reference."""
-    return [expand_string_from_source(change, source) for change in to_expand]
-
-
 class Comparable(ABC):
     """
     Objects that can be compared for implication, same meaning, contradiction, and consistency.
@@ -131,7 +108,7 @@ class Comparable(ABC):
         return str(self)
 
     @property
-    def recursive_terms(self) -> Dict[str, Term]:
+    def recursive_terms(self) -> Dict[str, "Term"]:
         r"""
         Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
@@ -147,7 +124,7 @@ class Comparable(ABC):
         return answers
 
     @property
-    def term_sequence(self) -> TermSequence:
+    def term_sequence(self) -> "TermSequence":
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -162,7 +139,7 @@ class Comparable(ABC):
             context.append(next_factor)
         return TermSequence(root=tuple(context))
 
-    def __ge__(self, other: Optional[Comparable]) -> bool:
+    def __ge__(self, other: Self | None) -> bool:
         """
         Call :meth:`implies` as an alias.
 
@@ -171,7 +148,7 @@ class Comparable(ABC):
         """
         return bool(self.implies(other))
 
-    def __gt__(self, other: Optional[Comparable]) -> bool:
+    def __gt__(self, other: Self | None) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
         if other is None:
             return True
@@ -183,9 +160,7 @@ class Comparable(ABC):
             text = f"<{text}>"
         return text
 
-    def _all_generic_terms_match(
-        self, other: Comparable, context: ContextRegister
-    ) -> bool:
+    def _all_generic_terms_match(self, other: Self, context: "ContextRegister") -> bool:
         if all(
             all(
                 context.assigns_same_value_to_key_factor(
@@ -201,7 +176,7 @@ class Comparable(ABC):
         return False
 
     def consistent_with(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: Optional[Self], context: Optional["ContextRegister"] = None
     ) -> bool:
         """
         Check if self and other can be non-contradictory.
@@ -219,7 +194,7 @@ class Comparable(ABC):
             for explanation in self.explanations_consistent_with(other, context)
         )
 
-    def compare_keys(self, other: Optional[Comparable]) -> bool:
+    def compare_keys(self, other: Self | None) -> bool:
         """
         Test if self and other would be considered identical in a ContextRegister.
 
@@ -230,7 +205,7 @@ class Comparable(ABC):
         """
         return other is not None and self.key == other.key
 
-    def compare_terms(self, other: Comparable, relation: Callable) -> bool:
+    def compare_terms(self, other: Self, relation: Callable) -> bool:
         r"""
         Test if relation holds for corresponding context factors of self and other.
 
@@ -249,7 +224,7 @@ class Comparable(ABC):
         return False
 
     def compare_ordering_of_terms(
-        self, other: Comparable, relation: Callable, ordering: TermSequence
+        self, other: Self, relation: Callable, ordering: "TermSequence"
     ) -> bool:
         """
         Determine whether one ordering of self's terms matches other's terms.
@@ -268,10 +243,10 @@ class Comparable(ABC):
 
     def _context_registers(
         self,
-        other: Optional[Comparable],
+        other: Self | None,
         comparison: Callable,
-        context: ContextRegister,
-    ) -> Iterator[ContextRegister]:
+        context: "ContextRegister",
+    ) -> Iterator["ContextRegister"]:
         r"""
         Search for ways to match :attr:`terms` of ``self`` and ``other``.
 
@@ -282,7 +257,7 @@ class Comparable(ABC):
         if other is None:
             yield context
         else:
-            already_found: List[ContextRegister] = []
+            already_found: List["ContextRegister"] = []
             for term_permutation in self.term_permutations():
                 for other_permutation in other.term_permutations():
                     for answer in term_permutation.ordered_comparison(
@@ -293,7 +268,7 @@ class Comparable(ABC):
                             yield answer
 
     def contradicts(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: Optional[Self], context: Optional["ContextRegister"] = None
     ) -> bool:
         """
         Test whether ``self`` implies the absence of ``other``.
@@ -311,8 +286,8 @@ class Comparable(ABC):
         )
 
     def _contradicts_if_present(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         """
         Test if ``self`` would contradict ``other`` if neither was ``absent``.
 
@@ -321,8 +296,8 @@ class Comparable(ABC):
         yield from iter([])
 
     def explain_same_meaning(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Explanation]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Optional["Explanation"]:
         """
         Get one explanation of why self and other have the same meaning.
 
@@ -348,8 +323,8 @@ class Comparable(ABC):
         return explanation
 
     def explain_consistent_with(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Explanation]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Optional["Explanation"]:
         """Get one explanation of why self and other need not contradict."""
         explanations = self.explanations_consistent_with(other, context=context)
         try:
@@ -359,8 +334,8 @@ class Comparable(ABC):
         return explanation
 
     def explain_contradiction(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Explanation]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Optional["Explanation"]:
         r"""
         Get one explanation of why self and other contradict.
 
@@ -403,8 +378,8 @@ class Comparable(ABC):
         return explanation
 
     def explain_implication(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Explanation]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Optional["Explanation"]:
         """Get one explanation of why self implies other."""
         explanations = self.explanations_implication(other, context=context)
         try:
@@ -414,8 +389,8 @@ class Comparable(ABC):
         return explanation
 
     def explain_implied_by(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Explanation]:
+        self, other: Self, context: Optional["ContextRegister"] = None
+    ) -> Optional["Explanation"]:
         """Get one explanation of why self implies other."""
         explanations = self.explanations_implied_by(other, context=context)
         try:
@@ -425,8 +400,8 @@ class Comparable(ABC):
         return explanation
 
     def _contexts_consistent_with(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: "Comparable", context: Optional["ContextRegister"] = None
+    ) -> Iterator["ContextRegister"]:
         context = context or ContextRegister()
         for possible in self.possible_contexts(other, context):
             if not self.contradicts(other, context=possible):
@@ -434,9 +409,9 @@ class Comparable(ABC):
 
     def _explanations_consistent_with(
         self,
-        other: Comparable,
-        explanation: Explanation,
-    ) -> Iterator[Explanation]:
+        other: Self,
+        explanation: "Explanation",
+    ) -> Iterator["Explanation"]:
         for new_context in self._contexts_consistent_with(
             other=other, context=explanation.context
         ):
@@ -444,9 +419,9 @@ class Comparable(ABC):
 
     def explanations_consistent_with(
         self,
-        other: Comparable,
-        context: Optional[Union[Explanation, ContextRegister]] = None,
-    ) -> Iterator[Explanation]:
+        other: Self,
+        context: "Explanation" | "ContextRegister" | None = None,
+    ) -> Iterator["Explanation"]:
         """
         Test whether ``self`` does not contradict ``other``.
 
@@ -464,8 +439,8 @@ class Comparable(ABC):
             yield new.with_match(FactorMatch(self, consistent_with, other))
 
     def _explanations_contradiction(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         if not isinstance(other, Comparable):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
@@ -481,9 +456,9 @@ class Comparable(ABC):
 
     def explanations_contradiction(
         self,
-        other: Comparable,
-        context: Optional[Union[Explanation, ContextRegister]] = None,
-    ) -> Iterator[Explanation]:
+        other: Self,
+        context: Optional[Union["Explanation", "ContextRegister"]] = None,
+    ) -> Iterator["Explanation"]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
 
@@ -505,8 +480,8 @@ class Comparable(ABC):
             )
 
     def _explanations_implication(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         if not isinstance(other, Comparable):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
@@ -521,9 +496,9 @@ class Comparable(ABC):
 
     def explanations_implication(
         self,
-        other: Comparable,
-        context: Optional[Union[Explanation, ContextRegister]] = None,
-    ) -> Iterator[Explanation]:
+        other: Self,
+        context: Optional[Union["Explanation", "ContextRegister"]] = None,
+    ) -> Iterator["Explanation"]:
         r"""
         Generate :class:`.ContextRegister`\s that cause `self` to imply `other`.
 
@@ -541,8 +516,8 @@ class Comparable(ABC):
             )
 
     def _explanations_implied_by(
-        self, other: Comparable, explanation: Explanation
-    ) -> Iterator[Explanation]:
+        self, other: Self, explanation: "Explanation"
+    ) -> Iterator["Explanation"]:
         reversed_explanation = explanation.with_context(explanation.context.reversed())
         for new in other._explanations_implication(
             self, explanation=reversed_explanation
@@ -1049,6 +1024,29 @@ def contradicts(left: Comparable, right: Comparable) -> bool:
         contradict ``self``, assuming relevant context factors
     """
     return left.contradicts(right)
+
+
+def expand_string_from_source(
+    term: Union[str, "Term"], source: Comparable | None
+) -> "Term":
+    """Replace ``term`` with the real term it references, if ``term`` is a string reference."""
+    if isinstance(term, str):
+        if source is not None:
+            result = source.get_factor(term)
+        else:
+            result = None
+    else:
+        return term
+    if result is None:
+        raise ValueError(f'Unable to find replacement term for text "{term}"')
+    return result
+
+
+def expand_strings_from_source(
+    to_expand: Sequence[Union[str, "Term"]], source: Optional[Comparable]
+) -> List["Term"]:
+    """Make list of Terms by replacing strings with the real Terms they reference."""
+    return [expand_string_from_source(change, source) for change in to_expand]
 
 
 class ContextRegister:
