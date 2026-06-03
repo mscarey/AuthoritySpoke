@@ -8,7 +8,7 @@ from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.terms import Comparable, Explanation, Term, TermSequence
 
 
-class Factor(Term, BaseModel):
+class Factor(Term):
     r"""
     A thing that can be asserted to be present or absent.
 

@@ -250,7 +250,7 @@ shows how to generate the schema as a Python dict and then view just the
     >>> from authorityspoke.holdings import Holding
     >>> schema = Holding.model_json_schema()
     >>> schema["properties"]
-    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
+    {'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}, 'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}}
 
 The schema can also be exported as JSON using
 the :meth:`authorityspoke.holdings.Holding.schema_json` method.

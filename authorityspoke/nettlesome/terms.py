@@ -13,7 +13,7 @@ from typing import KeysView, ValuesView, ItemsView
 
 import bidict
 from constraint import AllDifferentConstraint, Problem
-from pydantic import RootModel, ConfigDict, field_validator
+from pydantic import BaseModel, RootModel, ConfigDict, field_validator
 
 
 logger = logging.getLogger(__name__)
@@ -89,7 +89,6 @@ class Comparable(ABC):
         Indicates whether the object refers to multiple things.
     """
 
-    generic: bool
     context_factor_names: ClassVar[Tuple[str, ...]]
 
     @property
@@ -1470,13 +1469,15 @@ class Explanation:
         )
 
 
-class Term(Comparable):
+class Term(Comparable, BaseModel):
     r"""
     Things that can be referenced in a Statement.
 
     The name of a Term can replace the placeholder in
     a :class:`~nettlesome.predicates.StatementTemplate`\.
     """
+
+    generic: bool = False
 
     def _borrow_generic_context(self, other: Self) -> Self:
         self_factors = list(self.recursive_terms.values())
