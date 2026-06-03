@@ -12,7 +12,6 @@ from authorityspoke.nettlesome.terms import (
     ContextRegister,
     Explanation,
     TermSequence,
-    expand_string_from_source,
     means,
 )
 from authorityspoke.nettlesome.units import gram, hour, kilograms, miles
@@ -279,18 +278,17 @@ class TestStatements:
 
     def test_expand_string_from_statement(self, make_complex_fact):
         source = make_complex_fact["relevant_murder"]
-        expanded = expand_string_from_source(term="Alice", source=source)
+        expanded = source.get_factor(query="Alice")
         assert expanded.name == "Alice"
 
     def test_expand_string_from_statement_with_key(self, make_complex_fact):
         source = make_complex_fact["relevant_murder"]
-        expanded = expand_string_from_source(term="<Alice>", source=source)
+        expanded = source.get_factor(query="<Alice>")
         assert expanded.name == "Alice"
 
     def test_dont_expand_string_from_statement(self, make_complex_fact):
         source = make_complex_fact["relevant_murder"]
-        with pytest.raises(ValueError):
-            expand_string_from_source(term="Jim", source=source)
+        assert source.get_factor(query="Jim") is None
 
     def test_concrete_to_abstract(self):
         predicate = Predicate(content="{person} had a farm")

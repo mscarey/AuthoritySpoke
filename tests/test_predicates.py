@@ -1,5 +1,8 @@
 from datetime import date
 from decimal import Decimal
+
+from pydantic import ValidationError
+from pint import Quantity
 import pytest
 import sympy
 from sympy import Interval, oo
@@ -7,7 +10,7 @@ from sympy import Interval, oo
 
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_, Quantity
+from authorityspoke.nettlesome.quantities import Comparison, Q_
 
 
 class TestComparisons:
@@ -40,11 +43,11 @@ class TestComparisons:
 
 class TestPredicates:
     def test_no_sign_allowed_for_predicate(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Predicate(
-                "the date when {work} was created was",
-                sign=">=",
-                expression=date(1978, 1, 1),
+                content="the date when {work} was created was",
+                sign=">=",  # ty: ignore[unknown-argument]
+                expression=date(1978, 1, 1),  # ty: ignore[unknown-argument]
             )
 
     def test_term_positions(self):

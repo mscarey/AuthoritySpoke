@@ -6,7 +6,14 @@ import pytest
 from sympy import S, oo
 
 from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.quantities import UnitRange, DateRange, DecimalRange, Comparison
+
+from authorityspoke.nettlesome.quantities import (
+    UnitRange,
+    DateRange,
+    DecimalRange,
+    Comparison,
+)
+
 from authorityspoke.nettlesome.statements import Statement
 
 

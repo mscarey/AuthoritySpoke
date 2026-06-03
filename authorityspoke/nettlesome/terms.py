@@ -19,50 +19,6 @@ from pydantic import RootModel, ConfigDict, field_validator
 logger = logging.getLogger(__name__)
 
 
-def consistent_with(
-    left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
-) -> bool:
-    """
-    Call :meth:`.Factor.consistent_with` as function alias.
-
-    This exists because :func:`Factor._context_registers` needs
-    a function rather than a method for the `comparison` variable.
-
-    :returns:
-        whether ``other`` is consistent with ``self``.
-    """
-    context = context or ContextRegister()
-    return left.consistent_with(right, context)
-
-
-def means(left: Comparable, right: Comparable) -> bool:
-    """
-    Call :meth:`.Factor.means` as function alias.
-
-    This exists because :class:`.Explanation` objects expect
-    a function rather than a method
-
-    :returns:
-        whether ``other`` is another :class:`Factor` with the same
-        meaning as ``self``.
-    """
-    return left.means(right)
-
-
-def contradicts(left: Comparable, right: Comparable) -> bool:
-    """
-    Call :meth:`.Factor.contradicts` as function alias.
-
-    This exists because :class:`.Explanation` objects expect
-    a function rather than a method
-
-    :returns:
-        whether ``other`` is another :class:`Factor` that can
-        contradict ``self``, assuming relevant context factors
-    """
-    return left.contradicts(right)
-
-
 def new_context_helper(func: Callable):
     r"""
     Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
@@ -114,29 +70,6 @@ def new_context_helper(func: Callable):
         return func(factor, expanded_changes)
 
     return wrapper
-
-
-def expand_string_from_source(
-    term: Union[str, Term], source: Comparable | None
-) -> Term:
-    """Replace ``term`` with the real term it references, if ``term`` is a string reference."""
-    if isinstance(term, str):
-        if source is not None:
-            result: Optional[Term] = source.get_factor(term)
-        else:
-            result = None
-    else:
-        return term
-    if result is None:
-        raise ValueError(f'Unable to find replacement term for text "{term}"')
-    return result
-
-
-def expand_strings_from_source(
-    to_expand: Sequence[Union[str, Term]], source: Optional[Comparable]
-) -> List[Term]:
-    """Make list of Terms by replacing strings with the real Terms they reference."""
-    return [expand_string_from_source(change, source) for change in to_expand]
 
 
 class Comparable(ABC):
@@ -1049,6 +982,50 @@ class Comparable(ABC):
                 register_or_none = context.merged_with(new_register_variation)
                 if register_or_none is not None:
                     yield register_or_none
+
+
+def consistent_with(
+    left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
+) -> bool:
+    """
+    Call :meth:`.Factor.consistent_with` as function alias.
+
+    This exists because :func:`Factor._context_registers` needs
+    a function rather than a method for the `comparison` variable.
+
+    :returns:
+        whether ``other`` is consistent with ``self``.
+    """
+    context = context or ContextRegister()
+    return left.consistent_with(right, context)
+
+
+def contradicts(left: Comparable, right: Comparable) -> bool:
+    """
+    Call :meth:`.Factor.contradicts` as function alias.
+
+    This exists because :class:`.Explanation` objects expect
+    a function rather than a method
+
+    :returns:
+        whether ``other`` is another :class:`Factor` that can
+        contradict ``self``, assuming relevant context factors
+    """
+    return left.contradicts(right)
+
+
+def means(left: Comparable, right: Comparable) -> bool:
+    """
+    Call :meth:`.Factor.means` as function alias.
+
+    This exists because :class:`.Explanation` objects expect
+    a function rather than a method
+
+    :returns:
+        whether ``other`` is another :class:`Factor` with the same
+        meaning as ``self``.
+    """
+    return left.means(right)
 
 
 class ContextRegister:
