@@ -31,7 +31,6 @@ def walk_tree_and_modify(
     if isinstance(obj, List):
         return [walk_tree_and_modify(item, func, ignore) for item in obj]
     if isinstance(obj, Dict):
-
         obj_dict: Dict = func(obj)
 
         for key, value in obj_dict.items():

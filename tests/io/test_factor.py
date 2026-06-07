@@ -15,7 +15,6 @@ from authorityspoke.examples import cardenas as cardenas_example
 
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
-from authorityspoke.io.text_expansion import expand_shorthand
 
 
 class TestFactorFileLoad:

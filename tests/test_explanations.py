@@ -3,13 +3,9 @@ from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome import Predicate
 
 from authorityspoke import Fact
-from authorityspoke.io.text_expansion import expand_shorthand
 
 
 class TestContext:
-    al = expand_shorthand({"content": "{Al} sold {the bull} to {Betty}."})
-    alice = expand_shorthand({"content": "{Alice} sold {the cow} to {Bob}."})
-
     predicate = Predicate(content="{seller} sold {item} to {buyer}")
     fact_al = Fact(
         predicate=predicate,
