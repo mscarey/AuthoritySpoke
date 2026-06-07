@@ -11,11 +11,9 @@ from typing import List, Optional
 
 import yaml
 
-from legislice.download import Client
 
 from authorityspoke.decisions import DecisionReading, RawDecision
-from authorityspoke.holdings import Holding, RawHolding
-from authorityspoke.opinions import AnchoredHoldings
+from authorityspoke.holdings import RawHolding
 
 from authorityspoke.io import filepaths, readers
 

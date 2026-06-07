@@ -1,7 +1,5 @@
 import copy
-from datetime import date
 
-from anchorpoint.textselectors import TextQuoteSelector
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.opinions import (
     AnchoredHoldings,
@@ -16,10 +14,7 @@ from authorityspoke.examples.legislation import (
 )
 from authorityspoke.procedures import Procedure
 from legislice.enactments import (
-    Enactment,
     EnactmentPassage,
-    TextPositionSet as EnactmentTextPositionSet,
-    TextVersion,
 )
 from legislice.groups import EnactmentGroup
 

@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 from legislice.download import Client
 import pytest
 
-from authorityspoke.io import readers
-from authorityspoke.io.loaders import load_holdings
 
 
 load_dotenv()

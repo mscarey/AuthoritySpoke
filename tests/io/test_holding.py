@@ -1,19 +1,14 @@
 import copy
-from datetime import date
-from decimal import Decimal
 
 import os
-from pydantic import ValidationError
 import pytest
 
-from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice.download import Client
 from authorityspoke.nettlesome.terms import ContextRegister
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
 
-from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.examples import brad as brad_example
 from authorityspoke.examples import feist as feist_example
 from authorityspoke.examples import lotus as lotus_example
@@ -26,10 +21,7 @@ from authorityspoke.opinions import (
     AnchoredHoldings,
 )
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders
-from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.io import text_expansion
 from authorityspoke.rules import Rule
 
 load_dotenv()

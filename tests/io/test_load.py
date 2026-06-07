@@ -1,6 +1,5 @@
 import os
 
-import pytest
 
 from authorityspoke import LegisClient
 from authorityspoke.io import filepaths, loaders

@@ -18,7 +18,6 @@ from authorityspoke.facts import Exhibit, Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from tests.conftest import fake_beard_client
 
 load_dotenv()
 

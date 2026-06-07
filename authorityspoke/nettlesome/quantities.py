@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Dict, Optional, Self, Union
 
 from pint import UnitRegistry, Quantity
 from pint.facets.plain import PlainQuantity
-from pydantic import BaseModel, field_validator, model_validator, ValidationError
+from pydantic import BaseModel, field_validator, model_validator
 import sympy
 from sympy import Eq, Interval, Mul, oo, S
 from sympy.sets import EmptySet, FiniteSet

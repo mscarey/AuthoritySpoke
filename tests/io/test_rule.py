@@ -1,12 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-import pytest
 
-from legislice.download import Client
 
-from authorityspoke.io import loaders, readers
-from authorityspoke.facts import Exhibit
 from authorityspoke.rules import Rule
 
 load_dotenv()

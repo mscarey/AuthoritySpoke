@@ -34,7 +34,7 @@ from authorityspoke.facts import (
     RawFactor,
 )
 from authorityspoke.facts import Exhibit, Pleading
-from authorityspoke.holdings import Holding, RawHolding
+from authorityspoke.holdings import Holding
 from authorityspoke.opinions import OpinionReading
 from authorityspoke.rules import Procedure, Rule
 

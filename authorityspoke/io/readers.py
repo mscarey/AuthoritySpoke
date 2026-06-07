@@ -5,25 +5,13 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 
-from typing import Any, NamedTuple
-from typing import Dict, List, Optional, Tuple, Sequence, Union
+from typing import Dict, Union
 
 
-from anchorpoint.textselectors import TextQuoteSelector
-from legislice.download import Client
-from legislice.types import RawEnactment
 from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
-from authorityspoke.holdings import Holding, RawHolding
-from authorityspoke.opinions import (
-    AnchoredHoldings,
-    EnactmentWithAnchors,
-    TermWithAnchors,
-    HoldingWithAnchors,
-)
-from authorityspoke.facts import RawFactor
 
 RawSelector = Union[str, Dict[str, str]]
 

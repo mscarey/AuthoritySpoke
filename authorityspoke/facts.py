@@ -15,8 +15,7 @@ from pydantic import (
 )
 from slugify import slugify
 
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.factors import Factor, AbsenceOf
+from authorityspoke.nettlesome.factors import Entity, Factor, AbsenceOf
 from authorityspoke.nettlesome.formatting import indented, wrapped
 from authorityspoke.nettlesome.terms import (
     Comparable,
