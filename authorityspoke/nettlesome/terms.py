@@ -557,8 +557,7 @@ class Comparable(ABC):
             the attribute ``absent == True``.
         """
         if isinstance(other, self.__class__):
-            if not self.generic:
-                yield from self._implies_if_concrete(other, explanation)
+            yield from self._implies_if_concrete(other, explanation)
 
     def generic_terms(self) -> List["Term"]:
         """Get Terms that can be replaced without changing ``self``'s meaning."""
@@ -768,20 +767,6 @@ class Comparable(ABC):
         if new_context and new_context != context:
             return new_context
         return None
-
-    def make_generic(self) -> "Comparable":
-        """
-        Get a copy of ``self`` except ensure ``generic`` is ``True``.
-
-        .. note::
-            The new object created with this method will still have all the
-            attributes of ``self`` except ``generic=False``.
-
-        :returns: a new object changing ``generic`` to ``True``.
-        """
-        result = deepcopy(self)
-        result.generic = True
-        return result
 
     def means(
         self, other: "Self" | None, context: Optional["ContextRegister"] = None
@@ -1583,7 +1568,8 @@ class Term(Comparable, BaseModel):
         ):
             new_context = self._generic_register(other)
             yield explanation.with_context(new_context)
-        yield from super()._implies_if_present(other, explanation)
+        if not self.generic:
+            yield from super()._implies_if_present(other, explanation)
 
     def _generic_register(self, other: Self) -> ContextRegister:
         register = ContextRegister()
@@ -1595,6 +1581,20 @@ class Term(Comparable, BaseModel):
         if self.generic:
             return {self.key: self}
         return super().generic_terms_by_str()
+
+    def make_generic(self) -> "Term":
+        """
+        Get a copy of ``self`` except ensure ``generic`` is ``True``.
+
+        .. note::
+            The new object created with this method will still have all the
+            attributes of ``self`` except ``generic=False``.
+
+        :returns: a new object changing ``generic`` to ``True``.
+        """
+        result = deepcopy(self)
+        result.generic = True
+        return result
 
     @property
     def recursive_terms(self) -> Dict[str, "Term"]:
