@@ -153,12 +153,6 @@ class Comparable(ABC):
             return True
         return bool(self.implies(other) and not self.compare_keys(other))
 
-    def __str__(self):
-        text = f"the {self.__class__.__name__.lower()}" + " {}"
-        if self.generic:
-            text = f"<{text}>"
-        return text
-
     def _all_generic_terms_match(self, other: Self, context: "ContextRegister") -> bool:
         if all(
             all(
@@ -536,7 +530,7 @@ class Comparable(ABC):
     def _explanations_same_meaning(
         self, other: Self, explanation: "Explanation"
     ) -> Iterator["Explanation"]:
-        if self.__class__ == other.__class__ and self.generic == other.generic:
+        if self.__class__ == other.__class__:
             yield from self._means_if_concrete(other, explanation)
 
     def explanations_same_meaning(
@@ -1479,6 +1473,12 @@ class Term(Comparable, BaseModel):
 
     generic: bool = False
 
+    def __str__(self):
+        text = f"the {self.__class__.__name__.lower()}" + " {}"
+        if self.generic:
+            text = f"<{text}>"
+        return text
+
     def _borrow_generic_context(self, other: Self) -> Self:
         self_factors = list(self.recursive_terms.values())
         other_factors = list(other.recursive_terms.values())
@@ -1563,7 +1563,12 @@ class Term(Comparable, BaseModel):
             new_context = explanation.context.merged_with(generic_context)
             if new_context:
                 yield explanation.with_context(new_context)
-        yield from super()._explanations_same_meaning(other, explanation)
+        if (
+            isinstance(other, Term)
+            and self.__class__ == other.__class__
+            and self.generic == other.generic
+        ):
+            yield from self._means_if_concrete(other, explanation)
 
     def _implies_if_present(
         self, other: Comparable, explanation: Explanation
