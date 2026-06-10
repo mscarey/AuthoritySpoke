@@ -10,6 +10,7 @@ import textwrap
 from typing import Any, Callable, ClassVar, Dict, Iterator
 from typing import List, NamedTuple, Optional, Self, Sequence, Tuple, Union
 from typing import KeysView, ValuesView, ItemsView
+from typing import cast
 
 import bidict
 from constraint import AllDifferentConstraint, Problem
@@ -1141,28 +1142,33 @@ class ContextRegister:
         """Convert changes to ``factor``, expressed as built-in Python objects, to a ContextRegister."""
         if isinstance(changes, ContextRegister):
             return changes
-        if isinstance(changes, Dict):
+        if isinstance(changes, dict):
+            to_replace = cast(Sequence[Union["Term", str]], list(changes.keys()))
+            replacements = cast(Sequence[Union["Term", str]], list(changes.values()))
             return cls.from_lists(
-                to_replace=list(changes),
-                replacements=list(changes.values()),
+                to_replace=to_replace,
+                replacements=replacements,
                 current=current,
                 incoming=incoming,
             )
-        if (
+        if isinstance(changes, tuple) and (
             len(changes) == 2
             and all(not isinstance(change, str) for change in changes)
             and all(isinstance(change, Sequence) for change in changes)
         ):
+            to_replace = cast(Sequence[Union["Term", str]], changes[0])
+            replacements = cast(Sequence[Union["Term", str]], changes[1])
             return cls.from_lists(
-                to_replace=changes[0],
-                replacements=changes[1],
+                to_replace=to_replace,
+                replacements=replacements,
                 current=current,
                 incoming=incoming,
             )
         if terms_to_replace:
+            replacements = cast(Sequence[Union["Term", str]], changes)
             return cls.from_lists(
                 to_replace=terms_to_replace,
-                replacements=changes,
+                replacements=replacements,
                 current=current,
                 incoming=incoming,
             )
@@ -1173,7 +1179,9 @@ class ContextRegister:
                 "then a 'current' object must be provided."
             )
         return cls.from_changes_and_current(
-            current=current, changes=changes, incoming=incoming
+            current=current,
+            changes=cast(Sequence[Union[str, "Term"]], changes),
+            incoming=incoming,
         )
 
     def assigns_same_value_to_key_factor(
@@ -1621,7 +1629,7 @@ class TermSequence(RootModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
 
-    root: Tuple[Optional[Union["Entity", "Factor"]], ...] = ()
+    root: Tuple[Optional["Term"], ...] = ()
 
     def __iter__(self):
         return iter(self.root)
