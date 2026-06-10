@@ -652,14 +652,20 @@ class Rule(Comparable, BaseModel):
         self.procedure.set_outputs(factors)
 
     def set_enactments(
-        self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
+        self, enactments: Sequence[Enactment | EnactmentPassage] | EnactmentGroup
     ) -> None:
         """
         Set the list of Enactments cited as the basis for this Rule.
 
         Any prior enactments are replaced.
         """
-        self.enactments = EnactmentGroup(passages=enactments)
+        if not isinstance(enactments, EnactmentGroup):
+            passages = [
+                e if isinstance(e, EnactmentPassage) else EnactmentPassage(enactment=e)
+                for e in enactments
+            ]
+            enactments = EnactmentGroup(passages=passages)
+        self.enactments = enactments
 
     def set_enactments_despite(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
