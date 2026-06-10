@@ -213,6 +213,8 @@ class OpinionReading(Comparable, BaseModel):
             raise TypeError(
                 f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
+        if isinstance(context, ContextRegister):
+            context = Explanation.from_context(context)
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
@@ -292,6 +294,8 @@ class OpinionReading(Comparable, BaseModel):
             raise TypeError(
                 f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
+        if isinstance(context, ContextRegister):
+            context = Explanation.from_context(context)
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):

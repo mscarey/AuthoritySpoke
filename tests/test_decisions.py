@@ -244,6 +244,10 @@ class TestImplication:
             oracle.explanations_implication(rule, context=contradictory_context)
         )
         assert not with_context
+        with_register_context = list(
+            oracle.explanations_implication(rule, context=register)
+        )
+        assert not with_register_context
 
     def test_decision_not_implied_by_rule(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
