@@ -141,9 +141,9 @@ class DecisionReading(BaseModel, Comparable):
     def holdings(self) -> HoldingGroup:
         """Get the holdings of this Decision's majority Opinion."""
         if self.majority is not None:
-            return HoldingGroup(self.majority.holdings)
+            return self.majority.holdings
         elif len(self.opinion_readings) == 1:
-            return HoldingGroup(self.opinion_readings[0].holdings)
+            return self.opinion_readings[0].holdings
         return HoldingGroup()
 
     def add_opinion(self, opinion: Opinion) -> None:
@@ -219,7 +219,7 @@ class DecisionReading(BaseModel, Comparable):
     def explanations_implication(
         self,
         other: Union[DecisionReading, Decision, Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Generate explanation of how self's Holdings can imply other."""
         if isinstance(other, DecisionReading):
