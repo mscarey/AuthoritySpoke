@@ -660,22 +660,20 @@ class Rule(Comparable, BaseModel):
         Any prior enactments are replaced.
         """
         if not isinstance(enactments, EnactmentGroup):
-            passages = [
-                e if isinstance(e, EnactmentPassage) else EnactmentPassage(enactment=e)
-                for e in enactments
-            ]
-            enactments = EnactmentGroup(passages=passages)
+            enactments = EnactmentGroup.from_enactments(enactments)
         self.enactments = enactments
 
     def set_enactments_despite(
-        self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
+        self, enactments: Sequence[Enactment | EnactmentPassage] | EnactmentGroup
     ) -> None:
         """
         Set the list of Enactments known not to preclude application of this Rule.
 
         Any prior despite enactments are replaced.
         """
-        self.enactments_despite = EnactmentGroup(passages=enactments)
+        if not isinstance(enactments, EnactmentGroup):
+            enactments = EnactmentGroup.from_enactments(enactments)
+        self.enactments_despite = enactments
 
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"
