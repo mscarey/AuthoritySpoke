@@ -14,6 +14,7 @@ from authorityspoke.facts import Fact, Predicate
 from authorityspoke.examples.brad import anchored_holdings as brad_holdings
 from authorityspoke.examples.watt import anchored_holdings as watt_holdings
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.nettlesome.terms import ContextRegister
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import (
@@ -398,6 +399,27 @@ class TestImplication:
 
 
 class TestContradiction:
+    def test_explanations_contradiction_changes_with_context(
+        self, make_opinion_with_holding
+    ):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus_holding = make_opinion_with_holding["lotus_majority"].holdings[6]
+        lotus_holdings = HoldingGroup([lotus_holding])
+
+        without_context = list(oracle.explanations_contradiction(lotus_holdings))
+        assert without_context
+
+        java_api = oracle.generic_terms()[0]
+        contradictory_context = ContextRegister()
+        contradictory_context.insert_pair(java_api, java_api)
+        with_context = list(
+            oracle.explanations_contradiction(
+                lotus_holdings,
+                context=contradictory_context,
+            )
+        )
+        assert not with_context
+
     def test_opinion_contradicts_opinion(self, make_opinion_with_holding):
         """Return the only contradictory pair of Holdings between these two Opinions."""
         oracle = make_opinion_with_holding["oracle_majority"]

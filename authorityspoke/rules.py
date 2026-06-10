@@ -559,7 +559,7 @@ class Rule(Comparable, BaseModel):
             )
 
     def means(
-        self, other: Optional[Factor], context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: Optional[ContextRegister] = None
     ) -> bool:
         """
         Test whether ``other`` has the same meaning as ``self``.

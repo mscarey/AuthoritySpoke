@@ -152,19 +152,29 @@ class DecisionReading(BaseModel, Comparable):
             self.decision.casebody = CaseBody(data=CaseData())
         self.decision.casebody.data.opinions.append(opinion)
 
-    def contradicts(self, other):
+    def contradicts(
+        self,
+        other: Union[DecisionReading, Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> bool:
         """Check if a holding attributed to this decision contradicts a holding attributed in "other"."""
         if isinstance(other, DecisionReading):
             if self.majority and other.majority:
-                return self.majority.contradicts(other.majority)
+                return self.majority.contradicts(other.majority, context=context)
             return False
-        return self.majority.contradicts(other)
+        return (
+            self.majority.contradicts(other, context=context)
+            if self.majority
+            else False
+        )
 
     def explain_contradiction(
-        self, other: Union[OpinionReading, Holding, Rule]
+        self,
+        other: Union[OpinionReading, Holding, Rule],
+        context: Optional[ContextRegister] = None,
     ) -> Optional[Explanation]:
         """Get the first generated explanation of how a Holding of self contradicts a Holding of other."""
-        explanations = self.explanations_contradiction(other)
+        explanations = self.explanations_contradiction(other, context=context)
         try:
             explanation = next(explanations)
         except StopIteration:
@@ -174,14 +184,19 @@ class DecisionReading(BaseModel, Comparable):
     def explanations_contradiction(
         self,
         other: Union[DecisionReading, Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         """Generate explanations of how a Holding of self contradicts a Holding of other."""
         if isinstance(other, DecisionReading):
             if self.majority and other.majority:
-                yield from self.majority.explanations_contradiction(other.majority)
+                yield from self.majority.explanations_contradiction(
+                    other.majority, context=context
+                )
         elif isinstance(other, (Rule, Holding, OpinionReading)):
             if self.majority:
-                yield from self.majority.explanations_contradiction(other)
+                yield from self.majority.explanations_contradiction(
+                    other, context=context
+                )
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types "
@@ -191,9 +206,10 @@ class DecisionReading(BaseModel, Comparable):
     def explain_implication(
         self,
         other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
     ) -> Optional[Explanation]:
         """Get the first generated explanation of how a Holding of self implies a Holding of other."""
-        explanations = self.explanations_implication(other)
+        explanations = self.explanations_implication(other, context=context)
         try:
             explanation = next(explanations)
         except StopIteration:
@@ -201,17 +217,23 @@ class DecisionReading(BaseModel, Comparable):
         return explanation
 
     def explanations_implication(
-        self, other: Union[DecisionReading, Decision, Opinion, Holding, Rule]
+        self,
+        other: Union[DecisionReading, Decision, Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         """Generate explanation of how self's Holdings can imply other."""
         if isinstance(other, DecisionReading):
             self_majority = self.get_majority()
             if self_majority and other.get_majority():
-                yield from self_majority.explanations_implication(other.majority)
+                yield from self_majority.explanations_implication(
+                    other.majority, context=context
+                )
         elif isinstance(other, (Rule, Holding, OpinionReading)):
             self_majority = self.get_majority()
             if self_majority:
-                yield from self_majority.explanations_implication(other)
+                yield from self_majority.explanations_implication(
+                    other, context=context
+                )
         else:
             raise TypeError(
                 f"'Implication' test not implemented for types "

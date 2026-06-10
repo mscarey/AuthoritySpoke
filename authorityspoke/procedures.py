@@ -757,7 +757,7 @@ class Procedure(Comparable, BaseModel):
         self,
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
-    ) -> Optional[Comparable]:
+    ) -> Procedure | None:
         """Get a procedure with all the inputs and outputs of self and other."""
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)

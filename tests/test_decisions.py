@@ -11,6 +11,7 @@ from authorityspoke.examples.feist import HOLDINGS as FEIST_HOLDINGS
 from authorityspoke.examples.oracle import HOLDINGS as ORACLE_HOLDINGS
 from authorityspoke import Entity
 from authorityspoke.facts import Fact, Predicate
+from authorityspoke.nettlesome.terms import ContextRegister, Explanation
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -224,6 +225,25 @@ class TestImplication:
         oracle = make_decision_with_holding["oracle"]
         explanation = oracle.explain_implication(oracle.holdings[0].rule)
         assert len(explanation.reasons) == 3
+
+    def test_explanations_implication_changes_with_context(
+        self, make_decision_with_holding
+    ):
+        oracle = make_decision_with_holding["oracle"]
+        rule = oracle.holdings[0].rule
+
+        without_context = list(oracle.explanations_implication(rule))
+        assert without_context
+
+        java_api = oracle.holdings[0].generic_terms()[0]
+        register = ContextRegister()
+        register.insert_pair(java_api, Entity(name="a totally different API"))
+        contradictory_context = Explanation.from_context(register)
+
+        with_context = list(
+            oracle.explanations_implication(rule, context=contradictory_context)
+        )
+        assert not with_context
 
     def test_decision_not_implied_by_rule(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]

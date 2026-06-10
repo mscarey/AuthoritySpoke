@@ -170,7 +170,7 @@ class Comparable(ABC):
         return False
 
     def consistent_with(
-        self, other: Optional[Self], context: Optional["ContextRegister"] = None
+        self, other: Optional["Comparable"], context: Optional["ContextRegister"] = None
     ) -> bool:
         """
         Check if self and other can be non-contradictory.
@@ -262,7 +262,7 @@ class Comparable(ABC):
                             yield answer
 
     def contradicts(
-        self, other: Optional[Self], context: Optional["ContextRegister"] = None
+        self, other: Optional["Comparable"], context: Optional["ContextRegister"] = None
     ) -> bool:
         """
         Test whether ``self`` implies the absence of ``other``.
@@ -448,7 +448,7 @@ class Comparable(ABC):
 
     def explanations_contradiction(
         self,
-        other: Self,
+        other: "Comparable",
         context: Optional[Union["Explanation", "ContextRegister"]] = None,
     ) -> Iterator["Explanation"]:
         """
@@ -472,7 +472,7 @@ class Comparable(ABC):
             )
 
     def _explanations_implication(
-        self, other: Self, explanation: "Explanation"
+        self, other: "Comparable", explanation: "Explanation"
     ) -> Iterator["Explanation"]:
         if not isinstance(other, Comparable):
             raise TypeError(
@@ -488,7 +488,7 @@ class Comparable(ABC):
 
     def explanations_implication(
         self,
-        other: Self,
+        other: "Comparable",
         context: Optional[Union["Explanation", "ContextRegister"]] = None,
     ) -> Iterator["Explanation"]:
         r"""
@@ -508,7 +508,7 @@ class Comparable(ABC):
             )
 
     def _explanations_implied_by(
-        self, other: Self, explanation: "Explanation"
+        self, other: "Comparable", explanation: "Explanation"
     ) -> Iterator["Explanation"]:
         reversed_explanation = explanation.with_context(explanation.context.reversed())
         for new in other._explanations_implication(
@@ -518,7 +518,7 @@ class Comparable(ABC):
 
     def explanations_implied_by(
         self,
-        other: Self,
+        other: "Comparable",
         context: None | "ContextRegister" | "Explanation" = None,
     ) -> Iterator["Explanation"]:
         """Generate explanations for how other may imply self."""
@@ -536,7 +536,7 @@ class Comparable(ABC):
 
     def explanations_same_meaning(
         self,
-        other: Self,
+        other: "Comparable",
         context: None | "ContextRegister" | "Explanation" = None,
     ) -> Iterator["Explanation"]:
         """Generate ways to match contexts of self and other so they mean the same."""
@@ -547,7 +547,7 @@ class Comparable(ABC):
             yield new.with_match(FactorMatch(self, means, other))
 
     def _implies_if_present(
-        self, other: Self, explanation: "Explanation"
+        self, other: "Comparable", explanation: "Explanation"
     ) -> Iterator["Explanation"]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent.
@@ -621,7 +621,7 @@ class Comparable(ABC):
         return None
 
     def implied_by(
-        self, other: Self | None, context: Optional["ContextRegister"] = None
+        self, other: "Comparable" | None, context: Optional["ContextRegister"] = None
     ):
         r"""
         Find whether other implies self.

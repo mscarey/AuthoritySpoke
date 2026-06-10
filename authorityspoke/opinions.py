@@ -206,6 +206,7 @@ class OpinionReading(Comparable, BaseModel):
     def explanations_contradiction(
         self,
         other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in a contradiction between self and other."""
         if not self.comparable_with(other):
@@ -215,16 +216,20 @@ class OpinionReading(Comparable, BaseModel):
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
-            yield from self.holdings.explanations_contradiction(other)
+            yield from self.holdings.explanations_contradiction(other, context=context)
 
         if isinstance(other, HoldingGroup):
-            yield from self.holdings.explanations_contradiction(other)
+            yield from self.holdings.explanations_contradiction(other, context=context)
 
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_contradiction(other.holdings)
+            yield from self.holdings.explanations_contradiction(
+                other.holdings, context=context
+            )
 
         elif hasattr(other, "explanations_contradiction"):
-            yield from other.explanations_contradiction(self)
+            yield from other.explanations_contradiction(
+                self, context=context.reversed_context() if context else None
+            )
 
     def comparable_with(self, other: Any) -> bool:
         """Check if other can be compared to self for implication or contradiction."""
@@ -235,7 +240,7 @@ class OpinionReading(Comparable, BaseModel):
         return not isinstance(other, Factor)
 
     def contradicts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: Optional[ContextRegister] = None
     ) -> bool:
         """Check if other contradicts one of self's Holdings."""
         if not self.comparable_with(other):
@@ -280,6 +285,7 @@ class OpinionReading(Comparable, BaseModel):
     def explanations_implication(
         self,
         other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Union[ContextRegister, Explanation]]:
         """Yield contexts that would result in self implying other."""
         if not self.comparable_with(other):
@@ -290,13 +296,17 @@ class OpinionReading(Comparable, BaseModel):
             other = Holding(rule=other)
         if isinstance(other, Holding):
             for self_holding in self.holdings:
-                yield from self_holding.explanations_implication(other)
+                yield from self_holding.explanations_implication(other, context=context)
         if isinstance(other, HoldingGroup):
-            yield from self.holdings.explanations_implication(other)
+            yield from self.holdings.explanations_implication(other, context=context)
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_implication(other.holdings)
+            yield from self.holdings.explanations_implication(
+                other.holdings, context=context
+            )
         else:
-            yield from other.explanations_implied_by(self)
+            yield from other.explanations_implied_by(
+                self, context=context.reversed_context() if context else None
+            )
 
     def generic_terms_by_str(self) -> Dict[str, Comparable]:
         r"""
