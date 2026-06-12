@@ -456,17 +456,19 @@ class Procedure(Comparable, BaseModel):
                 )
 
     def _explain_implication_all_to_all_of_procedure(
-        self, other: Procedure, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+        self, other: Procedure, context: Explanation
+    ) -> Iterator[Explanation]:
         yield from self.explanations_same_meaning(other, context)
 
-        def other_outputs_implied(context: Optional[ContextRegister]):
+        def other_outputs_implied(
+            context: Optional[Explanation],
+        ) -> Iterator[Explanation]:
             for explanation in self.outputs_group.explanations_implication(
                 other.outputs_group, context=context
             ):
                 yield explanation
 
-        def self_inputs_implied(explanations: Iterable[ContextRegister]):
+        def self_inputs_implied(explanations: Iterable[Explanation]):
             for explanation in explanations:
                 for result in other.inputs_group.explanations_implication(
                     self.inputs_group, context=explanation
@@ -480,10 +482,11 @@ class Procedure(Comparable, BaseModel):
                 yield result
 
     def explain_implication_all_to_all(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Factor, context: Explanation | ContextRegister | None = None
+    ) -> Iterator[Explanation]:
         """Yield contexts establishing that if self is always valid, other is always valid."""
-        context = context or ContextRegister()
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         if isinstance(other, self.__class__):
             yield from self._explain_implication_all_to_all_of_procedure(other, context)
 
@@ -512,20 +515,22 @@ class Procedure(Comparable, BaseModel):
         )
 
     def _explain_implication_of_procedure_all_to_some(
-        self, other: Procedure, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+        self, other: Procedure, context: Explanation
+    ) -> Iterator[Explanation]:
         yield from self.explain_implication_all_to_all(other, context)
 
         other_despite_or_input = FactorGroup((*other.despite, *other.inputs))
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
-        def other_outputs_implied(context: ContextRegister):
+        def other_outputs_implied(context: Explanation) -> Iterator[Explanation]:
             for explanation in self.outputs_group.explanations_implication(
                 other.outputs_group, context=context
             ):
                 yield explanation
 
-        def other_despite_implied(explanations: Iterator[ContextRegister]):
+        def other_despite_implied(
+            explanations: Iterator[Explanation],
+        ) -> Iterator[Explanation]:
             for explanation in explanations:
                 for result in self_despite_or_input.explanations_implication(
                     other.despite_group, context=explanation
