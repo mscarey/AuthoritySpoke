@@ -531,7 +531,7 @@ class OpinionReading(Comparable, BaseModel):
             return self._implied_by_rule(other, context=context)
         return other.implies(self, context=context.reversed_context())
 
-    def __ge__(self, other: Union[OpinionReading, Holding, Rule]) -> bool:
+    def __ge__(self, other: Optional[Comparable]) -> bool:
         """
         Find whether ``self``'s holdings imply all the holdings of ``other``.
 
@@ -542,7 +542,7 @@ class OpinionReading(Comparable, BaseModel):
         """
         return self.implies(other)
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: Optional[Comparable]) -> bool:
         """
         Find whether ``self``\'s holdings imply ``other``\'s but self != other.
 

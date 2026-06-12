@@ -477,7 +477,7 @@ class Rule(Term, BaseModel):
                 )
 
     def implies(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: Optional[ContextRegister] = None
     ) -> bool:
         r"""
         Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
@@ -501,6 +501,8 @@ class Rule(Term, BaseModel):
             raise TypeError(
                 f'"implies" test not supported between class {self.__class__} and class {other.__class__}.'
             )
+        if other is None:
+            return True
         if not isinstance(other, self.__class__):
             if context:
                 context = context.reversed()
@@ -510,7 +512,7 @@ class Rule(Term, BaseModel):
             for explanation in self.explanations_implication(other, context)
         )
 
-    def __ge__(self, other: Comparable) -> bool:
+    def __ge__(self, other: Comparable | None) -> bool:
         return self.implies(other)
 
     def __len__(self):
