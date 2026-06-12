@@ -430,7 +430,7 @@ class Rule(Term, BaseModel):
 
         yield from self._explanations_contradiction(other=other, context=context)
 
-    def needs_subset_of_enactments(self, other) -> bool:
+    def needs_subset_of_enactments(self, other: "Rule") -> bool:
         r"""
         Test whether ``self``\'s :class:`.Enactment` support is a subset of ``other``\'s.
 
@@ -457,7 +457,8 @@ class Rule(Term, BaseModel):
     ) -> Iterator[Explanation]:
         """Find context matches that would result in self implying other."""
         if (
-            self.needs_subset_of_enactments(other)
+            isinstance(other, self.__class__)
+            and self.needs_subset_of_enactments(other)
             and self.mandatory >= other.mandatory
             and self.universal >= other.universal
         ):
