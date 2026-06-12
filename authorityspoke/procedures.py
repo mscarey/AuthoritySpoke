@@ -11,7 +11,7 @@ from copy import deepcopy
 from itertools import chain
 
 from typing import ClassVar, Dict, Iterable, Iterator
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Self, Sequence, Tuple, Union
 
 from pydantic import field_validator, BaseModel
 
@@ -23,7 +23,7 @@ from authorityspoke.nettlesome.terms import (
     Term,
     TermSequence,
 )
-from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.factors import AbsenceOf, Factor
 from authorityspoke.groups import FactorGroup
 from authorityspoke.nettlesome.formatting import indented
 
@@ -350,7 +350,7 @@ class Procedure(Comparable, BaseModel):
         new_factors = self.inputs_group.add_or_raise_error(incoming)
         self.set_inputs(new_factors)
 
-    def with_factor(self, incoming: Factor) -> Optional[Procedure]:
+    def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Optional[Procedure]:
         """
         Create new Procedure with added input :class:`.Factor`.
 
@@ -482,7 +482,7 @@ class Procedure(Comparable, BaseModel):
                 yield result
 
     def explain_implication_all_to_all(
-        self, other: Factor, context: Explanation | ContextRegister | None = None
+        self, other: Self, context: Explanation | ContextRegister | None = None
     ) -> Iterator[Explanation]:
         """Yield contexts establishing that if self is always valid, other is always valid."""
         if not isinstance(context, Explanation):
@@ -545,8 +545,8 @@ class Procedure(Comparable, BaseModel):
 
     def explain_implication_all_to_some(
         self,
-        other: Factor,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        other: Self,
+        context: Explanation | ContextRegister | None = None,
     ) -> Iterator[Explanation]:
         """Yield contexts establishing that if self is always valid, other is sometimes valid."""
         if not isinstance(context, Explanation):
