@@ -312,7 +312,7 @@ class OpinionReading(Comparable, BaseModel):
                 self, context=context.reversed_context() if context else None
             )
 
-    def generic_terms_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> dict[str, Comparable]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 

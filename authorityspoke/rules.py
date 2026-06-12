@@ -32,7 +32,7 @@ from authorityspoke.facts import AbsenceOfFactor
 RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 
 
-class Rule(Comparable, BaseModel):
+class Rule(Term, BaseModel):
     r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
@@ -149,7 +149,7 @@ class Rule(Comparable, BaseModel):
     def add(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Optional[Rule]:
         """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
@@ -160,7 +160,8 @@ class Rule(Comparable, BaseModel):
             raise TypeError
         if self.universal is False and other.universal is False:
             return None
-
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         if self.universal and other.universal:
             new_procedure = self.procedure._add_if_universal(
                 other.procedure, explanation=context
@@ -251,7 +252,7 @@ class Rule(Comparable, BaseModel):
         """
         return self.procedure.terms
 
-    def generic_terms_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> dict[str, Term]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -294,7 +295,7 @@ class Rule(Comparable, BaseModel):
         new_enactments = self.enactments_despite + incoming
         self.set_enactments_despite(new_enactments)
 
-    def with_enactment(self, incoming: Enactment) -> Rule:
+    def with_enactment(self, incoming: Enactment | EnactmentPassage) -> Rule:
         r"""
         Create new Rule with added Enactment.
 
@@ -340,7 +341,7 @@ class Rule(Comparable, BaseModel):
         self.procedure.add_factor(incoming)
         return None
 
-    def with_factor(self, incoming: Factor) -> Optional[Rule]:
+    def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Optional[Rule]:
         """
         Make new version of ``self`` with an added input :class:`.Factor`.
 
@@ -452,7 +453,7 @@ class Rule(Comparable, BaseModel):
         return True
 
     def explanations_implication(
-        self, other, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: ContextRegister | None = None
     ) -> Iterator[ContextRegister]:
         """Find context matches that would result in self implying other."""
         if (
@@ -509,7 +510,7 @@ class Rule(Comparable, BaseModel):
             for explanation in self.explanations_implication(other, context)
         )
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
+    def __ge__(self, other: Comparable) -> bool:
         return self.implies(other)
 
     def __len__(self):
@@ -543,7 +544,7 @@ class Rule(Comparable, BaseModel):
 
     def explanations_same_meaning(
         self,
-        other: Optional[Factor],
+        other: Comparable | None,
         context: Explanation | ContextRegister | None = None,
     ) -> Iterator[Explanation]:
         """Find context matches that would result in self and other meaning the same."""

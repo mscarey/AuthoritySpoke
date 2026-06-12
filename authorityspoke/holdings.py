@@ -206,7 +206,7 @@ class Holding(Comparable, BaseModel):
         """
         return self.rule.procedure.terms
 
-    def generic_terms_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> dict[str, Comparable]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 

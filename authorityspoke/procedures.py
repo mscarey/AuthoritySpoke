@@ -318,7 +318,7 @@ class Procedure(Comparable, BaseModel):
                     result.append(factor.absent)
         return TermSequence(result)
 
-    def generic_terms_by_str(self) -> Dict[str, Term]:
+    def generic_terms_by_str(self) -> dict[str, Term]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 

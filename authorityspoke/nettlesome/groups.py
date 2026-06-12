@@ -484,7 +484,7 @@ class FactorGroup(Comparable, RootModel):
             explanation=explanation,
         )
 
-    def generic_terms_by_str(self) -> Dict[str, Term]:
+    def generic_terms_by_str(self) -> dict[str, Term]:
         """Index Terms that can be replaced without changing ``self``'s meaning."""
         generics: Dict[str, Term] = {}
         for factor in self:
