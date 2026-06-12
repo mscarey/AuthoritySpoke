@@ -256,28 +256,33 @@ class OpinionReading(Comparable, BaseModel):
         )
 
     def implies(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """Check if all of other's Holdings are implied by holdings of self."""
         if other is None:
             return True
-        return any(self.explanations_implication(other))
+        return any(self.explanations_implication(other, context=context))
 
     def explain_implication(
         self,
         other: Comparable,
+        context: Optional[ContextRegister | Explanation] = None,
     ) -> Optional[Explanation]:
         """Get first Explanation of how one of self's Holdings implies other."""
-        explanations = self.explanations_implication(other)
+        explanations = self.explanations_implication(other, context=context)
         try:
             explanation = next(explanations)
         except StopIteration:
             return None
         return explanation
 
-    def explain_contradiction(self, other: Comparable) -> Optional[Explanation]:
+    def explain_contradiction(
+        self, other: Comparable, context: Optional[ContextRegister | Explanation] = None
+    ) -> Optional[Explanation]:
         """Get first Explanation of how other contradicts one of self's Holdings."""
-        explanations = self.explanations_contradiction(other)
+        explanations = self.explanations_contradiction(other, context=context)
         try:
             explanation = next(explanations)
         except StopIteration:
@@ -288,7 +293,7 @@ class OpinionReading(Comparable, BaseModel):
         self,
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
-    ) -> Iterator[Union[ContextRegister, Explanation]]:
+    ) -> Iterator[Explanation]:
         """Yield contexts that would result in self implying other."""
         if not self.comparable_with(other):
             raise TypeError(

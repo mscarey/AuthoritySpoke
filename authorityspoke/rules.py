@@ -453,8 +453,8 @@ class Rule(Term, BaseModel):
         return True
 
     def explanations_implication(
-        self, other: Comparable, context: ContextRegister | None = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: ContextRegister | Explanation | None = None
+    ) -> Iterator[Explanation]:
         """Find context matches that would result in self implying other."""
         if (
             self.needs_subset_of_enactments(other)
