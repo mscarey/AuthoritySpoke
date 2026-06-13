@@ -708,15 +708,15 @@ class Procedure(Comparable, BaseModel):
             )
         return self.__class__(**new_dict)
 
-    def set_inputs(self, factors: Sequence[Factor]) -> None:
+    def set_inputs(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
         """Set factors required to invoke this Procedure."""
         self.inputs = FactorGroup(factors).sequence
 
-    def set_despite(self, factors: Sequence[Factor]) -> None:
+    def set_despite(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
         """Set factors that do not preclude application of this Procedure."""
         self.despite = FactorGroup(factors).sequence
 
-    def set_outputs(self, factors: Sequence[Factor]) -> None:
+    def set_outputs(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
         """Set the outputs of this Procedure."""
         self.outputs = FactorGroup(factors).sequence
 

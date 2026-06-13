@@ -14,7 +14,7 @@ from typing import Optional, Sequence, Tuple, Union
 from pydantic import field_validator, BaseModel, ValidationError
 
 from legislice.enactments import Enactment, EnactmentPassage
-from legislice.groups import EnactmentGroup
+from legislice.groups import EnactmentGroup, consolidate_passages
 from legislice.types import RawEnactment
 
 from authorityspoke.nettlesome.terms import (
@@ -236,8 +236,8 @@ class Rule(Term, BaseModel):
             next_output = deepcopy(self.outputs[0])
             if not isinstance(next_output, AbsenceOfFactor):
                 next_output = AbsenceOfFactor(absent=next_output)
-            result.set_inputs(next_input)
-            result.set_outputs(next_output)
+            result.set_inputs([next_input])
+            result.set_outputs(factors=[next_output])
             result.mandatory = not self.mandatory
             result.universal = not self.universal
             yield result
@@ -643,15 +643,15 @@ class Rule(Term, BaseModel):
         """
         return self.union(other)
 
-    def set_inputs(self, factors: Sequence[Factor]) -> None:
+    def set_inputs(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
         """Set factors required to invoke this Procedure."""
         self.procedure.set_inputs(factors)
 
-    def set_despite(self, factors: Sequence[Factor]) -> None:
+    def set_despite(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
         """Set factors that do not preclude application of this Rule."""
         self.procedure.set_despite(factors)
 
-    def set_outputs(self, factors: Sequence[Factor]) -> None:
+    def set_outputs(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
         """Set the outputs of this Rule."""
         self.procedure.set_outputs(factors)
 
@@ -664,7 +664,8 @@ class Rule(Term, BaseModel):
         Any prior enactments are replaced.
         """
         if not isinstance(enactments, EnactmentGroup):
-            enactments = EnactmentGroup.from_enactments(enactments)
+            enactments = consolidate_passages(enactments)
+            enactments = EnactmentGroup(passages=enactments)
         self.enactments = enactments
 
     def set_enactments_despite(
@@ -676,7 +677,8 @@ class Rule(Term, BaseModel):
         Any prior despite enactments are replaced.
         """
         if not isinstance(enactments, EnactmentGroup):
-            enactments = EnactmentGroup.from_enactments(enactments)
+            enactments = consolidate_passages(enactments)
+            enactments = EnactmentGroup(passages=enactments)
         self.enactments_despite = enactments
 
     def __str__(self):

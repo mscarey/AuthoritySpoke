@@ -146,6 +146,6 @@ class FakeClient(Client):
     ) -> Enactment:
         """Use text expansion, unlike a real client."""
         raw_enactment = self.fetch(query=query, date=date)
-        enactment = self.read_from_json(raw_enactment, use_text_expansion=True)
+        enactment = self.read_from_json(raw_enactment)
         enactment.select_all()
         return enactment

@@ -10,9 +10,9 @@ dependencies = [
     "python-slugify>=8.0.4",
     "sympy>=1.14.0",
     "anchorpoint>=0.7.0",
-    "eyecite~=2.6.3",
+    "eyecite>=2.7.6",
     "justopinion",
-    "legislice==0.8.1",
+    "legislice==0.8.2",
     "lxml>=4.9.1",
     "python-dotenv",
     "python-ranges>=0.2.1",
@@ -42,4 +42,5 @@ dev = [
 "units.py" = ["F401"]
 
 [tool.uv.sources]
-nettlesome = { git = "https://github.com/mscarey/justopinion.git", rev = "use-uv" }
+justopinion = { git = "https://github.com/mscarey/justopinion.git", rev = "use-uv" }
+legislice = { git = "https://github.com/mscarey/legislice.git", rev = "before-validator" }
