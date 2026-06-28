@@ -115,10 +115,12 @@ class Procedure(Comparable, BaseModel):
 
     @field_validator("outputs", mode="before")
     @classmethod
-    def _validate_outputs(cls, v: Union[Factor, Sequence[Factor]]) -> List[Factor]:
+    def _validate_outputs(
+        cls, v: Union[Factor, Sequence[Factor]]
+    ) -> List[Factor | Dict]:
         if not v:
             raise ValueError("Procedure must have at least one output")
-        if isinstance(v, (Term, Dict)):
+        if isinstance(v, (Factor, Dict)):
             return [v]
         if isinstance(v, str):
             raise TypeError("outputs of Procedure cannot be type str")
@@ -127,9 +129,9 @@ class Procedure(Comparable, BaseModel):
     @field_validator("inputs", "despite", mode="before")
     @classmethod
     def _validate_factor_groups(
-        cls, v: Union[Factor, Sequence[Factor]]
-    ) -> List[Factor]:
-        if isinstance(v, (Term, Dict)):
+        cls, v: Union[Factor, Dict, Sequence[Factor | Dict]]
+    ) -> List[Factor | Dict]:
+        if isinstance(v, (Factor, Dict)):
             return [v]
         if isinstance(v, str):
             raise TypeError(

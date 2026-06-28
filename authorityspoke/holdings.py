@@ -142,7 +142,6 @@ class Holding(Comparable, BaseModel):
         generic: bool = False,
         decided: bool = True,
         exclusive: bool = False,
-        absent: bool = False,
     ):
         """Create new Holding without an existing Rule or Procedure."""
         procedure = Procedure(inputs=inputs, outputs=outputs, despite=despite)
@@ -379,7 +378,7 @@ class Holding(Comparable, BaseModel):
         return not isinstance(other, Factor)
 
     def implies(
-        self, other: Optional[Comparable], context: ContextRegister = None
+        self, other: Optional[Comparable], context: ContextRegister | None = None
     ) -> bool:
         r"""
         Test for implication.

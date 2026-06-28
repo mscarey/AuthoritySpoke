@@ -100,7 +100,7 @@ class Rule(Term, BaseModel):
     ) -> EnactmentGroup:
         """Convert EnactmentPassage to EnactmentGroup."""
         if isinstance(v, EnactmentPassage):
-            v = {"passages": [v]}
+            v = EnactmentGroup(passages=[v])
         elif not v:
             return EnactmentGroup()
         elif not isinstance(v, EnactmentGroup):
