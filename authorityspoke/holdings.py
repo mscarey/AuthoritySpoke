@@ -447,8 +447,8 @@ class Holding(Comparable, BaseModel):
         return other.implies(self, context=context)
 
     def _implies_if_decided(
-        self, other: Holding, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Holding, context: Optional[Explanation] = None
+    ) -> Iterator[Explanation]:
         r"""
         Test if ``self`` implies ``other`` if they're both decided.
 

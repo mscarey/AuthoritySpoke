@@ -403,7 +403,7 @@ class Rule(Term, BaseModel):
         )
 
     def _explanations_contradiction(
-        self, other, context: Explanation
+        self, other, context: Explanation | None = None
     ) -> Iterator[Explanation]:
         self_to_other = self.procedure.explain_contradiction_some_to_all(
             other.procedure, context
@@ -411,7 +411,7 @@ class Rule(Term, BaseModel):
         other_to_self = (
             register.reversed_context()
             for register in other.procedure.explain_contradiction_some_to_all(
-                self.procedure, context.reversed_context()
+                self.procedure, context.reversed_context() if context else None
             )
         )
 
