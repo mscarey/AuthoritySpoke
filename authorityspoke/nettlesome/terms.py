@@ -621,7 +621,9 @@ class Comparable(ABC):
         return None
 
     def implied_by(
-        self, other: "Comparable" | None, context: Optional["ContextRegister"] = None
+        self,
+        other: "Comparable" | None,
+        context: "ContextRegister" | "Explanation" | None = None,
     ):
         r"""
         Find whether other implies self.
