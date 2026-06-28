@@ -150,7 +150,7 @@ class Statement(Factor, BaseModel):
     @property
     def term_sequence(self) -> TermSequence:
         """Return a TermSequence of the terms in this Statement."""
-        return cast(TermSequence, self.terms)
+        return self.terms
 
     @property
     def short_string(self) -> str:
