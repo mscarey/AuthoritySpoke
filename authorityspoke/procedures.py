@@ -610,8 +610,8 @@ class Procedure(Comparable, BaseModel):
                     yield despite_explanation
 
     def _implies_if_present(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation
+    ) -> Iterator[Explanation]:
         r"""
         Find if ``self`` would imply ``other`` if they aren't absent.
 
@@ -675,7 +675,9 @@ class Procedure(Comparable, BaseModel):
             yield from self._explanations_same_meaning_as_procedure(other, context)
 
     def means(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable | None,
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
         Determine whether ``other`` has the same meaning as ``self``.
@@ -685,6 +687,8 @@ class Procedure(Comparable, BaseModel):
             :class:`.Factor`\s with the same context factors in the
             same roles.
         """
+        if other is None:
+            return False
         return any(
             context is not None
             for context in self.explanations_same_meaning(other, context)

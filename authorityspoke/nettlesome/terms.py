@@ -547,7 +547,7 @@ class Comparable(ABC):
             yield new.with_match(FactorMatch(self, means, other))
 
     def _implies_if_present(
-        self, other: "Comparable", explanation: "Explanation"
+        self, other: "Comparable", context: "Explanation"
     ) -> Iterator["Explanation"]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent.
@@ -558,7 +558,7 @@ class Comparable(ABC):
             the attribute ``absent == True``.
         """
         if isinstance(other, self.__class__):
-            yield from self._implies_if_concrete(other, explanation)
+            yield from self._implies_if_concrete(other, context)
 
     def generic_terms(self) -> List["Term"]:
         """Get Terms that can be replaced without changing ``self``'s meaning."""
@@ -1566,20 +1566,20 @@ class Term(Comparable, BaseModel):
             yield from self._means_if_concrete(other, explanation)
 
     def _implies_if_present(
-        self, other: Comparable, explanation: Explanation
+        self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
             and other.generic
             and (
-                explanation.context.get_factor(self) is None
-                or (explanation.context.get_factor(self) == other)
+                context.context.get_factor(self) is None
+                or (context.context.get_factor(self) == other)
             )
         ):
             new_context = self._generic_register(other)
-            yield explanation.with_context(new_context)
+            yield context.with_context(new_context)
         if not self.generic:
-            yield from super()._implies_if_present(other, explanation)
+            yield from super()._implies_if_present(other, context)
 
     def _generic_register(self, other: Self) -> ContextRegister:
         register = ContextRegister()

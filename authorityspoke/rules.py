@@ -108,8 +108,12 @@ class Rule(Term, BaseModel):
                 try:
                     v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
                 except ValidationError:
-                    v = EnactmentGroup(passages=[v])
-        return v
+                    v = EnactmentGroup(
+                        passages=[
+                            v
+                        ]  # ty: ignore[invalid-argument-type]. astral-sh/ty/issues/2403
+                    )
+        return v  # ty: ignore[invalid-return-type]. astral-sh/ty/issues/2403
 
     @field_validator("enactments", "enactments_despite")
     @classmethod
