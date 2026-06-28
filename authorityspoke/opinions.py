@@ -291,7 +291,7 @@ class OpinionReading(Comparable, BaseModel):
 
     def explanations_implication(
         self,
-        other: Comparable,
+        other: Comparable | None,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in self implying other."""

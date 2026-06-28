@@ -154,7 +154,7 @@ class DecisionReading(BaseModel, Comparable):
 
     def contradicts(
         self,
-        other: Union[DecisionReading, Opinion, Holding, Rule],
+        other: Comparable | None,
         context: Optional[ContextRegister] = None,
     ) -> bool:
         """Check if a holding attributed to this decision contradicts a holding attributed in "other"."""
@@ -170,7 +170,7 @@ class DecisionReading(BaseModel, Comparable):
 
     def explain_contradiction(
         self,
-        other: Union[OpinionReading, Holding, Rule],
+        other: Comparable | None,
         context: Optional[ContextRegister] = None,
     ) -> Optional[Explanation]:
         """Get the first generated explanation of how a Holding of self contradicts a Holding of other."""
@@ -183,8 +183,8 @@ class DecisionReading(BaseModel, Comparable):
 
     def explanations_contradiction(
         self,
-        other: Union[DecisionReading, Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
+        other: Comparable | None,
+        context: Explanation | ContextRegister | None = None,
     ) -> Iterator[Explanation]:
         """Generate explanations of how a Holding of self contradicts a Holding of other."""
         if isinstance(other, DecisionReading):
@@ -205,7 +205,7 @@ class DecisionReading(BaseModel, Comparable):
 
     def explain_implication(
         self,
-        other: Union[Opinion, Holding, Rule],
+        other: Comparable | None,
         context: Optional[ContextRegister] = None,
     ) -> Optional[Explanation]:
         """Get the first generated explanation of how a Holding of self implies a Holding of other."""
@@ -218,7 +218,7 @@ class DecisionReading(BaseModel, Comparable):
 
     def explanations_implication(
         self,
-        other: Union[DecisionReading, Decision, Opinion, Holding, Rule],
+        other: Comparable | None,
         context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Generate explanation of how self's Holdings can imply other."""
