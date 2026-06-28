@@ -83,9 +83,9 @@ class Procedure(Comparable, BaseModel):
         other :class:`Procedure`.
     """
 
-    outputs: List[FactorOrAbsence]
-    inputs: List[FactorOrAbsence] = Field(default_factory=list)
-    despite: List[FactorOrAbsence] = Field(default_factory=list)
+    outputs: FactorGroup[FactorOrAbsence]
+    inputs: FactorGroup[FactorOrAbsence] = Field(default_factory=lambda: FactorGroup())
+    despite: FactorGroup[FactorOrAbsence] = Field(default_factory=lambda: FactorGroup())
     name: str = ""
     absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
@@ -123,13 +123,6 @@ class Procedure(Comparable, BaseModel):
         if require_nonempty and not values:
             raise ValueError("Procedure must have at least one output")
         return values
-
-    @model_validator(mode="after")
-    def _store_as_factor_groups(self) -> Procedure:
-        self.outputs = FactorGroup(self.outputs)
-        self.inputs = FactorGroup(self.inputs)
-        self.despite = FactorGroup(self.despite)
-        return self
 
     @property
     def groups(self) -> List[FactorGroup[FactorOrAbsence]]:

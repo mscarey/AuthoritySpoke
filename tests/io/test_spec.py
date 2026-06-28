@@ -9,4 +9,4 @@ class TestSpec:
     def test_factor_one_of(self):
         spec = Holding.model_json_schema()
         factor_schema = spec["$defs"]["Procedure"]["properties"]["outputs"]
-        assert "anyOf" in factor_schema["items"]
+        assert "Fact" in factor_schema["$ref"]
