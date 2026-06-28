@@ -13,7 +13,7 @@ from itertools import chain
 from typing import ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Self, Sequence, Tuple, Union
 
-from pydantic import field_validator, BaseModel, Field, TypeAdapter
+from pydantic import field_validator, model_validator, BaseModel, Field, TypeAdapter
 
 from authorityspoke.nettlesome.terms import (
     Comparable,
@@ -83,9 +83,9 @@ class Procedure(Comparable, BaseModel):
         other :class:`Procedure`.
     """
 
-    outputs: FactorGroup
-    inputs: FactorGroup = Field(default_factory=FactorGroup)
-    despite: FactorGroup = Field(default_factory=FactorGroup)
+    outputs: List[FactorOrAbsence]
+    inputs: List[FactorOrAbsence] = Field(default_factory=list)
+    despite: List[FactorOrAbsence] = Field(default_factory=list)
     name: str = ""
     absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
@@ -94,11 +94,17 @@ class Procedure(Comparable, BaseModel):
     @classmethod
     def _coerce_factor_group(
         cls,
-        v: Union[Factor, Dict, Sequence[Factor | Dict], FactorGroup, None],
+        v: Union[
+            Factor,
+            Dict,
+            Sequence[Factor | Dict],
+            FactorGroup[FactorOrAbsence],
+            None,
+        ],
         *,
         require_nonempty: bool,
         group_name: str,
-    ) -> FactorGroup:
+    ) -> List[FactorOrAbsence]:
         if isinstance(v, str):
             if group_name == "outputs":
                 raise TypeError("outputs of Procedure cannot be type str")
@@ -107,35 +113,54 @@ class Procedure(Comparable, BaseModel):
             )
 
         if v is None:
-            group = FactorGroup()
+            values: List[FactorOrAbsence] = []
         elif isinstance(v, FactorGroup):
-            group = v
+            values = list(v)
         else:
             items = [v] if isinstance(v, (Factor, Dict)) else list(v)
-            parsed = FACTOR_LIST_ADAPTER.validate_python(items)
-            group = FactorGroup(sequence=parsed)
+            values = FACTOR_LIST_ADAPTER.validate_python(items)
 
-        if require_nonempty and not group:
+        if require_nonempty and not values:
             raise ValueError("Procedure must have at least one output")
-        return group
+        return values
+
+    @model_validator(mode="after")
+    def _store_as_factor_groups(self) -> Procedure:
+        self.outputs = FactorGroup(self.outputs)
+        self.inputs = FactorGroup(self.inputs)
+        self.despite = FactorGroup(self.despite)
+        return self
 
     @property
-    def groups(self) -> List[FactorGroup]:
+    def groups(self) -> List[FactorGroup[FactorOrAbsence]]:
         """Get input, output, and despite Factors as FactorGroups."""
         return [self.outputs, self.inputs, self.despite]
 
     @field_validator("outputs", mode="before")
     @classmethod
     def _validate_outputs(
-        cls, v: Union[Factor, Dict, Sequence[Factor | Dict], FactorGroup]
-    ) -> FactorGroup:
+        cls,
+        v: Union[
+            Factor,
+            Dict,
+            Sequence[Factor | Dict],
+            FactorGroup[FactorOrAbsence],
+        ],
+    ) -> List[FactorOrAbsence]:
         return cls._coerce_factor_group(v, require_nonempty=True, group_name="outputs")
 
     @field_validator("inputs", "despite", mode="before")
     @classmethod
     def _validate_factor_groups(
-        cls, v: Union[Factor, Dict, Sequence[Factor | Dict], FactorGroup, None]
-    ) -> FactorGroup:
+        cls,
+        v: Union[
+            Factor,
+            Dict,
+            Sequence[Factor | Dict],
+            FactorGroup[FactorOrAbsence],
+            None,
+        ],
+    ) -> List[FactorOrAbsence]:
         return cls._coerce_factor_group(v, require_nonempty=False, group_name="inputs")
 
     def add(
@@ -709,19 +734,22 @@ class Procedure(Comparable, BaseModel):
         return self.__class__(**new_dict)
 
     def set_inputs(
-        self, factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup
+        self,
+        factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup[FactorOrAbsence],
     ) -> None:
         """Set factors required to invoke this Procedure."""
         self.inputs = FactorGroup(factors)
 
     def set_despite(
-        self, factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup
+        self,
+        factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup[FactorOrAbsence],
     ) -> None:
         """Set factors that do not preclude application of this Procedure."""
         self.despite = FactorGroup(factors)
 
     def set_outputs(
-        self, factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup
+        self,
+        factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup[FactorOrAbsence],
     ) -> None:
         """Set the outputs of this Procedure."""
         self.outputs = FactorGroup(factors)

@@ -6,8 +6,8 @@ from copy import deepcopy
 import functools
 import operator
 import textwrap
-from typing import Any, Callable, ClassVar, Dict, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
+from typing import Any, Callable, ClassVar, Dict, Generic, Iterator, List
+from typing import Optional, Sequence, Tuple, TypeVar, Union
 from typing import cast
 from typing import Self
 from pydantic import ConfigDict, RootModel, field_validator, model_validator
@@ -20,6 +20,8 @@ from authorityspoke.nettlesome.terms import (
     DuplicateTermError,
 )
 from authorityspoke.nettlesome.terms import Explanation, Term, contradicts, means
+
+FactorGroupItem = TypeVar("FactorGroupItem")
 
 
 def unique_explanations(func: Callable):
@@ -40,7 +42,11 @@ def unique_explanations(func: Callable):
     return wrapper
 
 
-class FactorGroup(Comparable, RootModel):
+class FactorGroup(
+    Comparable,
+    RootModel[Tuple[FactorGroupItem, ...]],
+    Generic[FactorGroupItem],
+):
     r"""Terms to be used together in a comparison."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -49,7 +55,7 @@ class FactorGroup(Comparable, RootModel):
     absence_class: ClassVar[type] = AbsenceOf
     generic: ClassVar[bool] = False  # pyright: ignore[reportIncompatibleVariableOverride]
     context_factor_names: ClassVar[Tuple[str, ...]] = ()
-    root: Tuple[object, ...] = ()
+    root: Tuple[FactorGroupItem, ...] = ()
 
     def __init__(self, /, *args, **kwargs):
         if "sequence" in kwargs:
@@ -83,7 +89,9 @@ class FactorGroup(Comparable, RootModel):
 
     @field_validator("root")
     @classmethod
-    def validate_root(cls, value: Sequence[object]) -> tuple[object, ...]:
+    def validate_root(
+        cls, value: Sequence[FactorGroupItem]
+    ) -> tuple[FactorGroupItem, ...]:
         for factor in value:
             if not isinstance(factor, (cls.term_class, cls.absence_class)):
                 raise TypeError(
@@ -94,17 +102,17 @@ class FactorGroup(Comparable, RootModel):
         return tuple(value)
 
     @property
-    def sequence(self) -> Tuple[Comparable, ...]:
-        return cast(Tuple[Comparable, ...], tuple(self.root))
+    def sequence(self) -> Tuple[FactorGroupItem, ...]:
+        return tuple(self.root)
 
     @sequence.setter
-    def sequence(self, value: Sequence[Comparable]) -> None:
+    def sequence(self, value: Sequence[FactorGroupItem]) -> None:
         self.root = tuple(value)
 
-    def _at_index(self, key: int) -> Comparable:
+    def _at_index(self, key: int) -> FactorGroupItem:
         return self.sequence[key]
 
-    def __getitem__(self, key: Union[int, slice]) -> Union[Comparable, Self]:
+    def __getitem__(self, key: Union[int, slice]) -> Union[FactorGroupItem, Self]:
         if isinstance(key, slice):
             start, stop, step = key.indices(len(self))
             return self.__class__(
@@ -129,7 +137,7 @@ class FactorGroup(Comparable, RootModel):
             if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
                 raise TypeError("Can only assign a single factor to an index")
             updated[key] = value
-        validated = self.__class__(sequence=cast(Sequence[Comparable], updated))
+        validated = self.__class__(sequence=cast(Sequence[FactorGroupItem], updated))
         self.root = validated.root
 
     def __iter__(self):

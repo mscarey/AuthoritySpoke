@@ -333,13 +333,11 @@ using the ``.model_dump()`` or ``.model_dump_json()`` methods.
 
     >>> from pprint import pprint
     >>> pprint(oracle_holdings[0].model_dump()["rule"]["procedure"]["outputs"])
-    [{'generic': False,
+    ({'generic': False,
       'name': 'false the Java API was copyrightable',
       'predicate': {'content': '{the_java_api} was copyrightable', 'truth': False},
       'standard_of_proof': None,
-      'terms': [{'generic': True,
-                 'name': 'the Java API',
-                 'plural': False}]}]
+      'terms': [{'generic': True, 'name': 'the Java API', 'plural': False}]},)
 
 Linking Holdings to Opinions
 -------------------------------
