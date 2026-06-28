@@ -127,17 +127,17 @@ class Rule(Term, BaseModel):
     @property
     def despite(self):
         """Get despite Factors as a FactorGroup."""
-        return self.procedure.despite_group
+        return self.procedure.despite
 
     @property
     def inputs(self):
         """Get input Factors as a FactorGroup."""
-        return self.procedure.inputs_group
+        return self.procedure.inputs
 
     @property
     def outputs(self):
         """Get output Factors as a FactorGroup."""
-        return self.procedure.outputs_group
+        return self.procedure.outputs
 
     @property
     def recursive_terms(self) -> Dict[str, Term]:

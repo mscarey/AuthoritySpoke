@@ -144,7 +144,11 @@ class Holding(Comparable, BaseModel):
         exclusive: bool = False,
     ):
         """Create new Holding without an existing Rule or Procedure."""
-        procedure = Procedure(inputs=inputs, outputs=outputs, despite=despite)
+        procedure = Procedure(
+            inputs=inputs or FactorGroup(),
+            outputs=outputs,
+            despite=despite or FactorGroup(),
+        )
         rule = Rule(
             procedure=procedure,
             enactments=enactments,
@@ -162,17 +166,17 @@ class Holding(Comparable, BaseModel):
     @property
     def despite(self):
         """Get Factors that specifically don't preclude application of the Holding."""
-        return self.rule.procedure.despite_group
+        return self.rule.procedure.despite
 
     @property
     def inputs(self):
         """Get inputs from Procedure."""
-        return self.rule.procedure.inputs_group
+        return self.rule.procedure.inputs
 
     @property
     def outputs(self):
         """Get outputs from Procedure."""
-        return self.rule.procedure.outputs_group
+        return self.rule.procedure.outputs
 
     @property
     def enactments(self):

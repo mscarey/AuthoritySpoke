@@ -142,7 +142,7 @@ class TestProcedureImplication:
         c1_order = make_procedure["c1_entity_order"]
         assert f["f2"] in c1_easy.inputs
         assert f["f1"] not in c1_easy.inputs
-        assert c1_order.inputs_group.implies(f["f2"])
+        assert c1_order.inputs.implies(f["f2"])
 
     def test_factor_implication_with_exact_quantity(self, watt_factor, make_procedure):
         """This test is mostly to demonstrate the relationships

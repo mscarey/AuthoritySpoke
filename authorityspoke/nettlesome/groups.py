@@ -6,7 +6,7 @@ from copy import deepcopy
 import functools
 import operator
 import textwrap
-from typing import Callable, ClassVar, Dict, Iterator, List
+from typing import Any, Callable, ClassVar, Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 from typing import cast
 from typing import Self
@@ -111,6 +111,26 @@ class FactorGroup(Comparable, RootModel):
                 sequence=[self._at_index(i) for i in range(start, stop, step)]
             )
         return self._at_index(key)
+
+    def __setitem__(
+        self,
+        key: Union[int, slice],
+        value: Union[
+            Comparable,
+            Sequence[Comparable],
+        ],
+    ) -> None:
+        updated: list[Any] = list(self.sequence)
+        if isinstance(key, slice):
+            if not isinstance(value, Sequence):
+                raise TypeError("Can only assign a sequence to a slice")
+            updated[key] = list(value)
+        else:
+            if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+                raise TypeError("Can only assign a single factor to an index")
+            updated[key] = value
+        validated = self.__class__(sequence=cast(Sequence[Comparable], updated))
+        self.root = validated.root
 
     def __iter__(self):
         yield from self.sequence

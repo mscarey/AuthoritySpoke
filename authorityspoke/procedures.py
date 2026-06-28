@@ -13,7 +13,7 @@ from itertools import chain
 from typing import ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Self, Sequence, Tuple, Union
 
-from pydantic import field_validator, BaseModel
+from pydantic import field_validator, BaseModel, Field, TypeAdapter
 
 from authorityspoke.nettlesome.terms import (
     Comparable,
@@ -23,18 +23,16 @@ from authorityspoke.nettlesome.terms import (
     Term,
     TermSequence,
 )
-from authorityspoke.nettlesome.factors import AbsenceOf, Factor
+from authorityspoke.nettlesome.factors import Factor
 from authorityspoke.groups import FactorGroup
 from authorityspoke.nettlesome.formatting import indented
 
-from authorityspoke.facts import (
-    FactorOrAbsence,
-    AbsenceOfFactor,
-)
+from authorityspoke.facts import FactorOrAbsence, AbsenceOfFactor
 from authorityspoke.facts import RawFactor
 
 
 RawProcedure = Dict[str, Sequence[RawFactor]]
+FACTOR_LIST_ADAPTER = TypeAdapter(List[FactorOrAbsence])
 
 
 class Procedure(Comparable, BaseModel):
@@ -85,61 +83,60 @@ class Procedure(Comparable, BaseModel):
         other :class:`Procedure`.
     """
 
-    outputs: List[FactorOrAbsence]
-    inputs: List[FactorOrAbsence] = []
-    despite: List[FactorOrAbsence] = []
+    outputs: FactorGroup
+    inputs: FactorGroup = Field(default_factory=FactorGroup)
+    despite: FactorGroup = Field(default_factory=FactorGroup)
     name: str = ""
     absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("outputs", "inputs", "despite")
 
-    @property
-    def outputs_group(self) -> FactorGroup:
-        """Get input Factors as a FactorGroup."""
-        return FactorGroup(self.outputs)
+    @classmethod
+    def _coerce_factor_group(
+        cls,
+        v: Union[Factor, Dict, Sequence[Factor | Dict], FactorGroup, None],
+        *,
+        require_nonempty: bool,
+        group_name: str,
+    ) -> FactorGroup:
+        if isinstance(v, str):
+            if group_name == "outputs":
+                raise TypeError("outputs of Procedure cannot be type str")
+            raise TypeError(
+                "inputs and despite factors of Procedure cannot be type str"
+            )
 
-    @property
-    def inputs_group(self) -> FactorGroup:
-        """Get input Factors as a FactorGroup."""
-        return FactorGroup(self.inputs) if self.inputs else FactorGroup()
+        if v is None:
+            group = FactorGroup()
+        elif isinstance(v, FactorGroup):
+            group = v
+        else:
+            items = [v] if isinstance(v, (Factor, Dict)) else list(v)
+            parsed = FACTOR_LIST_ADAPTER.validate_python(items)
+            group = FactorGroup(sequence=parsed)
 
-    @property
-    def despite_group(self) -> FactorGroup:
-        """Get despite Factors as a FactorGroup."""
-        return FactorGroup(self.despite) if self.despite else FactorGroup()
+        if require_nonempty and not group:
+            raise ValueError("Procedure must have at least one output")
+        return group
 
     @property
     def groups(self) -> List[FactorGroup]:
         """Get input, output, and despite Factors as FactorGroups."""
-        return [self.outputs_group, self.inputs_group, self.despite_group]
+        return [self.outputs, self.inputs, self.despite]
 
     @field_validator("outputs", mode="before")
     @classmethod
     def _validate_outputs(
-        cls, v: Union[Factor, Sequence[Factor]]
-    ) -> List[Factor | Dict]:
-        if not v:
-            raise ValueError("Procedure must have at least one output")
-        if isinstance(v, (Factor, Dict)):
-            return [v]
-        if isinstance(v, str):
-            raise TypeError("outputs of Procedure cannot be type str")
-        return list(v)
+        cls, v: Union[Factor, Dict, Sequence[Factor | Dict], FactorGroup]
+    ) -> FactorGroup:
+        return cls._coerce_factor_group(v, require_nonempty=True, group_name="outputs")
 
     @field_validator("inputs", "despite", mode="before")
     @classmethod
     def _validate_factor_groups(
-        cls, v: Union[Factor, Dict, Sequence[Factor | Dict]]
-    ) -> List[Factor | Dict]:
-        if isinstance(v, (Factor, Dict)):
-            return [v]
-        if isinstance(v, str):
-            raise TypeError(
-                "inputs and despite factors of Procedure cannot be type str"
-            )
-        elif v is None:
-            return []
-        return list(v)
+        cls, v: Union[Factor, Dict, Sequence[Factor | Dict], FactorGroup, None]
+    ) -> FactorGroup:
+        return cls._coerce_factor_group(v, require_nonempty=False, group_name="inputs")
 
     def add(
         self,
@@ -163,10 +160,10 @@ class Procedure(Comparable, BaseModel):
         self, other: Procedure, explanation: Explanation
     ) -> Optional[Procedure]:
         """Show how first Procedure triggers the second if both are universal."""
-        self_output_or_input = FactorGroup((*self.outputs_group, *self.inputs_group))
+        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
         other_input = list(other.inputs)
-        implied_inputs = []
-        not_implied = []
+        implied_inputs: list[FactorOrAbsence] = []
+        not_implied: list[FactorOrAbsence] = []
 
         while other_input:
             current = other_input.pop()
@@ -232,18 +229,17 @@ class Procedure(Comparable, BaseModel):
         remain the same.
         """
 
-        new_inputs = self.inputs_group._union_from_explanation(
-            other.inputs_group, context
-        )
-        new_outputs = self.outputs_group._union_from_explanation(
-            other.outputs_group, context
-        )
-        new_despite = self.despite_group._union_from_explanation_allow_contradiction(
-            other.despite_group, context
+        new_inputs = self.inputs._union_from_explanation(other.inputs, context)
+        new_outputs = self.outputs._union_from_explanation(other.outputs, context)
+        new_despite = self.despite._union_from_explanation_allow_contradiction(
+            other.despite, context
         )
 
         if any(group is None for group in (new_outputs, new_inputs, new_despite)):
             return None
+        assert new_outputs is not None
+        assert new_inputs is not None
+        assert new_despite is not None
         return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
 
     def __len__(self):
@@ -349,7 +345,7 @@ class Procedure(Comparable, BaseModel):
         :returns:
             None
         """
-        new_factors = self.inputs_group.add_or_raise_error(incoming)
+        new_factors = self.inputs.add_or_raise_error(incoming)
         self.set_inputs(new_factors)
 
     def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Optional[Procedure]:
@@ -362,7 +358,7 @@ class Procedure(Comparable, BaseModel):
         :returns:
             a new version of ``self`` with the specified change
         """
-        new_factors = self.inputs_group + incoming
+        new_factors = self.inputs.add(incoming)
         if new_factors is None:
             return None
         result = deepcopy(self)
@@ -412,7 +408,7 @@ class Procedure(Comparable, BaseModel):
         """Check if every input of other implies some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input._explanations_implied_by(
-            other.inputs_group, explanation=context
+            other.inputs, explanation=context
         )
 
     def _has_input_or_despite_factors_implying_all_inputs_of(
@@ -423,7 +419,7 @@ class Procedure(Comparable, BaseModel):
         """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input._explanations_implication(
-            other.inputs_group, explanation=context
+            other.inputs, explanation=context
         )
 
     def explain_contradiction_some_to_all(
@@ -453,9 +449,7 @@ class Procedure(Comparable, BaseModel):
         for m in chain(implying_contexts, implied_contexts):
             if m.context not in seen_contexts:
                 seen_contexts.append(m.context)
-                yield from self.outputs_group._explanations_contradiction(
-                    other.outputs_group, m
-                )
+                yield from self.outputs._explanations_contradiction(other.outputs, m)
 
     def _explain_implication_all_to_all_of_procedure(
         self, other: Procedure, context: Explanation
@@ -465,21 +459,21 @@ class Procedure(Comparable, BaseModel):
         def other_outputs_implied(
             context: Optional[Explanation],
         ) -> Iterator[Explanation]:
-            for explanation in self.outputs_group.explanations_implication(
-                other.outputs_group, context=context
+            for explanation in self.outputs.explanations_implication(
+                other.outputs, context=context
             ):
                 yield explanation
 
         def self_inputs_implied(explanations: Iterable[Explanation]):
             for explanation in explanations:
-                for result in other.inputs_group.explanations_implication(
-                    self.inputs_group, context=explanation
+                for result in other.inputs.explanations_implication(
+                    self.inputs, context=explanation
                 ):
                     yield result
 
         for explanation in self_inputs_implied(other_outputs_implied(context)):
-            for result in self.inputs_group.explanations_consistent_with(
-                other=other.despite_group, context=explanation
+            for result in self.inputs.explanations_consistent_with(
+                other=other.despite, context=explanation
             ):
                 yield result
 
@@ -525,8 +519,8 @@ class Procedure(Comparable, BaseModel):
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
         def other_outputs_implied(context: Explanation) -> Iterator[Explanation]:
-            for explanation in self.outputs_group.explanations_implication(
-                other.outputs_group, context=context
+            for explanation in self.outputs.explanations_implication(
+                other.outputs, context=context
             ):
                 yield explanation
 
@@ -535,12 +529,12 @@ class Procedure(Comparable, BaseModel):
         ) -> Iterator[Explanation]:
             for explanation in explanations:
                 for result in self_despite_or_input.explanations_implication(
-                    other.despite_group, context=explanation
+                    other.despite, context=explanation
                 ):
                     yield result
 
         for explanation in other_despite_implied(other_outputs_implied(context)):
-            if self.inputs_group.consistent_with(
+            if self.inputs.consistent_with(
                 other_despite_or_input, context=explanation.context
             ):
                 yield explanation
@@ -588,19 +582,19 @@ class Procedure(Comparable, BaseModel):
         self, other: Procedure, context: Explanation
     ) -> Iterator[Explanation]:
         def other_outputs_implied(context: Explanation):
-            yield from self.outputs_group.explanations_implication(
-                other.outputs_group, context=context
+            yield from self.outputs.explanations_implication(
+                other.outputs, context=context
             )
 
         def other_inputs_implied(context: Explanation):
-            yield from self.inputs_group.explanations_implication(
-                other.inputs_group, context=context
+            yield from self.inputs.explanations_implication(
+                other.inputs, context=context
             )
 
         def other_despite_implied(context: Explanation):
             despite_or_input = FactorGroup((*self.despite, *self.inputs))
             yield from despite_or_input.explanations_implication(
-                other.despite_group,
+                other.despite,
                 context=context,
             )
 
@@ -640,22 +634,22 @@ class Procedure(Comparable, BaseModel):
         self, other: Procedure, context: Explanation
     ):
         def same_outputs(context: Explanation):
-            for explanation in self.outputs_group.explanations_same_meaning(
-                other=other.outputs_group, context=context
+            for explanation in self.outputs.explanations_same_meaning(
+                other=other.outputs, context=context
             ):
                 yield explanation
 
         def same_inputs(contexts: Iterable[Explanation]):
             for context in contexts:
-                for explanation in self.inputs_group.explanations_same_meaning(
-                    other=other.inputs_group, context=context
+                for explanation in self.inputs.explanations_same_meaning(
+                    other=other.inputs, context=context
                 ):
                     yield explanation
 
         def same_despite(contexts: Iterable[Explanation]):
             for context in contexts:
-                for explanation in self.despite_group.explanations_same_meaning(
-                    other=other.despite_group, context=context
+                for explanation in self.despite.explanations_same_meaning(
+                    other=other.despite, context=context
                 ):
                     yield explanation
 
@@ -709,22 +703,28 @@ class Procedure(Comparable, BaseModel):
         """
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
-            new_dict[name] = tuple(
-                factor.new_context(changes) for factor in new_dict[name]
+            new_dict[name] = FactorGroup(
+                sequence=[factor.new_context(changes) for factor in new_dict[name]]
             )
         return self.__class__(**new_dict)
 
-    def set_inputs(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
+    def set_inputs(
+        self, factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup
+    ) -> None:
         """Set factors required to invoke this Procedure."""
-        self.inputs = FactorGroup(factors).sequence
+        self.inputs = FactorGroup(factors)
 
-    def set_despite(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
+    def set_despite(
+        self, factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup
+    ) -> None:
         """Set factors that do not preclude application of this Procedure."""
-        self.despite = FactorGroup(factors).sequence
+        self.despite = FactorGroup(factors)
 
-    def set_outputs(self, factors: Sequence[Factor | AbsenceOfFactor]) -> None:
+    def set_outputs(
+        self, factors: Sequence[Factor | AbsenceOfFactor] | FactorGroup
+    ) -> None:
         """Set the outputs of this Procedure."""
-        self.outputs = FactorGroup(factors).sequence
+        self.outputs = FactorGroup(factors)
 
     def triggers_next_procedure(
         self,
@@ -755,10 +755,10 @@ class Procedure(Comparable, BaseModel):
             context = Explanation.from_context(context)
 
         for explanation_1 in self_output_or_input.explanations_implication(
-            other.inputs_group, context=context
+            other.inputs, context=context
         ):
             yield from self_despite_or_input.explanations_implication(
-                other.despite_group, context=explanation_1
+                other.despite, context=explanation_1
             )
 
     def __or__(self, other: Comparable) -> Optional[Comparable]:
