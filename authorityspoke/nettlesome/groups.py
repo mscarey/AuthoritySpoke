@@ -476,7 +476,7 @@ class FactorGroup(
 
         if isinstance(other, FactorGroup):
             yield from self._verbose_comparison(
-                still_need_matches=list(other.sequence),
+                still_need_matches=list(other.sequence[:]),
                 explanation=explanation,
             )
         elif isinstance(other, (self.term_class, self.absence_class)):
