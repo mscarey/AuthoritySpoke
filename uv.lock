@@ -70,7 +70,7 @@ requires-dist = [
     { name = "bidict", specifier = ">=0.23.1" },
     { name = "eyecite", specifier = ">=2.7.6" },
     { name = "justopinion", git = "https://github.com/mscarey/justopinion.git?rev=use-uv" },
-    { name = "legislice", git = "https://github.com/mscarey/legislice.git?rev=before-validator" },
+    { name = "legislice", git = "https://github.com/mscarey/legislice.git?rev=enactmentgroup-basemodel" },
     { name = "lxml", specifier = ">=4.9.1" },
     { name = "pint", specifier = ">=0.25.3" },
     { name = "pydantic", specifier = ">=2.13.3" },
@@ -330,7 +330,7 @@ dependencies = [
 [[package]]
 name = "legislice"
 version = "0.8.1"
-source = { git = "https://github.com/mscarey/legislice.git?rev=before-validator#6afdccb83304eac89776cf523040b14b2e2a73db" }
+source = { git = "https://github.com/mscarey/legislice.git?rev=enactmentgroup-basemodel#517f66c71ca5252533964c10039a205d86f87832" }
 dependencies = [
     { name = "anchorpoint" },
     { name = "python-dotenv" },

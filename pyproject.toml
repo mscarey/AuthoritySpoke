@@ -43,4 +43,4 @@ dev = [
 
 [tool.uv.sources]
 justopinion = { git = "https://github.com/mscarey/justopinion.git", rev = "use-uv" }
-legislice = { git = "https://github.com/mscarey/legislice.git", rev = "before-validator" }
+legislice = { git = "https://github.com/mscarey/legislice.git", rev = "enactmentgroup-basemodel" }
