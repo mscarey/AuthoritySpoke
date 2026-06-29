@@ -250,14 +250,14 @@ class Fact(Factor, BaseModel):
         return str(self.predicate._content_with_terms(self.terms))
 
     def _means_if_concrete(
-        self, other: Comparable, context: Explanation
+        self, other: Comparable, explanation: Explanation
     ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
             and self.standard_of_proof == other.__dict__.get("standard_of_proof")
             and self.predicate.means(other.predicate)
         ):
-            yield from super()._means_if_concrete(other, context)
+            yield from super()._means_if_concrete(other, explanation)
 
     def __len__(self):
         return len(self.generic_terms())
@@ -484,14 +484,14 @@ class Exhibit(Factor, BaseModel):
     )
 
     def _means_if_concrete(
-        self, other: Comparable, context: Explanation
+        self, other: Comparable, explanation: Explanation
     ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
             and self.form == other.form
             and self.offered_by.means(other.offered_by)
         ):
-            yield from super()._means_if_concrete(other, context)
+            yield from super()._means_if_concrete(other, explanation)
 
     def _implies_if_concrete(
         self, other: Comparable, context: Explanation

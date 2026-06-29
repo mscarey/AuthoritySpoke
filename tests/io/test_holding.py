@@ -243,7 +243,7 @@ class TestExclusiveFlag:
             outputs=not_copyrightable, inputs=not_original
         )
         no_originality_rule = Rule(
-            no_originality_procedure,
+            procedure=no_originality_procedure,
             mandatory=True,
             universal=True,
             enactments=[
