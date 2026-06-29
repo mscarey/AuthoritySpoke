@@ -674,7 +674,7 @@ class Comparable(ABC):
         )
 
     def _implies_if_concrete(
-        self, other: Self, explanation: "Explanation"
+        self, other: Self, context: "Explanation"
     ) -> Iterator["Explanation"]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
@@ -691,9 +691,9 @@ class Comparable(ABC):
         """
         if self.compare_terms(other, operator.ge):
             for new_context in self._context_registers(
-                other, operator.ge, explanation.context
+                other, operator.ge, context.context
             ):
-                yield explanation.with_context(new_context)
+                yield context.with_context(new_context)
 
     def implies_same_context(self, other: Self) -> bool:
         """Check if self would imply other if their generic terms are matched in order."""

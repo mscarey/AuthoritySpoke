@@ -4,7 +4,7 @@ from __future__ import annotations
 from copy import deepcopy
 import operator
 from typing import Any, ClassVar, Dict, Iterator, List
-from typing import Mapping, Optional, Sequence, Tuple, Union
+from typing import Mapping, Optional, Self, Sequence, Tuple, Union
 
 from pydantic import (
     field_validator,
@@ -251,9 +251,11 @@ class Fact(Factor, BaseModel):
     def _means_if_concrete(
         self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
-        if self.standard_of_proof == other.__dict__.get(
-            "standard_of_proof"
-        ) and self.predicate.means(other.predicate):
+        if (
+            isinstance(other, self.__class__)
+            and self.standard_of_proof == other.__dict__.get("standard_of_proof")
+            and self.predicate.means(other.predicate)
+        ):
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):
