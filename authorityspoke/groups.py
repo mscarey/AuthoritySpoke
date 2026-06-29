@@ -85,8 +85,7 @@ class EnactmentGroup(RootModel[Tuple[EnactmentPassage, ...]]):
     def validate_root(
         cls, value: Sequence[EnactmentPassage]
     ) -> tuple[EnactmentPassage, ...]:
-        # Consolidate and sort after Pydantic has coerced mappings into EnactmentPassages.
-        value = sort_passages(consolidate_enactments(list(value)))
+        value = sort_passages(list(value))
         for passage in value:
             if not isinstance(passage, EnactmentPassage):
                 raise TypeError(

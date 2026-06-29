@@ -1,3 +1,4 @@
+from copy import deepcopy
 from authorityspoke.decisions import Decision, DecisionReading
 import datetime
 import os
@@ -18,6 +19,9 @@ import pytest
 
 from authorityspoke.examples import oracle
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
+from authorityspoke.examples.legislation import (
+    STATE_MONEY_TRANSMITTING_LICENSE_PROVISION,
+)
 from authorityspoke.facts import Fact
 from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
@@ -211,6 +215,18 @@ class TestEnactments:
         due_process_14.select("life, liberty, or property, without due process of law")
 
         combined = EnactmentGroup(passages=[due_process_5, due_process_14])
+        assert len(combined) == 2
+
+    def test_construct_group_from_dumped_passages_keeps_both(self):
+        short_passage = deepcopy(
+            STATE_MONEY_TRANSMITTING_LICENSE_PROVISION.enactment
+        ).select(end="or a felony under State law")
+        longer_passage = deepcopy(STATE_MONEY_TRANSMITTING_LICENSE_PROVISION)
+
+        combined = EnactmentGroup(
+            passages=[short_passage.model_dump(), longer_passage.model_dump()]
+        )
+
         assert len(combined) == 2
 
     def test_cannot_add_fact_to_enactment(self, watt_factor, e_search_clause):

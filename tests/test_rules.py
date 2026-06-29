@@ -912,6 +912,26 @@ class TestUnion:
         assert len(new_holding.outputs) == 1
         assert len(new_holding.enactments) == 2
 
+    def test_combining_mazza_holdings_keeps_both_given_enactments(
+        self, fake_usc_client, make_anchored_holding
+    ):
+        statute = fake_usc_client.read("/us/usc/t18/s1960/b/1")
+        felony_passage = statute.select(end="or a felony under State law")
+
+        first_mazza_holding = make_anchored_holding["mazza"].holdings[0].holding
+        new_york_holding = Holding.from_factors(
+            inputs=first_mazza_holding.inputs[0],
+            outputs=first_mazza_holding.outputs[0],
+            universal=True,
+        )
+        holding_from_python = new_york_holding + felony_passage
+        holding_from_examples = make_anchored_holding["mazza"].holdings[1].holding
+
+        combined_holding = holding_from_python + holding_from_examples
+
+        assert combined_holding is not None
+        assert len(combined_holding.enactments) == 2
+
     def test_union_rule_and_fact(self, make_opinion_with_holding, make_factor):
         feist = make_opinion_with_holding["feist_majority"]
         with pytest.raises(TypeError):
