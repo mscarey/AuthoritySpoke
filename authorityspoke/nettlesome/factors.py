@@ -17,6 +17,8 @@ class Factor(Term):
     :class:`~nettlesome.terms.Term`\s that are not Factors.
     """
 
+    name: str = ""
+
 
 class AbsenceOf(Comparable, BaseModel):
     """A factor that is not present."""
