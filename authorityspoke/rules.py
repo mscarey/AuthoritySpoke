@@ -11,7 +11,7 @@ from copy import deepcopy
 from typing import Any, ClassVar, Dict, Iterator
 from typing import Optional, Sequence, Tuple, Union
 
-from pydantic import field_validator, BaseModel, ValidationError
+from pydantic import field_validator, BaseModel, Field, ValidationError
 
 from legislice.enactments import Enactment, EnactmentPassage
 from authorityspoke.groups import EnactmentGroup, consolidate_passages
@@ -80,8 +80,12 @@ class Rule(Term, BaseModel):
     """
 
     procedure: Procedure
-    enactments: EnactmentGroup[EnactmentPassage] = EnactmentGroup()
-    enactments_despite: EnactmentGroup[EnactmentPassage] = EnactmentGroup()
+    enactments: EnactmentGroup[EnactmentPassage] = Field(
+        default_factory=EnactmentGroup[EnactmentPassage]
+    )
+    enactments_despite: EnactmentGroup[EnactmentPassage] = Field(
+        default_factory=EnactmentGroup[EnactmentPassage]
+    )
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
@@ -104,17 +108,25 @@ class Rule(Term, BaseModel):
         ],
     ) -> EnactmentGroup[EnactmentPassage]:
         """Convert EnactmentPassage to EnactmentGroup."""
+        enactment_group_type = EnactmentGroup[EnactmentPassage]
+
+        if isinstance(v, EnactmentGroup):
+            # Normalize unparameterized EnactmentGroup instances into the
+            # expected specialized generic type for stable serialization.
+            return enactment_group_type(passages=v.passages)
+
         if isinstance(v, EnactmentPassage):
-            v = EnactmentGroup(passages=[v])
-        elif not v:
-            return EnactmentGroup()
-        elif not isinstance(v, EnactmentGroup):
-            if not isinstance(v, dict) or "passages" not in v:
-                try:
-                    v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
-                except ValidationError:
-                    v = EnactmentGroup(passages=[v])
-        return v  # ty: ignore[invalid-return-type]. astral-sh/ty/issues/2403
+            return enactment_group_type(passages=[v])
+        if not v:
+            return enactment_group_type()
+
+        if isinstance(v, dict) and "passages" in v:
+            return enactment_group_type.model_validate(v)
+
+        try:
+            return enactment_group_type(passages=list(v))
+        except (TypeError, ValidationError):
+            return enactment_group_type(passages=[v])
 
     @field_validator("enactments", "enactments_despite")
     @classmethod
