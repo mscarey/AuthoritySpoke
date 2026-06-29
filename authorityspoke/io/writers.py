@@ -4,8 +4,6 @@ import pathlib
 
 from typing import Optional, Union
 
-from justopinion.decisions import Decision
-
 from authorityspoke.decisions import Decision
 from authorityspoke.io import filepaths
 

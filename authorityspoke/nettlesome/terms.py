@@ -1631,7 +1631,7 @@ class TermSequence(RootModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
 
-    root: Tuple[Optional["Term"], ...] = ()
+    root: Sequence[Optional["Term"]] = ()
 
     def __iter__(self):
         return iter(self.root)
