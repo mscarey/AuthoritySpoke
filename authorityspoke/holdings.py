@@ -298,7 +298,7 @@ class Holding(Comparable, BaseModel):
                     yield explanation
 
     def explanations_contradiction(
-        self, other: Factor, context: ContextRegister = None
+        self, other: Comparable, context: ContextRegister | Explanation | None = None
     ) -> Iterator[Explanation]:
         r"""
         Find context matches that would result in a contradiction with other.
@@ -354,7 +354,7 @@ class Holding(Comparable, BaseModel):
                 )
 
     def _explanations_implies_if_not_exclusive(
-        self, other: Factor, context: Explanation
+        self, other: Holding, context: Explanation
     ) -> Iterator[Explanation]:
         if self.decided and other.decided:
             yield from self._implies_if_decided(other, context)
