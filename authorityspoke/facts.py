@@ -4,7 +4,7 @@ from __future__ import annotations
 from copy import deepcopy
 import operator
 from typing import Any, ClassVar, Dict, Iterator, List
-from typing import Mapping, Optional, Self, Sequence, Tuple, Union
+from typing import Mapping, Optional, Sequence, Tuple, Union
 
 from pydantic import (
     field_validator,
@@ -17,6 +17,7 @@ from slugify import slugify
 
 from authorityspoke.nettlesome.factors import Entity, Factor, AbsenceOf
 from authorityspoke.nettlesome.formatting import indented, wrapped
+from authorityspoke.nettlesome.groups import FactorGroup
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
@@ -379,9 +380,14 @@ def build_fact(
         to insert ``terms`` that are typically the
         subject and objects of the clause.
 
-    :param terms:
+    :param indices:
         a series of integer indices of generic factors to
         fill in the blanks in the :class:`.Predicate`
+
+    :param case_factors:
+        a series of :class:`.Factor`\s that have already been mentioned
+        in the :class:`.Opinion`. They are available for composing the
+        new :class:`.Factor` object and don't need to be recreated.
 
     :param name:
         an identifier for this object, often used if the object needs
@@ -401,10 +407,6 @@ def build_fact(
         object of the same class without changing the truth of the
         :class:`Rule` in which it is mentioned.
 
-    :param case_factors:
-        a series of :class:`.Factor`\s that have already been mentioned
-        in the :class:`.Opinion`. They are available for composing the
-        new :class:`.Factor` object and don't need to be recreated.
     """
     if not indices:
         indices = range(len(predicate))

@@ -372,7 +372,7 @@ class Holding(Comparable, BaseModel):
                 self.explanations_same_meaning(other.negated(), context),
             )
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
+    def __ge__(self, other: Comparable | None) -> bool:
         return self.implies(other)
 
     def comparable_with(self, other: Any) -> bool:
@@ -382,7 +382,9 @@ class Holding(Comparable, BaseModel):
         return not isinstance(other, Factor)
 
     def implies(
-        self, other: Optional[Comparable], context: ContextRegister | None = None
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
         Test for implication.
@@ -435,7 +437,9 @@ class Holding(Comparable, BaseModel):
             )
 
     def implied_by(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable | None,
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
         Test if other implies self.
@@ -444,8 +448,13 @@ class Holding(Comparable, BaseModel):
         that don't know the structure of the :class:`Holding` class,
         such as :class:`.Fact` and :class:`.Rule`\.
         """
+        if other is None:
+            return False
         if context:
-            context = context.reversed()
+            if isinstance(context, Explanation):
+                context = context.reversed_context()
+            else:
+                context = context.reversed()
         if isinstance(other, Rule):
             return Holding(rule=other).implies(self, context=context)
         return other.implies(self, context=context)
