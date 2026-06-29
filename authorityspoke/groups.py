@@ -5,13 +5,18 @@ from __future__ import annotations
 from authorityspoke.nettlesome.groups import FactorGroup, unique_explanations
 
 import textwrap
-from typing import List, Sequence, Tuple, Union
+from typing import Generic, List, Sequence, Tuple, TypeVar, Union, cast
 
 from legislice.enactments import Enactment, EnactmentPassage, consolidate_enactments
 from pydantic import RootModel, field_validator, model_validator
 
 
-def sort_passages(passages: List[EnactmentPassage]) -> List[EnactmentPassage]:
+EnactmentGroupItem = TypeVar("EnactmentGroupItem", bound=EnactmentPassage)
+SortablePassage = TypeVar("SortablePassage", bound=EnactmentPassage)
+ConsolidatablePassage = TypeVar("ConsolidatablePassage", bound=EnactmentPassage)
+
+
+def sort_passages(passages: List[SortablePassage]) -> List[SortablePassage]:
     """
     Sort EnactmentPassages in group, in place.
 
@@ -25,24 +30,30 @@ def sort_passages(passages: List[EnactmentPassage]) -> List[EnactmentPassage]:
 
 
 def consolidate_passages(
-    obj: EnactmentGroup
+    obj: EnactmentGroup[ConsolidatablePassage]
     | Enactment
-    | EnactmentPassage
-    | Sequence[Enactment | EnactmentPassage],
+    | ConsolidatablePassage
+    | Sequence[Enactment | ConsolidatablePassage],
 ) -> list[EnactmentPassage]:
     """Consolidate overlapping EnactmentPassages into fewer objects."""
+    items: Sequence[Enactment | EnactmentPassage]
     if isinstance(obj, EnactmentGroup):
-        return obj.passages
-    if isinstance(obj, (Enactment, EnactmentPassage)):
-        obj = [obj]
-    consolidated: List[EnactmentPassage] = consolidate_enactments(list(obj))
+        items = cast(list[EnactmentPassage], list(obj.passages))
+    elif isinstance(obj, (Enactment, EnactmentPassage)):
+        items = [obj]
+    else:
+        items = cast(list[Enactment | EnactmentPassage], list(obj))
+    consolidated: List[EnactmentPassage] = consolidate_enactments(items)
     return consolidated
 
 
-class EnactmentGroup(RootModel[Tuple[EnactmentPassage, ...]]):
+class EnactmentGroup(
+    RootModel[Tuple[EnactmentGroupItem, ...]],
+    Generic[EnactmentGroupItem],
+):
     """Group of Enactments with comparison methods."""
 
-    root: Tuple[EnactmentPassage, ...] = ()
+    root: Tuple[EnactmentGroupItem, ...] = ()
 
     def __init__(self, /, *args, **kwargs):
         if "passages" in kwargs:
@@ -83,8 +94,8 @@ class EnactmentGroup(RootModel[Tuple[EnactmentPassage, ...]]):
     @field_validator("root")
     @classmethod
     def validate_root(
-        cls, value: Sequence[EnactmentPassage]
-    ) -> tuple[EnactmentPassage, ...]:
+        cls, value: Sequence[EnactmentGroupItem]
+    ) -> tuple[EnactmentGroupItem, ...]:
         value = sort_passages(list(value))
         for passage in value:
             if not isinstance(passage, EnactmentPassage):
@@ -96,27 +107,27 @@ class EnactmentGroup(RootModel[Tuple[EnactmentPassage, ...]]):
         return tuple(value)
 
     @property
-    def sequence(self) -> Tuple[EnactmentPassage, ...]:
+    def sequence(self) -> Tuple[EnactmentGroupItem, ...]:
         return tuple(self.root)
 
     @sequence.setter
-    def sequence(self, value: Sequence[EnactmentPassage]) -> None:
+    def sequence(self, value: Sequence[EnactmentGroupItem]) -> None:
         self.root = tuple(value)
 
     @property
-    def passages(self) -> List[EnactmentPassage]:
+    def passages(self) -> List[EnactmentGroupItem]:
         return list(self.sequence)
 
     @passages.setter
-    def passages(self, value: Sequence[Enactment | EnactmentPassage]) -> None:
+    def passages(self, value: Sequence[Enactment | EnactmentGroupItem]) -> None:
         self.root = self.__class__(root=value).root
 
-    def _at_index(self, key: int) -> EnactmentPassage:
+    def _at_index(self, key: int) -> EnactmentGroupItem:
         return self.passages[key]
 
     def __getitem__(
         self, key: Union[int, slice]
-    ) -> Union[EnactmentPassage, EnactmentGroup]:
+    ) -> Union[EnactmentGroupItem, EnactmentGroup[EnactmentGroupItem]]:
         if isinstance(key, slice):
             start, stop, step = key.indices(len(self))
             return self.__class__(
@@ -140,19 +151,21 @@ class EnactmentGroup(RootModel[Tuple[EnactmentPassage, ...]]):
             result += f"\n{textwrap.indent(str(factor), prefix=indent)}"
         return result
 
-    def _add_group(self, other: EnactmentGroup) -> EnactmentGroup:
+    def _add_group(
+        self, other: EnactmentGroup[EnactmentGroupItem]
+    ) -> EnactmentGroup[EnactmentGroupItem]:
         combined = self.passages[:] + other.passages[:]
         return self.__class__(passages=combined)
 
     def __add__(
         self,
         other: Union[
-            EnactmentGroup,
-            Sequence[Enactment | EnactmentPassage],
+            EnactmentGroup[EnactmentGroupItem],
+            Sequence[Enactment | EnactmentGroupItem],
             Enactment,
-            EnactmentPassage,
+            EnactmentGroupItem,
         ],
-    ) -> EnactmentGroup:
+    ) -> EnactmentGroup[EnactmentGroupItem]:
         """Combine two EnactmentGroups, consolidating any duplicate Enactments."""
         if isinstance(other, self.__class__):
             return self._add_group(other)
@@ -160,22 +173,41 @@ class EnactmentGroup(RootModel[Tuple[EnactmentPassage, ...]]):
         to_add = self.__class__(passages=passages)
         return self._add_group(to_add)
 
-    def __ge__(self, other: Union[Enactment, EnactmentPassage, EnactmentGroup]) -> bool:
+    def __ge__(
+        self,
+        other: Union[
+            Enactment,
+            EnactmentGroupItem,
+            EnactmentGroup[EnactmentGroupItem],
+        ],
+    ) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
         return bool(self.implies(other))
 
-    def __gt__(self, other: Union[Enactment, EnactmentPassage, EnactmentGroup]) -> bool:
+    def __gt__(
+        self,
+        other: Union[
+            Enactment,
+            EnactmentGroupItem,
+            EnactmentGroup[EnactmentGroupItem],
+        ],
+    ) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
         return bool(self.implies(other))
 
-    def _implies_enactment(self, other: Union[Enactment, EnactmentPassage]) -> bool:
+    def _implies_enactment(self, other: Union[Enactment, EnactmentGroupItem]) -> bool:
         return any(self_enactment.implies(other) for self_enactment in self)
 
-    def _implies(self, other: EnactmentGroup) -> bool:
+    def _implies(self, other: EnactmentGroup[EnactmentGroupItem]) -> bool:
         return all(self._implies_enactment(other_law) for other_law in other)
 
     def implies(
-        self, other: Union[Enactment, EnactmentPassage, EnactmentGroup]
+        self,
+        other: Union[
+            Enactment,
+            EnactmentGroupItem,
+            EnactmentGroup[EnactmentGroupItem],
+        ],
     ) -> bool:
         """Determine whether self includes all the text of another Enactment or EnactmentGroup."""
         if isinstance(other, (Enactment, EnactmentPassage)):

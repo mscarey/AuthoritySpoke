@@ -80,8 +80,8 @@ class Rule(Term, BaseModel):
     """
 
     procedure: Procedure
-    enactments: EnactmentGroup = EnactmentGroup()
-    enactments_despite: EnactmentGroup = EnactmentGroup()
+    enactments: EnactmentGroup[EnactmentPassage] = EnactmentGroup()
+    enactments_despite: EnactmentGroup[EnactmentPassage] = EnactmentGroup()
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
@@ -96,8 +96,13 @@ class Rule(Term, BaseModel):
     @classmethod
     def validate_enactment_groups(
         cls,
-        v: Union[Dict, EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup],
-    ) -> EnactmentGroup:
+        v: Union[
+            Dict,
+            EnactmentPassage,
+            Sequence[EnactmentPassage],
+            EnactmentGroup[EnactmentPassage],
+        ],
+    ) -> EnactmentGroup[EnactmentPassage]:
         """Convert EnactmentPassage to EnactmentGroup."""
         if isinstance(v, EnactmentPassage):
             v = EnactmentGroup(passages=[v])
@@ -108,16 +113,14 @@ class Rule(Term, BaseModel):
                 try:
                     v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
                 except ValidationError:
-                    v = EnactmentGroup(
-                        passages=[
-                            v
-                        ]  # ty: ignore[invalid-argument-type]. astral-sh/ty/issues/2403
-                    )
+                    v = EnactmentGroup(passages=[v])
         return v  # ty: ignore[invalid-return-type]. astral-sh/ty/issues/2403
 
     @field_validator("enactments", "enactments_despite")
     @classmethod
-    def select_enactment_text(cls, v: EnactmentGroup) -> EnactmentGroup:
+    def select_enactment_text(
+        cls, v: EnactmentGroup[EnactmentPassage]
+    ) -> EnactmentGroup[EnactmentPassage]:
         """For Enactments with no text selection, select all text."""
         for enactment in v:
             if not enactment.selected_text():
@@ -660,30 +663,40 @@ class Rule(Term, BaseModel):
         self.procedure.set_outputs(factors)
 
     def set_enactments(
-        self, enactments: Sequence[Enactment | EnactmentPassage] | EnactmentGroup
+        self,
+        enactments: Sequence[Enactment | EnactmentPassage]
+        | EnactmentGroup[EnactmentPassage],
     ) -> None:
         """
         Set the list of Enactments cited as the basis for this Rule.
 
         Any prior enactments are replaced.
         """
-        if not isinstance(enactments, EnactmentGroup):
-            enactments = consolidate_passages(enactments)
-            enactments = EnactmentGroup(passages=enactments)
-        self.enactments = enactments
+        if isinstance(enactments, EnactmentGroup):
+            normalized = EnactmentGroup[EnactmentPassage](passages=enactments.passages)
+        else:
+            normalized = EnactmentGroup[EnactmentPassage](
+                passages=consolidate_passages(enactments)
+            )
+        self.enactments = normalized
 
     def set_enactments_despite(
-        self, enactments: Sequence[Enactment | EnactmentPassage] | EnactmentGroup
+        self,
+        enactments: Sequence[Enactment | EnactmentPassage]
+        | EnactmentGroup[EnactmentPassage],
     ) -> None:
         """
         Set the list of Enactments known not to preclude application of this Rule.
 
         Any prior despite enactments are replaced.
         """
-        if not isinstance(enactments, EnactmentGroup):
-            enactments = consolidate_passages(enactments)
-            enactments = EnactmentGroup(passages=enactments)
-        self.enactments_despite = enactments
+        if isinstance(enactments, EnactmentGroup):
+            normalized = EnactmentGroup[EnactmentPassage](passages=enactments.passages)
+        else:
+            normalized = EnactmentGroup[EnactmentPassage](
+                passages=consolidate_passages(enactments)
+            )
+        self.enactments_despite = normalized
 
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"
