@@ -802,7 +802,7 @@ class Comparable(ABC):
         )
 
     def _means_if_concrete(
-        self, other: Self, explanation: "Explanation"
+        self, other: Self, context: "Explanation"
     ) -> Iterator["Explanation"]:
         """
         Test equality based on :attr:`terms`.
@@ -818,9 +818,9 @@ class Comparable(ABC):
         """
         if self.compare_terms(other, means):
             for new_context in self._context_registers(
-                other, comparison=means, context=explanation.context
+                other, comparison=means, context=context.context
             ):
-                yield explanation.with_context(new_context)
+                yield context.with_context(new_context)
 
     @new_context_helper
     def new_context(self, changes: "ContextRegister") -> Self:
