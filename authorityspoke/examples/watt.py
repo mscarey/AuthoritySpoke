@@ -15,7 +15,7 @@ from authorityspoke.opinions import (
 from authorityspoke.procedures import Procedure
 from legislice.enactments import EnactmentPassage
 from legislice.enactments import TextPositionSet as EnactmentTextPositionSet
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 
 
 class FactSpec(TypedDict):

@@ -18,7 +18,7 @@ from authorityspoke.opinions import (
     TextPositionSet,
 )
 from authorityspoke.procedures import Procedure
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 
 ENTITIES: dict[str, Entity] = {
     "the_java_api": Entity(name="the Java API", generic=True, plural=False),

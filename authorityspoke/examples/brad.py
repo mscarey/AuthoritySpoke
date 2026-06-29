@@ -1,7 +1,7 @@
 import copy
 from typing import Any, cast
 
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors

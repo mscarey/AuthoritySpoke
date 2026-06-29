@@ -13,7 +13,7 @@ from authorityspoke.opinions import (
 )
 
 
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.procedures import Procedure

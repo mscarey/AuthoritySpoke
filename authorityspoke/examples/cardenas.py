@@ -7,7 +7,7 @@ from authorityspoke.opinions import (
     TextPositionSet,
 )
 
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import (

@@ -5,7 +5,7 @@ import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup

@@ -16,7 +16,7 @@ from authorityspoke.procedures import Procedure
 from legislice.enactments import (
     EnactmentPassage,
 )
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 
 ENTITIES: dict[str, Entity] = {
     "mazza_alaluf": Entity(name="Mazza-Alaluf", generic=True, plural=False),

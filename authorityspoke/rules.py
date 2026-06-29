@@ -14,7 +14,7 @@ from typing import Optional, Sequence, Tuple, Union
 from pydantic import field_validator, BaseModel, ValidationError
 
 from legislice.enactments import Enactment, EnactmentPassage
-from legislice.groups import EnactmentGroup, consolidate_passages
+from authorityspoke.groups import EnactmentGroup, consolidate_passages
 from legislice.types import RawEnactment
 
 from authorityspoke.nettlesome.terms import (

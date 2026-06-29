@@ -8,7 +8,7 @@ from legislice.download import Client
 
 from legislice.citations import CodeLevel
 from legislice.enactments import Enactment
-from legislice.groups import EnactmentGroup
+from authorityspoke.groups import EnactmentGroup
 
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
