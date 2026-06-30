@@ -9,7 +9,7 @@ from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Term,
-    TermSequence,
+    Explanation,
 )
 
 
@@ -59,7 +59,9 @@ class Entity(Term, BaseModel, extra="forbid"):
         return str(self)
 
     def implies(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """
         Test if ``self`` implies ``other``.
@@ -76,7 +78,9 @@ class Entity(Term, BaseModel, extra="forbid"):
         return super().implies(other=other, context=context)
 
     def means(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """
         Test if ``self`` has the same meaning as ``other``.

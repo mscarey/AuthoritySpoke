@@ -15,3 +15,23 @@ from .opinions import OpinionReading
 from .rules import Rule
 
 __version__ = "0.10.0"
+
+__all__ = [
+    "CAPClient",
+    "LegisClient",
+    "Decision",
+    "Opinion",
+    "Enactment",
+    "Entity",
+    "Predicate",
+    "Comparison",
+    "DecisionReading",
+    "Fact",
+    "Exhibit",
+    "Evidence",
+    "Allegation",
+    "Pleading",
+    "Holding",
+    "OpinionReading",
+    "Rule",
+]

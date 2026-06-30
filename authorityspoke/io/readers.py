@@ -33,5 +33,5 @@ def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
         A dict created from a Caselaw Access Project API response.
     """
     if not isinstance(decision, Decision):
-        decision = Decision(**decision)
+        decision = Decision(**decision)  # ty: ignore[invalid-argument-type]
     return DecisionReading(decision=decision)

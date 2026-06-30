@@ -510,6 +510,7 @@ class OpinionReading(Comparable, BaseModel):
         holding_anchors: TextPositionSelector
         | TextQuoteSelector
         | TextPositionSet
+        | List[TextPositionSelector | TextQuoteSelector]
         | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,

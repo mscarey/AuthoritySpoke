@@ -17,6 +17,7 @@ from anchorpoint.textselectors import (
     TextQuoteSelector,
     TextPositionSelector,
     TextSequence,
+    TextPositionSet,
 )
 from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
 from justopinion.citations import CAPCitation
@@ -249,7 +250,13 @@ class DecisionReading(BaseModel, Comparable):
             HoldingWithAnchors,
             List[Union[HoldingWithAnchors, Holding, Rule]],
         ],
-        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        holding_anchors: List[
+            TextPositionSelector
+            | TextQuoteSelector
+            | TextPositionSet
+            | List[TextPositionSelector | TextQuoteSelector]
+        ]
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
