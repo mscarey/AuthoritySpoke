@@ -17,6 +17,7 @@ from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Union
 
 from legislice.enactments import Enactment
+from legislice.groups import EnactmentGroup
 
 from authorityspoke.nettlesome.terms import (
     Comparable,
@@ -135,8 +136,8 @@ class Holding(Comparable, BaseModel):
         outputs: FactorGroup,
         inputs: Optional[FactorGroup] = None,
         despite: Optional[FactorGroup] = None,
-        enactments: Sequence[Enactment] = (),
-        enactments_despite: Sequence[Enactment] = (),
+        enactments: Optional[EnactmentGroup] = None,
+        enactments_despite: Optional[EnactmentGroup] = None,
         mandatory: bool = False,
         universal: bool = False,
         generic: bool = False,
@@ -151,8 +152,8 @@ class Holding(Comparable, BaseModel):
         )
         rule = Rule(
             procedure=procedure,
-            enactments=enactments,
-            enactments_despite=enactments_despite,
+            enactments=enactments or EnactmentGroup(),
+            enactments_despite=enactments_despite or EnactmentGroup(),
             mandatory=mandatory,
             universal=universal,
         )
