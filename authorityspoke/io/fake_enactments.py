@@ -4,9 +4,15 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import Dict, Optional, Union
+from typing import Dict, NoReturn, Optional, Union
 
-from legislice.download import Client, normalize_path, LegislicePathError
+from legislice.download import (
+    Client,
+    normalize_path,
+    LegislicePathError,
+    CitingProvisionLocation,
+    InboundReference,
+)
 from legislice.enactments import CrossReference, Enactment
 from legislice.types import RawEnactment
 
@@ -14,8 +20,8 @@ from authorityspoke.io import filepaths
 
 
 # A dict indexing responses by iso-format date strings.
-ResponsesByDate = Dict[str, Dict]
-ResponsesByDateByPath = Dict[str, Dict[str, Dict]]
+ResponsesByDate = Dict[str, RawEnactment]
+ResponsesByDateByPath = Dict[str, Dict[str, ResponsesByDate]]
 
 
 class FakeClient(Client):
@@ -72,8 +78,8 @@ class FakeClient(Client):
         return self.responses[name_of_best_entry]
 
     def search_tree_for_path(
-        self, path: str, branch: Dict
-    ) -> Optional[ResponsesByDate]:
+        self, path: str, branch: RawEnactment
+    ) -> Optional[RawEnactment]:
         """Search responses attribute for keys that are partial paths to the given path."""
         path = normalize_path(path)
         if branch["node"] == path:
@@ -89,7 +95,11 @@ class FakeClient(Client):
             )
         return None
 
-    def fetch(self, query: str, date: Union[datetime.date, str] = "") -> RawEnactment:
+    def fetch(
+        self,
+        query: Union[str, CitingProvisionLocation, CrossReference, InboundReference],
+        date: Union[datetime.date, str] = "",
+    ) -> RawEnactment:
         """
         Fetch data about legislation at specified path and date from Client's assigned API root.
 
@@ -129,14 +139,17 @@ class FakeClient(Client):
 
         selected_version = responses[selected_date]
 
-        result = self.search_tree_for_path(path=query, branch=selected_version)
-        if not result:
+        responses_by_date = self.search_tree_for_path(
+            path=query, branch=selected_version
+        )
+        if not responses_by_date:
             raise LegislicePathError(
                 f"No enacted text found for query {query} after date {date}"
             )
-        return result
 
-    def _fetch_from_url(self, url: str) -> None:
+        return responses_by_date
+
+    def _fetch_from_url(self, url: str) -> NoReturn:
         raise RuntimeError("Network access not allowed from FakeClient")
 
     def read(
