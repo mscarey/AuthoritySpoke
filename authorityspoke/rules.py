@@ -497,7 +497,9 @@ class Rule(Term, BaseModel):
                 )
 
     def implies(
-        self, other: Comparable | None, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable | None,
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
         Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
@@ -525,7 +527,10 @@ class Rule(Term, BaseModel):
             return True
         if not isinstance(other, self.__class__):
             if context:
-                context = context.reversed()
+                if isinstance(context, Explanation):
+                    context = context.reversed_context()
+                else:
+                    context = context.reversed()
             return other.implied_by(self, context=context)
         return any(
             explanation is not None

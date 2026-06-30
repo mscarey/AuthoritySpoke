@@ -367,9 +367,11 @@ class OpinionReading(Comparable, BaseModel):
     def posit_holding(
         self,
         holding: Union[Holding, Rule, HoldingWithAnchors],
-        holding_anchors: Optional[
-            Union[TextPositionSelector, TextQuoteSelector, TextPositionSet]
-        ] = None,
+        holding_anchors: TextPositionSelector
+        | TextQuoteSelector
+        | TextPositionSet
+        | List[TextPositionSelector | TextQuoteSelector]
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -421,7 +423,13 @@ class OpinionReading(Comparable, BaseModel):
         holdings: Union[
             AnchoredHoldings, List[Union[HoldingWithAnchors, Holding, Rule]]
         ],
-        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        holding_anchors: List[
+            TextPositionSelector
+            | TextQuoteSelector
+            | TextPositionSet
+            | List[TextPositionSelector | TextQuoteSelector]
+        ]
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -470,7 +478,10 @@ class OpinionReading(Comparable, BaseModel):
             HoldingWithAnchors,
             List[Union[HoldingWithAnchors, Holding, Rule]],
         ],
-        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        holding_anchors: TextPositionSelector
+        | TextQuoteSelector
+        | TextPositionSet
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -505,9 +516,13 @@ class OpinionReading(Comparable, BaseModel):
                 context=context,
             )
         else:
+            if holding_anchors:
+                raise TypeError(
+                    "The `posit` method does not support `holding_anchors` when `holdings` is a list. "
+                    "Use `posit_holdings` instead."
+                )
             self.posit_holdings(
                 holdings,
-                holding_anchors=holding_anchors,
                 named_anchors=named_anchors,
                 enactment_anchors=enactment_anchors,
                 context=context,
