@@ -206,7 +206,7 @@ class DecisionReading(BaseModel, Comparable):
     def explain_implication(
         self,
         other: Comparable | None,
-        context: Optional[ContextRegister] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Optional[Explanation]:
         """Get the first generated explanation of how a Holding of self implies a Holding of other."""
         explanations = self.explanations_implication(other, context=context)
