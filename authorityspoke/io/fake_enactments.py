@@ -138,7 +138,10 @@ class FakeClient(Client):
             selected_date = max(versions_not_later_than_query)
 
         selected_version = responses[selected_date]
-
+        if isinstance(query, CitingProvisionLocation):
+            query = query.node
+        if isinstance(query, (CrossReference, InboundReference)):
+            query = query.target_uri
         responses_by_date = self.search_tree_for_path(
             path=query, branch=selected_version
         )
