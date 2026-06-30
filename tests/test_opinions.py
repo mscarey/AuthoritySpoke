@@ -20,6 +20,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import (
     AnchoredHoldings,
+    HoldingWithAnchors,
     OpinionReading,
     TermWithAnchors,
 )
@@ -310,6 +311,30 @@ class TestOpinionHoldings:
                 copy.deepcopy(make_holding["h1"]),
                 holding_anchors=[1],
             )
+
+    def test_posit_holding_adds_anchors_for_matching_holding(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        first_anchor = TextPositionSelector(start=1, end=2)
+        second_anchor = TextPositionSelector(start=4, end=5)
+
+        opinion.posit_holding(
+            copy.deepcopy(make_holding["h1"]),
+            holding_anchors=first_anchor,
+        )
+        opinion.posit_holding(
+            HoldingWithAnchors(
+                holding=copy.deepcopy(make_holding["h1"]),
+                anchors=TextPositionSet(positions=[second_anchor]),
+            )
+        )
+
+        assert len(opinion.anchored_holdings.holdings) == 1
+        positions = opinion.anchored_holdings.holdings[0].anchors.positions
+        assert [(item.start, item.end) for item in positions] == [(1, 2), (4, 5)]
 
 
 class TestOpinionFactors:

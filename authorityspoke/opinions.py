@@ -357,11 +357,11 @@ class OpinionReading(Comparable, BaseModel):
         r"""Search recursively for :class:`.Factor` in holdings of self."""
         return self.holdings.get_factor_by_str(query)
 
-    def get_matching_holding(self, holding: Holding) -> Optional[Holding]:
+    def get_matching_holding(self, holding: Holding) -> Optional[HoldingWithAnchors]:
         """Check self's Holdings for a Holding with the same meaning."""
-        for known_holding in self.holdings:
-            if holding.means(known_holding):
-                return known_holding
+        for anchored_holding in self.anchored_holdings.holdings:
+            if anchored_holding.holding.means(holding):
+                return anchored_holding
         return None
 
     def posit_holding(
@@ -432,12 +432,12 @@ class OpinionReading(Comparable, BaseModel):
 
         for enactment_anchor in enactment_anchors:
             self.anchored_holdings.add_enactment(
-                enactment=enactment_anchor.passage, anchors=named_anchor.anchors
+                enactment=enactment_anchor.passage, anchors=enactment_anchor.anchors
             )
 
         matching_holding = self.get_matching_holding(holding)
         if matching_holding:
-            matching_holding.anchors += holding.anchors
+            matching_holding.anchors += holding_anchors
         else:
             if context:
                 holding = holding.new_context(context, source=self)
