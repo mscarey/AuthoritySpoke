@@ -3,6 +3,7 @@ import copy
 import pytest
 
 from anchorpoint.textselectors import (
+    TextPositionSelector,
     TextPositionSet,
     TextQuoteSelector,
     TextSelectionError,
@@ -210,7 +211,7 @@ class TestOpinionHoldings:
             "officers' search of the yard": "officers' search of the stockpile",
             "Bradley's marijuana patch": "the stockpile of trees",
         }
-        watt.posit(brad.holdings[0], context_pairs)
+        watt.posit(holdings=brad.holdings[0], context=context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
     def test_getting_factors_from_opinion(self, make_opinion_with_holding):
@@ -261,6 +262,54 @@ class TestOpinionHoldings:
         factors = watt.factors_by_name()
         factor = factors["the fact that <the elephant> was an elephant"]
         assert factor.terms[0].name == "the elephant"
+
+    def test_posit_holding_normalizes_position_selector_to_positionset(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        selector = TextPositionSelector(start=3, end=8)
+        opinion.posit_holding(
+            copy.deepcopy(make_holding["h1"]), holding_anchors=selector
+        )
+
+        anchors = opinion.anchored_holdings.holdings[-1].anchors
+        assert isinstance(anchors, TextPositionSet)
+        assert anchors.positions == [selector]
+        assert anchors.quotes == []
+
+    def test_posit_holding_normalizes_quote_list_to_positionset(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        quote = TextQuoteSelector(exact="method of operation")
+        opinion.posit_holding(
+            copy.deepcopy(make_holding["h1"]),
+            holding_anchors=[quote, "process, system"],
+        )
+
+        anchors = opinion.anchored_holdings.holdings[-1].anchors
+        assert isinstance(anchors, TextPositionSet)
+        assert anchors.positions == []
+        assert [item.exact for item in anchors.quotes] == [
+            "method of operation",
+            "process, system",
+        ]
+
+    def test_posit_holding_rejects_invalid_anchor_list_item(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        with pytest.raises(TypeError):
+            opinion.posit_holding(
+                copy.deepcopy(make_holding["h1"]),
+                holding_anchors=[1],
+            )
 
 
 class TestOpinionFactors:

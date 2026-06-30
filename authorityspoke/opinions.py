@@ -382,12 +382,39 @@ class OpinionReading(Comparable, BaseModel):
 
         if isinstance(holding, HoldingWithAnchors):
             holding, holding_anchors = holding.holding, holding.anchors
-        if isinstance(holding_anchors, (TextQuoteSelector, str)):
-            holding_anchors = [holding_anchors]
-        if isinstance(holding_anchors, List) and isinstance(
-            holding_anchors[0], (str, TextQuoteSelector)
-        ):
+
+        if holding_anchors is None:
+            holding_anchors = TextPositionSet()
+        elif isinstance(holding_anchors, TextPositionSet):
+            pass
+        elif isinstance(holding_anchors, TextPositionSelector):
+            holding_anchors = TextPositionSet(positions=[holding_anchors])
+        elif isinstance(holding_anchors, (TextQuoteSelector, str)):
             holding_anchors = TextPositionSet.from_quotes(holding_anchors)
+        elif isinstance(holding_anchors, list):
+            positions = [
+                anchor
+                for anchor in holding_anchors
+                if isinstance(anchor, TextPositionSelector)
+            ]
+            quotes = []
+            for anchor in holding_anchors:
+                if isinstance(anchor, TextQuoteSelector):
+                    quotes.append(anchor)
+                elif isinstance(anchor, str):
+                    quotes.append(TextQuoteSelector.from_text(anchor))
+            if len(positions) + len(quotes) != len(holding_anchors):
+                raise TypeError(
+                    "holding_anchors list items must be TextPositionSelector, "
+                    "TextQuoteSelector, or str."
+                )
+            holding_anchors = TextPositionSet(positions=positions, quotes=quotes)
+        else:
+            raise TypeError(
+                "holding_anchors must be TextPositionSet, TextPositionSelector, "
+                "TextQuoteSelector, str, a list of selectors, or None."
+            )
+
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "
