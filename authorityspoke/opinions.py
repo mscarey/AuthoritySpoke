@@ -59,7 +59,7 @@ class EnactmentWithAnchors(BaseModel):
 class TermWithAnchors(BaseModel):
     """A term with a set of anchors."""
 
-    term: AbsenceOfFactor | Entity | Fact | Allegation | Pleading | Exhibit | Evidence
+    term: Term
     anchors: TextPositionSet = TextPositionSet()
 
     @field_validator("anchors", mode="before")
