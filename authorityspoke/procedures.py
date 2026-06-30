@@ -158,11 +158,11 @@ class Procedure(Comparable, BaseModel):
 
     def add(
         self,
-        other: Comparable,
+        other: Factor | AbsenceOfFactor | Procedure,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Optional[Procedure]:
         """Show how first Procedure triggers the second if not both are universal."""
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, Procedure):
             return self.with_factor(other)
         for explanation in self.triggers_next_procedure(other, context=context):
             added = self._trigger_addition(other, explanation)
