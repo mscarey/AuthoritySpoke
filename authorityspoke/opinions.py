@@ -524,7 +524,7 @@ class OpinionReading(Comparable, BaseModel):
 
     def implied_by(
         self,
-        other: Union[OpinionReading, Holding, Rule],
+        other: Comparable | None,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> bool:
         """Determine if other implies all the Holdings of self."""
@@ -534,6 +534,8 @@ class OpinionReading(Comparable, BaseModel):
             return self._implied_by_holding(other, context=context)
         elif isinstance(other, Rule):
             return self._implied_by_rule(other, context=context)
+        elif other is None:
+            return False
         return other.implies(self, context=context.reversed_context())
 
     def __ge__(self, other: Optional[Comparable]) -> bool:

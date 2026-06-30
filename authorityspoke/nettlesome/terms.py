@@ -642,7 +642,9 @@ class Comparable(ABC):
         return any(self.explanations_implied_by(other, context=context))
 
     def implies(
-        self, other: Self | None, context: Optional["ContextRegister"] = None
+        self,
+        other: Self | None,
+        context: "ContextRegister" | "Explanation" | None = None,
     ) -> bool:
         r"""
         Test whether ``self`` implies ``other``.
