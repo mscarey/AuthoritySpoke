@@ -181,7 +181,7 @@ class Procedure(Comparable, BaseModel):
         self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
         other_input = list(other.inputs)
         implied_inputs: list[FactorOrAbsence] = []
-        not_implied: list[FactorOrAbsence] = []
+        not_implied = FactorGroup([])
 
         while other_input:
             current = other_input.pop()

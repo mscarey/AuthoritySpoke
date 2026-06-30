@@ -372,7 +372,7 @@ class Comparable(ABC):
         return explanation
 
     def explain_implication(
-        self, other: Self, context: Optional["ContextRegister"] = None
+        self, other: Self, context: "ContextRegister" | "Explanation" | None = None
     ) -> Optional["Explanation"]:
         """Get one explanation of why self implies other."""
         explanations = self.explanations_implication(other, context=context)

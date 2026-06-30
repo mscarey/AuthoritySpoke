@@ -105,6 +105,9 @@ class FactorGroup(
     def sequence(self) -> Tuple[FactorGroupItem, ...]:
         return tuple(self.root)
 
+    def append(self, value: FactorGroupItem) -> None:
+        self.root = self.root + (value,)
+
     @sequence.setter
     def sequence(self, value: Sequence[FactorGroupItem]) -> None:
         self.root = tuple(value)
