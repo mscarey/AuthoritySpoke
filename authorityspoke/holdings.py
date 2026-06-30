@@ -709,7 +709,7 @@ class HoldingGroup(FactorGroup):
     def explanations_implication(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Generate contexts in which all Holdings in other are implied by self."""
         if isinstance(other, Rule):
@@ -719,7 +719,7 @@ class HoldingGroup(FactorGroup):
         )
         if isinstance(other, Holding):
             yield from self._explanations_implication_of_holding(
-                other=other, context=context
+                other=other, context=explanation
             )
         elif isinstance(other, self.__class__):
             yield from self.verbose_comparison(

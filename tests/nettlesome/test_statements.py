@@ -1391,7 +1391,7 @@ class TestContradiction:
             [Entity(name="Dan")], [Entity(name="Dan")]
         )
         update = right.update_context_register(
-            right.predicate,
+            right.predicate,  # ty:ignore[invalid-argument-type]
             register,
             operator.gt,
         )
