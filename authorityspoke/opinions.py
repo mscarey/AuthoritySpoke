@@ -245,6 +245,8 @@ class OpinionReading(Comparable, BaseModel):
         self, other: Comparable | None, context: Optional[ContextRegister] = None
     ) -> bool:
         """Check if other contradicts one of self's Holdings."""
+        if other is None:
+            return False
         if not self.comparable_with(other):
             raise TypeError(
                 "'Contradicts' test not implemented for types "
@@ -291,7 +293,7 @@ class OpinionReading(Comparable, BaseModel):
 
     def explanations_implication(
         self,
-        other: Comparable | None,
+        other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in self implying other."""
@@ -317,7 +319,7 @@ class OpinionReading(Comparable, BaseModel):
                 self, context=context.reversed_context() if context else None
             )
 
-    def generic_terms_by_str(self) -> dict[str, Comparable]:
+    def generic_terms_by_str(self) -> dict[str, Term]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 
@@ -327,13 +329,13 @@ class OpinionReading(Comparable, BaseModel):
             of ``self``, with guaranteed order, including each
             generic :class:`.Factor` only once.
         """
-        generics: Dict[str, Comparable] = {}
+        generics: Dict[str, Term] = {}
         for holding in self.holdings:
             for generic in holding.generic_terms():
                 generics[str(generic)] = generic
         return generics
 
-    def get_term_by_name(self, name: str) -> Optional[Comparable]:
+    def get_term_by_name(self, name: str) -> Optional[Term]:
         """
         Search recursively in holdings of ``self`` for :class:`.Term` with ``name``.
 
