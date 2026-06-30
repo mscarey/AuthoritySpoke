@@ -333,9 +333,9 @@ class OpinionReading(Comparable, BaseModel):
                 generics[str(generic)] = generic
         return generics
 
-    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
+    def get_term_by_name(self, name: str) -> Optional[Comparable]:
         """
-        Search recursively in holdings of ``self`` for :class:`.Factor` with ``name``.
+        Search recursively in holdings of ``self`` for :class:`.Term` with ``name``.
 
         :param name:
             string to match with the ``name`` attribute of the
@@ -348,14 +348,14 @@ class OpinionReading(Comparable, BaseModel):
         """
 
         for holding in self.holdings:
-            factor = holding.get_factor_by_name(name)
-            if factor is not None:
-                return factor
+            term = holding.get_term_by_name(name)
+            if term is not None:
+                return term
         return None
 
-    def get_factor_by_str(self, query: str) -> Optional[Factor]:
-        r"""Search recursively for :class:`.Factor` in holdings of self."""
-        return self.holdings.get_factor_by_str(query)
+    def get_term_by_str(self, query: str) -> Optional[Term]:
+        r"""Search recursively for :class:`.Term` in holdings of self."""
+        return self.holdings.get_term_by_str(query)
 
     def get_matching_holding(self, holding: Holding) -> Optional[HoldingWithAnchors]:
         """Check self's Holdings for a Holding with the same meaning."""

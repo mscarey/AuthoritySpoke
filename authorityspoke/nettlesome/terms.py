@@ -580,7 +580,7 @@ class Comparable(ABC):
                     generics[generic.short_string] = generic
         return generics
 
-    def get_factor(self, query: str) -> Optional["Term"]:
+    def get_term(self, query: str) -> Optional["Term"]:
         """
         Search for Comparable with str or name matching query.
 
@@ -588,17 +588,17 @@ class Comparable(ABC):
             a string that matches the desired Comparable's ``name`` or the
             output of its __str__ method.
         """
-        result = self.get_factor_by_str(query)
+        result = self.get_term_by_str(query)
         if result is None:
-            result = self.get_factor_by_name(query)
+            result = self.get_term_by_name(query)
         return result
 
-    def get_factor_by_name(self, name: str) -> Optional["Term"]:
+    def get_term_by_name(self, name: str) -> Optional["Term"]:
         """
-        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified ``name``.
+        Search of ``self`` and ``self``'s attributes for :class:`Term` with specified ``name``.
 
         :returns:
-            a :class:`Comparable` with the specified ``name`` attribute
+            a :class:`Term` with the specified ``name`` attribute
             if it exists, otherwise ``None``.
         """
         factors_to_search = self.recursive_terms
@@ -607,12 +607,12 @@ class Comparable(ABC):
                 return value
         return None
 
-    def get_factor_by_str(self, query: str) -> Optional["Term"]:
+    def get_term_by_str(self, query: str) -> Optional["Term"]:
         """
-        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
+        Search of ``self`` and ``self``'s attributes for :class:`Term` with specified string.
 
         :returns:
-            a :class:`Factor` with the specified string
+            a :class:`Term` with the specified string
             if it exists, otherwise ``None``.
         """
         for name, factor in self.recursive_terms.items():
@@ -1013,7 +1013,7 @@ def expand_string_from_source(
     """Replace ``term`` with the real term it references, if ``term`` is a string reference."""
     if isinstance(term, str):
         if source is not None:
-            result = source.get_factor(term)
+            result = source.get_term(term)
         else:
             result = None
     else:

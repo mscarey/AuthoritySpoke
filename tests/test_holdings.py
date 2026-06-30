@@ -110,8 +110,8 @@ class TestHolding:
         watt = make_opinion_with_holding["watt_majority"]
         holding = watt.holdings[4]
         assert holding.outputs[0].absent.exhibit.name == "proof of Wattenburg's guilt"
-        factor = holding.get_factor_by_name("proof of Wattenburg's guilt")
-        assert factor.name == "proof of Wattenburg's guilt"
+        term = holding.get_term_by_name("proof of Wattenburg's guilt")
+        assert term.name == "proof of Wattenburg's guilt"
 
     def test_enactment_text_in_holding_str(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]

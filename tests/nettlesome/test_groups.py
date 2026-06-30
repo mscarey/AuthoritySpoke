@@ -87,9 +87,9 @@ class TestMakeGroup:
         )
         assert group[1].key.endswith("was less than 35 foot")
 
-    def test_get_factor_by_name(self, make_complex_fact):
+    def test_get_term_by_name(self, make_complex_fact):
         group = FactorGroup(sequence=[make_complex_fact["relevant_murder"]])
-        entity = group.get_factor_by_name("Alice")
+        entity = group.get_term_by_name("Alice")
         assert entity.plural is False
 
     def test_iterate_through_factors(self, make_complex_fact):
@@ -873,13 +873,17 @@ class TestUnion:
         """Test that Factor is not mistaken as redundant."""
         alice_had_bullets = Statement(
             predicate=Comparison.new(
-                content="the number of bullets {person} had was", sign=">=", expression=5
+                content="the number of bullets {person} had was",
+                sign=">=",
+                expression=5,
             ),
             terms=[Entity(name="Alice")],
         )
         bob_had_bullets = Statement(
             predicate=Comparison.new(
-                content="the number of bullets {person} had was", sign=">=", expression=5
+                content="the number of bullets {person} had was",
+                sign=">=",
+                expression=5,
             ),
             terms=[Entity(name="Bob")],
         )

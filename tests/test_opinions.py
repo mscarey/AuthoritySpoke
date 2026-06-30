@@ -374,16 +374,16 @@ class TestOpinionFactors:
         assert len(index.named_anchors) == 1
         assert index.named_anchors[0].anchors.quotes == [quote_selector]
 
-    def test_get_factor_from_opinion(self, make_opinion_with_holding):
+    def test_get_term_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        company = oracle.get_factor_by_name("the Java API")
+        company = oracle.get_term_by_name("the Java API")
         assert isinstance(company, Entity)
 
     def test_factors_by_name(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        factors = oracle.factors_by_name()
-        factor = factors["false the Java API was an original work"]
-        assert factor.terms[0].name == "the Java API"
+        terms = oracle.factors_by_name()
+        term = terms["false the Java API was an original work"]
+        assert term.terms[0].name == "the Java API"
 
 
 class TestImplication:
