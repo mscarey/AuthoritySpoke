@@ -14,7 +14,7 @@ from legislice.download import (
     InboundReference,
 )
 from legislice.enactments import CrossReference, Enactment
-from legislice.models import RawEnactment
+from legislice.models import PublicationCoverage, RawEnactment
 
 from authorityspoke.io import filepaths
 
@@ -34,24 +34,28 @@ class FakeClient(Client):
     def __init__(self, responses: ResponsesByDateByPath):
         """Populate fake client with fake response data."""
         self.responses = responses
-        self.coverage: Dict[str, Dict[str, Union[datetime.date, str]]] = {
-            "/us/const": {
-                "latest_heading": "United States Constitution",
-                "first_published": datetime.date(1788, 6, 21),
-                "earliest_in_db": datetime.date(1788, 6, 21),
-            },
-            "/us/usc": {
-                "latest_heading": "United States Code (USC)",
-                "first_published": datetime.date(1926, 6, 30),
-                "earliest_in_db": datetime.date(2013, 7, 18),
-                "latest_in_db": datetime.date(2020, 8, 8),
-            },
-            "/test/acts": {
-                "latest_heading": "Test Acts",
-                "first_published": datetime.date(1935, 4, 1),
-                "earliest_in_db": datetime.date(1935, 4, 1),
-                "latest_in_db": datetime.date(2013, 7, 18),
-            },
+        self.coverage: dict[str, PublicationCoverage] = {
+            "/us/const": PublicationCoverage(
+                uri="/us/const",
+                latest_heading="United States Constitution",
+                first_published=datetime.date(1788, 6, 21),
+                earliest_in_db=datetime.date(1788, 6, 21),
+                latest_in_db=datetime.date(1992, 5, 5),
+            ),
+            "/us/usc": PublicationCoverage(
+                uri="/us/usc",
+                latest_heading="United States Code (USC)",
+                first_published=datetime.date(1926, 6, 30),
+                earliest_in_db=datetime.date(2013, 7, 18),
+                latest_in_db=datetime.date(2020, 8, 8),
+            ),
+            "/test/acts": PublicationCoverage(
+                uri="/test/acts",
+                latest_heading="Test Acts",
+                first_published=datetime.date(1935, 4, 1),
+                earliest_in_db=datetime.date(1935, 4, 1),
+                latest_in_db=datetime.date(2013, 7, 18),
+            ),
         }
         self.update_coverage_from_api = False
 
