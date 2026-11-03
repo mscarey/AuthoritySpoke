@@ -594,7 +594,7 @@ class Comparison(BaseModel, PhraseABC):
             ...     sign=">=",
             ...     expression="10 grams")
             >>> weight.quantity
-            <Quantity(10, 'gram')>
+            Quantity(Decimal('10'), "gram")
         """
         return self.quantity_range.q
 

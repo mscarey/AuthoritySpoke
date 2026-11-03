@@ -9,7 +9,7 @@ dependencies = [
     "bidict>=0.23.1",
     "eyecite>=2.7.6",
     "justopinion==0.5.0",
-    "legislice==0.9.0rc1",
+    "legislice",
     "lxml>=4.9.1",
     "pint>=0.25.3",
     "pydantic>=2.13.3",
@@ -35,10 +35,10 @@ dev = [
     "sphinx-autodoc-typehints>=3.10.2",
 ]
 
-[tool.uv.sources]
-legislice = { git = "https://github.com/mscarey/legislice.git", branch = "v090" }
-
 [tool.ruff.lint.per-file-ignores]
 "decisions.py" = ["F401"]
 "factors.py" = ["F401"]
 "units.py" = ["F401"]
+
+[tool.uv.sources]
+legislice = { git = "https://github.com/mscarey/legislice", branch = "v090" }
