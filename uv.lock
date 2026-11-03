@@ -71,7 +71,7 @@ requires-dist = [
     { name = "bidict", specifier = ">=0.23.1" },
     { name = "eyecite", specifier = ">=2.7.6" },
     { name = "justopinion", specifier = "==0.5.0" },
-    { name = "legislice", git = "https://github.com/mscarey/legislice?branch=v090" },
+    { name = "legislice", git = "https://github.com/mscarey/legislice?branch=earliest-in-db" },
     { name = "lxml", specifier = ">=4.9.1" },
     { name = "pint", specifier = ">=0.25.3" },
     { name = "pydantic", specifier = ">=2.13.3" },
@@ -424,7 +424,7 @@ wheels = [
 [[package]]
 name = "legislice"
 version = "0.9.0rc1"
-source = { git = "https://github.com/mscarey/legislice?branch=v090#d247b031489b020e63f2263f35df06f36d989bad" }
+source = { git = "https://github.com/mscarey/legislice?branch=earliest-in-db#9227839f86eb865736feb3bc810070fc059ccb98" }
 dependencies = [
     { name = "anchorpoint" },
     { name = "python-dotenv" },
