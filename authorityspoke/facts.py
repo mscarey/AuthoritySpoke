@@ -15,10 +15,10 @@ from pydantic import (
 )
 from slugify import slugify
 
-from nettlesome.entities import Entity
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented, wrapped
-from nettlesome.terms import (
+from authorityspoke.nettlesome.factors import Entity, Factor, AbsenceOf
+from authorityspoke.nettlesome.formatting import indented, wrapped
+from authorityspoke.nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -26,8 +26,8 @@ from nettlesome.terms import (
     TermSequence,
     new_context_helper,
 )
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, QuantityRange
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, QuantityRange
 
 
 RawPredicate = Dict[str, Union[str, bool]]
@@ -60,10 +60,6 @@ class Fact(Factor, BaseModel):
     :param standard_of_proof:
         a descriptor for the degree of certainty associated
         with the assertion in the ``predicate``.
-
-    :param absent:
-        whether the absence, rather than the presence, of the legal
-        fact described above is being asserted.
 
     :param generic:
         whether this object could be replaced by another generic
@@ -146,7 +142,7 @@ class Fact(Factor, BaseModel):
     @property
     def term_sequence(self) -> TermSequence:
         """Return a TermSequence of the terms in this Statement."""
-        return TermSequence(self.terms)
+        return TermSequence(root=self.terms)
 
     @property
     def terms_without_nulls(self) -> Sequence[Term]:
@@ -246,7 +242,7 @@ class Fact(Factor, BaseModel):
             else ""
         )
         string = f"{standard}{unwrapped}"
-        return Comparable.__str__(self).format(string).replace(",,", ",")
+        return Term.__str__(self).format(string).replace(",,", ",")
 
     @property
     def content(self) -> str:
@@ -254,19 +250,21 @@ class Fact(Factor, BaseModel):
         return str(self.predicate._content_with_terms(self.terms))
 
     def _means_if_concrete(
-        self, other: Comparable, context: Explanation
+        self, other: Comparable, explanation: Explanation
     ) -> Iterator[Explanation]:
-        if self.standard_of_proof == other.__dict__.get(
-            "standard_of_proof"
-        ) and self.predicate.means(other.predicate):
-            yield from super()._means_if_concrete(other, context)
+        if (
+            isinstance(other, self.__class__)
+            and self.standard_of_proof == other.__dict__.get("standard_of_proof")
+            and self.predicate.means(other.predicate)
+        ):
+            yield from super()._means_if_concrete(other, explanation)
 
     def __len__(self):
         return len(self.generic_terms())
 
     def _implies_if_concrete(
-        self, other: Comparable, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation
+    ) -> Iterator[Explanation]:
         """
         Test if ``self`` implies ``other``, assuming they are not ``generic``.
 
@@ -321,7 +319,10 @@ class Fact(Factor, BaseModel):
         """
         result = deepcopy(self)
         new_terms = TermSequence(
-            [factor.new_context(changes) for factor in self.terms_without_nulls]
+            root=[
+                factor.new_context(changes=changes)
+                for factor in self.terms_without_nulls
+            ]
         )
         result.terms = list(new_terms)
         return result
@@ -359,7 +360,7 @@ class Fact(Factor, BaseModel):
         """Generate permutations of context factors that preserve same meaning."""
         for pattern in self.predicate.term_index_permutations():
             sorted_terms = [x for _, x in sorted(zip(pattern, self.terms))]
-            yield TermSequence(sorted_terms)
+            yield TermSequence(root=sorted_terms)
 
 
 def build_fact(
@@ -370,7 +371,7 @@ def build_fact(
     standard_of_proof: Optional[str] = None,
     absent: bool = False,
     generic: bool = False,
-):
+) -> Fact | AbsenceOfFactor:
     r"""
     Build a :class:`.Fact` with generics selected from a list.
 
@@ -379,9 +380,14 @@ def build_fact(
         to insert ``terms`` that are typically the
         subject and objects of the clause.
 
-    :param terms:
+    :param indices:
         a series of integer indices of generic factors to
         fill in the blanks in the :class:`.Predicate`
+
+    :param case_factors:
+        a series of :class:`.Factor`\s that have already been mentioned
+        in the :class:`.Opinion`. They are available for composing the
+        new :class:`.Factor` object and don't need to be recreated.
 
     :param name:
         an identifier for this object, often used if the object needs
@@ -401,10 +407,6 @@ def build_fact(
         object of the same class without changing the truth of the
         :class:`Rule` in which it is mentioned.
 
-    :param case_factors:
-        a series of :class:`.Factor`\s that have already been mentioned
-        in the :class:`.Opinion`. They are available for composing the
-        new :class:`.Factor` object and don't need to be recreated.
     """
     if not indices:
         indices = range(len(predicate))
@@ -418,14 +420,16 @@ def build_fact(
         wrapped_factors = list(case_factors)
 
     terms = [wrapped_factors[i] for i in indices]
-    return Fact(
+    result = Fact(
         predicate=predicate,
         terms=terms,
         name=name or "",
         standard_of_proof=standard_of_proof,
-        absent=absent,
         generic=generic,
     )
+    if absent:
+        return AbsenceOfFactor(absent=result)
+    return result
 
 
 class Exhibit(Factor, BaseModel):
@@ -480,17 +484,17 @@ class Exhibit(Factor, BaseModel):
     )
 
     def _means_if_concrete(
-        self, other: Factor, context: ContextRegister
+        self, other: Comparable, explanation: Explanation
     ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
             and self.form == other.form
             and self.offered_by.means(other.offered_by)
         ):
-            yield from super()._means_if_concrete(other, context)
+            yield from super()._means_if_concrete(other, explanation)
 
     def _implies_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
         if isinstance(other, self.__class__) and (
             self.form == other.form or other.form is None
@@ -560,10 +564,11 @@ class Evidence(Factor, BaseModel):
     @model_validator(mode="before")
     @classmethod
     def check_type_field(cls, values):
-        """Fail valitation if the input has a "type" field without the class name."""
-        type_str = values.pop("type", "")
-        if type_str and type_str.lower() != "evidence":
-            raise ValueError(f"type {type_str} was passed to Evidence model")
+        """Fail validation if the input has a "type" field without the class name."""
+        if isinstance(values, dict):
+            type_str = values.pop("type", "")
+            if type_str and type_str.lower() != "evidence":
+                raise ValueError(f"type {type_str} was passed to Evidence model")
         return values
 
     def __str__(self):
@@ -662,8 +667,10 @@ class Allegation(Factor, BaseModel):
         return super().__str__().format(string).replace("Allegation", "allegation")
 
 
-Fact.model_rebuild()
-Exhibit.model_rebuild()
-Evidence.model_rebuild()
-Allegation.model_rebuild()
-Pleading.model_rebuild()
+class AbsenceOfFactor(AbsenceOf):
+    """Absence of a Factor specific to the AuthoritySpoke layer."""
+
+    absent: Fact | Evidence | Exhibit | Pleading | Allegation
+
+
+FactorOrAbsence = Union[Fact, AbsenceOfFactor, Exhibit, Pleading, Allegation, Evidence]

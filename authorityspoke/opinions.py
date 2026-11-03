@@ -13,13 +13,25 @@ from anchorpoint.textselectors import (
     TextPositionSet,
     TextPositionSelector,
 )
-from justopinion import Opinion
 from legislice.enactments import EnactmentPassage
-from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
-from nettlesome.factors import Factor
+from authorityspoke.nettlesome.terms import (
+    Comparable,
+    ContextRegister,
+    Explanation,
+    Term,
+)
+from authorityspoke.nettlesome.factors import Factor
 from pydantic import field_validator, BaseModel
 
-from authorityspoke.facts import Entity, Fact, Allegation, Pleading, Exhibit, Evidence
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Entity,
+    Fact,
+    Allegation,
+    Pleading,
+    Exhibit,
+    Evidence,
+)
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -47,7 +59,7 @@ class EnactmentWithAnchors(BaseModel):
 class TermWithAnchors(BaseModel):
     """A term with a set of anchors."""
 
-    term: Union[Entity, Fact, Allegation, Pleading, Exhibit, Evidence]
+    term: Term
     anchors: TextPositionSet = TextPositionSet()
 
     @field_validator("anchors", mode="before")
@@ -194,25 +206,32 @@ class OpinionReading(Comparable, BaseModel):
     def explanations_contradiction(
         self,
         other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in a contradiction between self and other."""
         if not self.comparable_with(other):
             raise TypeError(
                 f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
+        if isinstance(context, ContextRegister):
+            context = Explanation.from_context(context)
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
-            yield from self.holdings.explanations_contradiction(other)
+            yield from self.holdings.explanations_contradiction(other, context=context)
 
         if isinstance(other, HoldingGroup):
-            yield from self.holdings.explanations_contradiction(other)
+            yield from self.holdings.explanations_contradiction(other, context=context)
 
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_contradiction(other.holdings)
+            yield from self.holdings.explanations_contradiction(
+                other.holdings, context=context
+            )
 
         elif hasattr(other, "explanations_contradiction"):
-            yield from other.explanations_contradiction(self)
+            yield from other.explanations_contradiction(
+                self, context=context.reversed_context() if context else None
+            )
 
     def comparable_with(self, other: Any) -> bool:
         """Check if other can be compared to self for implication or contradiction."""
@@ -223,9 +242,11 @@ class OpinionReading(Comparable, BaseModel):
         return not isinstance(other, Factor)
 
     def contradicts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: Optional[ContextRegister] = None
     ) -> bool:
         """Check if other contradicts one of self's Holdings."""
+        if other is None:
+            return False
         if not self.comparable_with(other):
             raise TypeError(
                 "'Contradicts' test not implemented for types "
@@ -237,28 +258,33 @@ class OpinionReading(Comparable, BaseModel):
         )
 
     def implies(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """Check if all of other's Holdings are implied by holdings of self."""
         if other is None:
             return True
-        return any(self.explanations_implication(other))
+        return any(self.explanations_implication(other, context=context))
 
     def explain_implication(
         self,
         other: Comparable,
+        context: Optional[ContextRegister | Explanation] = None,
     ) -> Optional[Explanation]:
         """Get first Explanation of how one of self's Holdings implies other."""
-        explanations = self.explanations_implication(other)
+        explanations = self.explanations_implication(other, context=context)
         try:
             explanation = next(explanations)
         except StopIteration:
             return None
         return explanation
 
-    def explain_contradiction(self, other: Comparable) -> Optional[Explanation]:
+    def explain_contradiction(
+        self, other: Comparable, context: Optional[ContextRegister | Explanation] = None
+    ) -> Optional[Explanation]:
         """Get first Explanation of how other contradicts one of self's Holdings."""
-        explanations = self.explanations_contradiction(other)
+        explanations = self.explanations_contradiction(other, context=context)
         try:
             explanation = next(explanations)
         except StopIteration:
@@ -268,25 +294,32 @@ class OpinionReading(Comparable, BaseModel):
     def explanations_implication(
         self,
         other: Comparable,
-    ) -> Iterator[Union[ContextRegister, Explanation]]:
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         """Yield contexts that would result in self implying other."""
         if not self.comparable_with(other):
             raise TypeError(
                 f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
+        if isinstance(context, ContextRegister):
+            context = Explanation.from_context(context)
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
             for self_holding in self.holdings:
-                yield from self_holding.explanations_implication(other)
+                yield from self_holding.explanations_implication(other, context=context)
         if isinstance(other, HoldingGroup):
-            yield from self.holdings.explanations_implication(other)
+            yield from self.holdings.explanations_implication(other, context=context)
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_implication(other.holdings)
+            yield from self.holdings.explanations_implication(
+                other.holdings, context=context
+            )
         else:
-            yield from other.explanations_implied_by(self)
+            yield from other.explanations_implied_by(
+                self, context=context.reversed_context() if context else None
+            )
 
-    def generic_terms_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> dict[str, Term]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 
@@ -296,15 +329,15 @@ class OpinionReading(Comparable, BaseModel):
             of ``self``, with guaranteed order, including each
             generic :class:`.Factor` only once.
         """
-        generics: Dict[str, Comparable] = {}
+        generics: Dict[str, Term] = {}
         for holding in self.holdings:
             for generic in holding.generic_terms():
                 generics[str(generic)] = generic
         return generics
 
-    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
+    def get_term_by_name(self, name: str) -> Optional[Term]:
         """
-        Search recursively in holdings of ``self`` for :class:`.Factor` with ``name``.
+        Search recursively in holdings of ``self`` for :class:`.Term` with ``name``.
 
         :param name:
             string to match with the ``name`` attribute of the
@@ -317,28 +350,30 @@ class OpinionReading(Comparable, BaseModel):
         """
 
         for holding in self.holdings:
-            factor = holding.get_factor_by_name(name)
-            if factor is not None:
-                return factor
+            term = holding.get_term_by_name(name)
+            if term is not None:
+                return term
         return None
 
-    def get_factor_by_str(self, query: str) -> Optional[Factor]:
-        r"""Search recursively for :class:`.Factor` in holdings of self."""
-        return self.holdings.get_factor_by_str(query)
+    def get_term_by_str(self, query: str) -> Optional[Term]:
+        r"""Search recursively for :class:`.Term` in holdings of self."""
+        return self.holdings.get_term_by_str(query)
 
-    def get_matching_holding(self, holding: Holding) -> Optional[Holding]:
+    def get_matching_holding(self, holding: Holding) -> Optional[HoldingWithAnchors]:
         """Check self's Holdings for a Holding with the same meaning."""
-        for known_holding in self.holdings:
-            if holding.means(known_holding):
-                return known_holding
+        for anchored_holding in self.anchored_holdings.holdings:
+            if anchored_holding.holding.means(holding):
+                return anchored_holding
         return None
 
     def posit_holding(
         self,
         holding: Union[Holding, Rule, HoldingWithAnchors],
-        holding_anchors: Optional[
-            Union[TextPositionSelector, TextQuoteSelector, TextPositionSet]
-        ] = None,
+        holding_anchors: TextPositionSelector
+        | TextQuoteSelector
+        | TextPositionSet
+        | List[TextPositionSelector | TextQuoteSelector]
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -349,12 +384,39 @@ class OpinionReading(Comparable, BaseModel):
 
         if isinstance(holding, HoldingWithAnchors):
             holding, holding_anchors = holding.holding, holding.anchors
-        if isinstance(holding_anchors, (TextQuoteSelector, str)):
-            holding_anchors = [holding_anchors]
-        if isinstance(holding_anchors, List) and isinstance(
-            holding_anchors[0], (str, TextQuoteSelector)
-        ):
+
+        if holding_anchors is None:
+            holding_anchors = TextPositionSet()
+        elif isinstance(holding_anchors, TextPositionSet):
+            pass
+        elif isinstance(holding_anchors, TextPositionSelector):
+            holding_anchors = TextPositionSet(positions=[holding_anchors])
+        elif isinstance(holding_anchors, (TextQuoteSelector, str)):
             holding_anchors = TextPositionSet.from_quotes(holding_anchors)
+        elif isinstance(holding_anchors, list):
+            positions = [
+                anchor
+                for anchor in holding_anchors
+                if isinstance(anchor, TextPositionSelector)
+            ]
+            quotes = []
+            for anchor in holding_anchors:
+                if isinstance(anchor, TextQuoteSelector):
+                    quotes.append(anchor)
+                elif isinstance(anchor, str):
+                    quotes.append(TextQuoteSelector.from_text(anchor))
+            if len(positions) + len(quotes) != len(holding_anchors):
+                raise TypeError(
+                    "holding_anchors list items must be TextPositionSelector, "
+                    "TextQuoteSelector, or str."
+                )
+            holding_anchors = TextPositionSet(positions=positions, quotes=quotes)
+        else:
+            raise TypeError(
+                "holding_anchors must be TextPositionSet, TextPositionSelector, "
+                "TextQuoteSelector, str, a list of selectors, or None."
+            )
+
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "
@@ -372,12 +434,12 @@ class OpinionReading(Comparable, BaseModel):
 
         for enactment_anchor in enactment_anchors:
             self.anchored_holdings.add_enactment(
-                enactment=enactment_anchor.passage, anchors=named_anchor.anchors
+                enactment=enactment_anchor.passage, anchors=enactment_anchor.anchors
             )
 
         matching_holding = self.get_matching_holding(holding)
         if matching_holding:
-            matching_holding.anchors += holding.anchors
+            matching_holding.anchors += holding_anchors
         else:
             if context:
                 holding = holding.new_context(context, source=self)
@@ -390,7 +452,13 @@ class OpinionReading(Comparable, BaseModel):
         holdings: Union[
             AnchoredHoldings, List[Union[HoldingWithAnchors, Holding, Rule]]
         ],
-        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        holding_anchors: List[
+            TextPositionSelector
+            | TextQuoteSelector
+            | TextPositionSet
+            | List[TextPositionSelector | TextQuoteSelector]
+        ]
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -439,7 +507,11 @@ class OpinionReading(Comparable, BaseModel):
             HoldingWithAnchors,
             List[Union[HoldingWithAnchors, Holding, Rule]],
         ],
-        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        holding_anchors: TextPositionSelector
+        | TextQuoteSelector
+        | TextPositionSet
+        | List[TextPositionSelector | TextQuoteSelector]
+        | None = None,
         named_anchors: Optional[List[TermWithAnchors]] = None,
         enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -474,9 +546,13 @@ class OpinionReading(Comparable, BaseModel):
                 context=context,
             )
         else:
+            if holding_anchors:
+                raise TypeError(
+                    "The `posit` method does not support `holding_anchors` when `holdings` is a list. "
+                    "Use `posit_holdings` instead."
+                )
             self.posit_holdings(
                 holdings,
-                holding_anchors=holding_anchors,
                 named_anchors=named_anchors,
                 enactment_anchors=enactment_anchors,
                 context=context,
@@ -493,7 +569,7 @@ class OpinionReading(Comparable, BaseModel):
 
     def implied_by(
         self,
-        other: Union[OpinionReading, Holding, Rule],
+        other: Comparable | None,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> bool:
         """Determine if other implies all the Holdings of self."""
@@ -503,9 +579,11 @@ class OpinionReading(Comparable, BaseModel):
             return self._implied_by_holding(other, context=context)
         elif isinstance(other, Rule):
             return self._implied_by_rule(other, context=context)
+        elif other is None:
+            return False
         return other.implies(self, context=context.reversed_context())
 
-    def __ge__(self, other: Union[OpinionReading, Holding, Rule]) -> bool:
+    def __ge__(self, other: Optional[Comparable]) -> bool:
         """
         Find whether ``self``'s holdings imply all the holdings of ``other``.
 
@@ -516,7 +594,7 @@ class OpinionReading(Comparable, BaseModel):
         """
         return self.implies(other)
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: Optional[Comparable]) -> bool:
         """
         Find whether ``self``\'s holdings imply ``other``\'s but self != other.
 

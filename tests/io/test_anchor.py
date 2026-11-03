@@ -1,4 +1,4 @@
-import pytest
+from authorityspoke.opinions import TermWithAnchors
 
 
 class TestCollectAnchors:

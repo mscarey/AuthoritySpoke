@@ -4,18 +4,24 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import Dict, Optional, Union
+from typing import Dict, NoReturn, Optional, Union
 
-from legislice.download import Client, normalize_path, LegislicePathError
+from legislice.download import (
+    Client,
+    normalize_path,
+    LegislicePathError,
+    CitingProvisionLocation,
+    InboundReference,
+)
 from legislice.enactments import CrossReference, Enactment
-from legislice.types import RawEnactment
+from legislice.models import PublicationCoverage, RawEnactment
 
 from authorityspoke.io import filepaths
 
 
 # A dict indexing responses by iso-format date strings.
-ResponsesByDate = Dict[str, Dict]
-ResponsesByDateByPath = Dict[str, Dict[str, Dict]]
+ResponsesByDate = Dict[str, RawEnactment]
+ResponsesByDateByPath = Dict[str, Dict[str, ResponsesByDate]]
 
 
 class FakeClient(Client):
@@ -28,24 +34,28 @@ class FakeClient(Client):
     def __init__(self, responses: ResponsesByDateByPath):
         """Populate fake client with fake response data."""
         self.responses = responses
-        self.coverage: Dict[str, Dict[str, Union[datetime.date, str]]] = {
-            "/us/const": {
-                "latest_heading": "United States Constitution",
-                "first_published": datetime.date(1788, 6, 21),
-                "earliest_in_db": datetime.date(1788, 6, 21),
-            },
-            "/us/usc": {
-                "latest_heading": "United States Code (USC)",
-                "first_published": datetime.date(1926, 6, 30),
-                "earliest_in_db": datetime.date(2013, 7, 18),
-                "latest_in_db": datetime.date(2020, 8, 8),
-            },
-            "/test/acts": {
-                "latest_heading": "Test Acts",
-                "first_published": datetime.date(1935, 4, 1),
-                "earliest_in_db": datetime.date(1935, 4, 1),
-                "latest_in_db": datetime.date(2013, 7, 18),
-            },
+        self.coverage: dict[str, PublicationCoverage] = {
+            "/us/const": PublicationCoverage(
+                uri="/us/const",
+                latest_heading="United States Constitution",
+                first_published=datetime.date(1788, 6, 21),
+                earliest_in_db=datetime.date(1788, 6, 21),
+                latest_in_db=datetime.date(1992, 5, 5),
+            ),
+            "/us/usc": PublicationCoverage(
+                uri="/us/usc",
+                latest_heading="United States Code (USC)",
+                first_published=datetime.date(1926, 6, 30),
+                earliest_in_db=datetime.date(2013, 7, 18),
+                latest_in_db=datetime.date(2020, 8, 8),
+            ),
+            "/test/acts": PublicationCoverage(
+                uri="/test/acts",
+                latest_heading="Test Acts",
+                first_published=datetime.date(1935, 4, 1),
+                earliest_in_db=datetime.date(1935, 4, 1),
+                latest_in_db=datetime.date(2013, 7, 18),
+            ),
         }
         self.update_coverage_from_api = False
 
@@ -72,8 +82,8 @@ class FakeClient(Client):
         return self.responses[name_of_best_entry]
 
     def search_tree_for_path(
-        self, path: str, branch: Dict
-    ) -> Optional[ResponsesByDate]:
+        self, path: str, branch: RawEnactment
+    ) -> Optional[RawEnactment]:
         """Search responses attribute for keys that are partial paths to the given path."""
         path = normalize_path(path)
         if branch["node"] == path:
@@ -89,7 +99,11 @@ class FakeClient(Client):
             )
         return None
 
-    def fetch(self, query: str, date: Union[datetime.date, str] = "") -> RawEnactment:
+    def fetch(
+        self,
+        query: Union[str, CitingProvisionLocation, CrossReference, InboundReference],
+        date: Union[datetime.date, str] = "",
+    ) -> RawEnactment:
         """
         Fetch data about legislation at specified path and date from Client's assigned API root.
 
@@ -128,15 +142,21 @@ class FakeClient(Client):
             selected_date = max(versions_not_later_than_query)
 
         selected_version = responses[selected_date]
-
-        result = self.search_tree_for_path(path=query, branch=selected_version)
-        if not result:
+        if isinstance(query, CitingProvisionLocation):
+            query = query.node
+        if isinstance(query, (CrossReference, InboundReference)):
+            query = query.target_uri
+        responses_by_date = self.search_tree_for_path(
+            path=query, branch=selected_version
+        )
+        if not responses_by_date:
             raise LegislicePathError(
                 f"No enacted text found for query {query} after date {date}"
             )
-        return result
 
-    def _fetch_from_url(self, url: str) -> None:
+        return responses_by_date
+
+    def _fetch_from_url(self, url: str) -> NoReturn:
         raise RuntimeError("Network access not allowed from FakeClient")
 
     def read(
@@ -146,6 +166,6 @@ class FakeClient(Client):
     ) -> Enactment:
         """Use text expansion, unlike a real client."""
         raw_enactment = self.fetch(query=query, date=date)
-        enactment = self.read_from_json(raw_enactment, use_text_expansion=True)
+        enactment = self.read_from_json(raw_enactment)
         enactment.select_all()
         return enactment

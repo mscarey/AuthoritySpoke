@@ -18,13 +18,15 @@
       - suffix: Works of authorship include
   exclusive: true
 - inputs:
-  - type: fact
-    content: the Lotus menu command hierarchy was an original work
-    absent: true
+    - type: absence
+      absent:
+        type: fact
+        content: the Lotus menu command hierarchy was an original work
   outputs:
-  - type: fact
-    content: the Lotus menu command hierarchy was copyrightable
-    absent: true
+    - type: absence
+      absent:
+        type: fact
+        content: the Lotus menu command hierarchy was copyrightable
   universal: true
   enactments:
   - copyright protection
@@ -42,10 +44,11 @@
       content: '{Lotus Development Corporation} registered a copyright covering the
         Lotus menu command hierarchy'
     name: evidence of Lotus's copyright registration
-  - type: fact
-    content: the Lotus menu command hierarchy was copyrightable
-    truth: false
-    absent: true
+  - type: absence
+    absent:
+      type: fact
+      content: the Lotus menu command hierarchy was copyrightable
+      truth: false
   outputs:
   - type: fact
     content: the Lotus menu command hierarchy was copyrightable

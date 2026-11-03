@@ -87,7 +87,9 @@ Now we can have AuthoritySpoke read this JSON and convert it to a list
 of :class:`~authorityspoke.rules.Rule` objects. In particular, we’ll look at the first two Rules, which
 describe two ways that an object can be defined to be a “beard”.
 
-    >>> beard_holdings = loaders.read_holdings_from_file("beard_rules.yaml", client=legis_client)
+    >>> from authorityspoke import Holding
+    >>> from authorityspoke.examples import beard_act
+    >>> beard_holdings = [Holding(rule=rule) for rule in beard_act.rules()]
     >>> print(beard_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -112,9 +114,8 @@ describe two ways that an object can be defined to be a “beard”.
           millimeter
           the fact that <the suspected beard> existed in an uninterrupted line
           from the front of one ear to the front of the other ear below the nose
-        GIVEN the ENACTMENTS:
-          "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
-          "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
+        GIVEN the ENACTMENT:
+          "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:…exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4 1935-04-01)
 
 
 The difference between these two Rules is that the first one applies to
@@ -138,12 +139,12 @@ contradict one another.
 For instance, if we create a new Rule that’s identical to the first Rule
 in the Beard Tax Act except that it applies to facial hair that’s
 exactly 8 millimeters long instead of “no shorter than 5 millimetres”,
-we can determine that the original “chin rule” 
+we can determine that the original “chin rule”
 :meth:`~authorityspoke.rules.Rule.implies` our new :class:`~authorityspoke.rules.Rule`\.
 
-    >>> from authorityspoke.io import readers
-    >>> beard_rule_data[0]['inputs'][1]['content'] = 'the length of the suspected beard was = 8 millimetres'
-    >>> longer_hair = readers.read_holdings([beard_rule_data[0]], client=legis_client)
+  >>> longer_hair = [beard_holdings[0].model_copy(deep=True)]
+  >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.sign = "=="
+  >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity_magnitude = 8
     >>> print(longer_hair[0])
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -168,12 +169,21 @@ library). And we can show that this new Rule contradicts a Rule that
 came from the Beard Tax Act.
 
     >>> from authorityspoke import Fact, Entity
-    >>> changed_holdings = loaders.read_holdings_from_file("beard_rules.yaml", client=legis_client)
+    >>> from authorityspoke.nettlesome.quantities import Comparison, UnitRange
+    >>> changed_holdings = [Holding(rule=rule) for rule in beard_act.rules()]
     >>> long_means_not_beard = changed_holdings[1].rule
     >>> long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
-    >>> long_means_not_beard.set_inputs(Fact(
-    ...     content="the length of ${the_suspected_beard} was >= 12 inches",
-    ...     terms=[Entity(name="the suspected beard")]))
+    >>> long_means_not_beard.set_inputs([
+    ...     Fact(
+    ...         predicate=Comparison(
+    ...             content="the length of {the_suspected_beard} was",
+    ...             quantity_range=UnitRange(
+    ...                 sign=">=", quantity_magnitude=12, quantity_units="inches"
+    ...             ),
+    ...         ),
+    ...         terms=[Entity(name="the suspected beard")],
+    ...     )
+    ... ])
     >>> long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
     >>> long_means_not_beard.mandatory = True
     >>> print(long_means_not_beard)
@@ -186,9 +196,8 @@ came from the Beard Tax Act.
         the fact that <the suspected beard> was facial hair
         the fact that <the suspected beard> existed in an uninterrupted line
         from the front of one ear to the front of the other ear below the nose
-      GIVEN the ENACTMENTS:
-        "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
-        "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
+      GIVEN the ENACTMENT:
+        "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:…exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4 1935-04-01)
     >>> long_means_not_beard.contradicts(ear_rule)
     True
 
@@ -238,9 +247,7 @@ Here are the two Rules we’ll be adding together.
         the fact it was false that <the counterparty> was <the Department of
         Beards>
       DESPITE:
-        the fact that the token attributed to <the Department of Beards>,
-        asserting the fact that <the Department of Beards> granted an
-        exemption from the prohibition of wearing beards, was counterfeit
+        the fact that any beardcoin was counterfeit
       GIVEN the ENACTMENTS:
         "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
         "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
@@ -256,9 +263,10 @@ Here are the two Rules we’ll be adding together.
         between <the defendant> and <the counterparty>
       GIVEN:
         the fact that <the beardcoin transaction> was <the defendant>'s loan
-        of the token attributed to <the Department of Beards>, asserting the
-        fact that <the Department of Beards> granted an exemption from the
-        prohibition of wearing beards, to <the counterparty>
+        of <the counterparty> to the token attributed to <the Department of
+        Beards>, asserting the fact that <the Department of Beards> granted an
+        exemption authorizing the defendant's act of wearing the suspected
+        beard,
       GIVEN the ENACTMENT:
         "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
 
@@ -283,9 +291,10 @@ the ``elements_of_offense`` :class:`~authorityspoke.rules.Rule` relies upon.
         between <the defendant> and <the counterparty>
       GIVEN:
         the fact that <the beardcoin transaction> was <the defendant>'s loan
-        of the token attributed to <the Department of Beards>, asserting the
-        fact that <the Department of Beards> granted an exemption from the
-        prohibition of wearing beards, to <the counterparty>
+        of <the counterparty> to the token attributed to <the Department of
+        Beards>, asserting the fact that <the Department of Beards> granted an
+        exemption authorizing the defendant's act of wearing the suspected
+        beard,
         absence of the fact that <the beardcoin transaction> was a licensed
         beardcoin repurchase
         the fact it was false that <the counterparty> was <the Department of
@@ -319,13 +328,12 @@ With these changes, we can add together two Holdings to get a new one.
           absence of the fact that <the beardcoin transaction> was a licensed
           beardcoin repurchase
           the fact that <the beardcoin transaction> was <the defendant>'s loan
-          of the token attributed to <the Department of Beards>, asserting the
-          fact that <the Department of Beards> granted an exemption from the
-          prohibition of wearing beards, to <the counterparty>
+          of <the counterparty> to the token attributed to <the Department of
+          Beards>, asserting the fact that <the Department of Beards> granted an
+          exemption authorizing the defendant's act of wearing the suspected
+          beard,
         DESPITE:
-          the fact that the token attributed to <the Department of Beards>,
-          asserting the fact that <the Department of Beards> granted an
-          exemption from the prohibition of wearing beards, was counterfeit
+          the fact that any beardcoin was counterfeit
         GIVEN the ENACTMENTS:
           "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
           "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)

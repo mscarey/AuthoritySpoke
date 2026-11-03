@@ -1,23 +1,17 @@
 import pytest
 
-from pydantic import ValidationError
-
-from nettlesome.terms import ContextRegister
-from nettlesome.entities import Entity
-from nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import ContextRegister
+from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.facts import Fact
-from authorityspoke.io import readers
+from authorityspoke.examples.watt import ENTITIES as WATT_ENTITIES
 
 
 class TestMakeEntities:
-    def test_make_entity_from_str_without_mentioned(self):
-        """
-        This fails because it needs to look up the string factor_records
-        in a "mentioned" list, but no "mentioned" parameter is given.
-        """
-        with pytest.raises(AttributeError):
-            readers.read_holdings(record=[{"outputs": ["Bradley"]}])
+    def test_entity_from_examples_module(self):
+        entity = WATT_ENTITIES["wattenburg"]
+        assert entity.name == "Wattenburg"
+        assert entity.generic is True
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
@@ -60,7 +54,7 @@ class TestSameMeaning:
 
     def test_entity_does_not_mean_statement(self):
         entity = Entity(name="Bob")
-        statement = Fact(predicate="$person loves ice cream", terms=entity)
+        statement = Fact(predicate="{person} loves ice cream", terms=entity)
         assert not entity.means(statement)
         assert not statement.means(entity)
 
@@ -109,7 +103,7 @@ class TestImplication:
 
     def test_entity_does_not_imply_statement(self):
         entity = Entity(name="Bob")
-        statement = Fact(predicate="$person loves ice cream", terms=entity)
+        statement = Fact(predicate="{person} loves ice cream", terms=entity)
         assert not entity.implies(statement)
         assert not statement.implies(entity)
         assert not entity >= statement

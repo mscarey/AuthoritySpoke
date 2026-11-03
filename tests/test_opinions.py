@@ -1,26 +1,45 @@
+import copy
+
 import pytest
 
 from anchorpoint.textselectors import (
+    TextPositionSelector,
     TextPositionSet,
     TextQuoteSelector,
     TextSelectionError,
 )
 
-from nettlesome.entities import Entity
+from authorityspoke.nettlesome.entities import Entity
 
 from authorityspoke.facts import Fact, Predicate
+from authorityspoke.examples.brad import anchored_holdings as brad_holdings
+from authorityspoke.examples.watt import anchored_holdings as watt_holdings
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.nettlesome.terms import ContextRegister
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import loaders, readers
-from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.opinions import (
     AnchoredHoldings,
-    Opinion,
-    FactorIndex,
+    HoldingWithAnchors,
     OpinionReading,
     TermWithAnchors,
 )
+
+
+class TestAnchor:
+    def test_get_term_anchors(self, make_anchored_holding):
+        anchored = make_anchored_holding["mazza"]
+        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
+        anchors = anchored.get_term_anchors(key)
+        assert anchors.quotes[0].exact.startswith(
+            "without respect to whether or not Turismo"
+        )
+        assert len(anchored.holdings) == 2
+        key = "the fact that <Turismo Costa Brava> was a money transmitting business"
+        assert (
+            "Turismo conducted substantial money transmitting business"
+            in anchored.get_term_anchors(key).quotes[0].exact
+        )
 
 
 class TestOpinions:
@@ -177,20 +196,15 @@ class TestOpinionHoldings:
                 context=(Entity(name="House on Haunted Hill"), "nonexistent factor"),
             )
 
-    def test_new_context_creates_equal_rule(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_new_context_creates_equal_rule(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
-        client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
-        watt.posit(readers.read_holdings(watt_raw, client=client))
+        watt.posit(copy.deepcopy(watt_holdings().holdings))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.yaml")
-        brad.posit(readers.read_holdings(brad_raw, client=client))
+        brad.posit(copy.deepcopy(brad_holdings().holdings))
 
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
@@ -198,40 +212,29 @@ class TestOpinionHoldings:
             "officers' search of the yard": "officers' search of the stockpile",
             "Bradley's marijuana patch": "the stockpile of trees",
         }
-        watt.posit(brad.holdings[0], context_pairs)
+        watt.posit(holdings=brad.holdings[0], context=context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_getting_factors_from_opinion(
-        self, make_opinion_with_holding, make_response
-    ):
-        client = FakeClient(responses=make_response)
-
+    def test_getting_factors_from_opinion(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
-        holdings_to_posit = readers.read_holdings(watt_raw, client=client)
+        holdings_to_posit = copy.deepcopy(watt_holdings().holdings)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
         assert "proof of Wattenburg's guilt" in factors.keys()
 
-    def test_new_context_inferring_factors_to_change(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_new_context_inferring_factors_to_change(self, make_opinion_with_holding):
         """
         This changes watt's holdings; may break tests below.
         """
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
 
-        client = FakeClient(responses=make_response)
-
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
-        watt.posit(readers.read_holdings(watt_raw, client=client))
+        watt.posit(copy.deepcopy(watt_holdings().holdings))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.yaml")
-        brad.posit(readers.read_holdings(brad_raw, client=client))
+        brad.posit(copy.deepcopy(brad_holdings().holdings))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -247,10 +250,10 @@ class TestOpinionHoldings:
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         elephants = Fact(
-            predicate="$animal was an elephant", terms=Entity(name="the elephant")
+            predicate="{animal} was an elephant", terms=Entity(name="the elephant")
         )
         mouseholes = Fact(
-            predicate=Predicate(content="$animal hides in mouseholes", truth=False),
+            predicate=Predicate(content="{animal} hides in mouseholes", truth=False),
             terms=Entity(name="the elephant"),
         )
         procedure = Procedure(inputs=elephants, outputs=mouseholes)
@@ -260,6 +263,78 @@ class TestOpinionHoldings:
         factors = watt.factors_by_name()
         factor = factors["the fact that <the elephant> was an elephant"]
         assert factor.terms[0].name == "the elephant"
+
+    def test_posit_holding_normalizes_position_selector_to_positionset(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        selector = TextPositionSelector(start=3, end=8)
+        opinion.posit_holding(
+            copy.deepcopy(make_holding["h1"]), holding_anchors=selector
+        )
+
+        anchors = opinion.anchored_holdings.holdings[-1].anchors
+        assert isinstance(anchors, TextPositionSet)
+        assert anchors.positions == [selector]
+        assert anchors.quotes == []
+
+    def test_posit_holding_normalizes_quote_list_to_positionset(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        quote = TextQuoteSelector(exact="method of operation")
+        opinion.posit_holding(
+            copy.deepcopy(make_holding["h1"]),
+            holding_anchors=[quote, "process, system"],
+        )
+
+        anchors = opinion.anchored_holdings.holdings[-1].anchors
+        assert isinstance(anchors, TextPositionSet)
+        assert anchors.positions == []
+        assert [item.exact for item in anchors.quotes] == [
+            "method of operation",
+            "process, system",
+        ]
+
+    def test_posit_holding_rejects_invalid_anchor_list_item(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        with pytest.raises(TypeError):
+            opinion.posit_holding(
+                copy.deepcopy(make_holding["h1"]),
+                holding_anchors=[1],
+            )
+
+    def test_posit_holding_adds_anchors_for_matching_holding(
+        self, make_opinion_with_holding, make_holding
+    ):
+        opinion = make_opinion_with_holding["watt_majority"]
+        opinion.clear_holdings()
+
+        first_anchor = TextPositionSelector(start=1, end=2)
+        second_anchor = TextPositionSelector(start=4, end=5)
+
+        opinion.posit_holding(
+            copy.deepcopy(make_holding["h1"]),
+            holding_anchors=first_anchor,
+        )
+        opinion.posit_holding(
+            HoldingWithAnchors(
+                holding=copy.deepcopy(make_holding["h1"]),
+                anchors=TextPositionSet(positions=[second_anchor]),
+            )
+        )
+
+        assert len(opinion.anchored_holdings.holdings) == 1
+        positions = opinion.anchored_holdings.holdings[0].anchors.positions
+        assert [(item.start, item.end) for item in positions] == [(1, 2), (4, 5)]
 
 
 class TestOpinionFactors:
@@ -288,7 +363,7 @@ class TestOpinionFactors:
         anchors = TextPositionSet(quotes=quote_selector)
         fact = Fact(
             predicate=Predicate(
-                content="$product possessed at least some minimal degree of creativity"
+                content="{product} possessed at least some minimal degree of creativity"
             ),
             terms=[api],
         )
@@ -299,16 +374,16 @@ class TestOpinionFactors:
         assert len(index.named_anchors) == 1
         assert index.named_anchors[0].anchors.quotes == [quote_selector]
 
-    def test_get_factor_from_opinion(self, make_opinion_with_holding):
+    def test_get_term_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        company = oracle.get_factor_by_name("the Java API")
+        company = oracle.get_term_by_name("the Java API")
         assert isinstance(company, Entity)
 
     def test_factors_by_name(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        factors = oracle.factors_by_name()
-        factor = factors["false the Java API was an original work"]
-        assert factor.terms[0].name == "the Java API"
+        terms = oracle.factors_by_name()
+        term = terms["false the Java API was an original work"]
+        assert term.terms[0].name == "the Java API"
 
 
 class TestImplication:
@@ -337,16 +412,12 @@ class TestImplication:
         assert not watt >= brad
         assert not watt.implies(brad.holdings)
 
-    def test_posit_list_of_holdings_and_imply(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_posit_list_of_holdings_and_imply(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         watt.clear_holdings()
         brad.clear_holdings()
-        client = FakeClient(responses=make_response)
-        some_rules_raw = loaders.load_holdings(filename="holding_watt.yaml")
-        some_rules = readers.read_holdings(some_rules_raw, client=client)
+        some_rules = copy.deepcopy(watt_holdings().holdings)
         for case in (watt, brad):
             case.clear_holdings()
             case.posit(some_rules[:3])
@@ -402,6 +473,27 @@ class TestImplication:
 
 
 class TestContradiction:
+    def test_explanations_contradiction_changes_with_context(
+        self, make_opinion_with_holding
+    ):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus_holding = make_opinion_with_holding["lotus_majority"].holdings[6]
+        lotus_holdings = HoldingGroup([lotus_holding])
+
+        without_context = list(oracle.explanations_contradiction(lotus_holdings))
+        assert without_context
+
+        java_api = oracle.generic_terms()[0]
+        contradictory_context = ContextRegister()
+        contradictory_context.insert_pair(java_api, java_api)
+        with_context = list(
+            oracle.explanations_contradiction(
+                lotus_holdings,
+                context=contradictory_context,
+            )
+        )
+        assert not with_context
+
     def test_opinion_contradicts_opinion(self, make_opinion_with_holding):
         """Return the only contradictory pair of Holdings between these two Opinions."""
         oracle = make_opinion_with_holding["oracle_majority"]

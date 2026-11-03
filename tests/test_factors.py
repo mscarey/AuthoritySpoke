@@ -2,14 +2,14 @@ import operator
 
 import pytest
 
-from nettlesome.terms import ContextRegister, DuplicateTermError
-from nettlesome.terms import Explanation, TermSequence, means
-from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.terms import ContextRegister, DuplicateTermError
+from authorityspoke.nettlesome.terms import Explanation, TermSequence, means
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, Q_
 
-from authorityspoke.facts import Fact, build_fact
+from authorityspoke.facts import AbsenceOfFactor, Fact, build_fact
 
 
 class TestFacts:
@@ -119,7 +119,7 @@ class TestFacts:
         elaine = Entity(name="Elaine", generic=True)
         opened_account = Fact(
             predicate=Predicate(
-                content="$applicant opened a bank account for $applicant and $cosigner"
+                content="{applicant} opened a bank account for {applicant} and {cosigner}"
             ),
             terms=(devon, elaine),
         )
@@ -305,13 +305,13 @@ class TestSameMeaning:
 
         ann_and_bob_were_family = Fact(
             predicate=Predicate(
-                content="$relative1 and $relative2 both were members of the same family"
+                content="{relative1} and {relative2} both were members of the same family"
             ),
             terms=(ann, bob),
         )
         bob_and_ann_were_family = Fact(
             predicate=Predicate(
-                content="$relative1 and $relative2 both were members of the same family"
+                content="{relative1} and {relative2} both were members of the same family"
             ),
             terms=(bob, ann),
         )
@@ -324,7 +324,6 @@ class TestSameMeaning:
             e_copyright.means(watt_factor["f1"])
 
     def test_standard_of_proof_inequality(self, watt_factor):
-
         f = watt_factor
         assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
         assert not f["f2_clear_and_convincing"].means(f["f2"])
@@ -336,10 +335,10 @@ class TestSameMeaning:
         directory = Entity(name="Rural's telephone directory", plural=False)
         listings = Entity(name="Rural's telephone listings", plural=True)
         directory_original = Fact(
-            predicate=Predicate(content="$thing was original"), terms=directory
+            predicate=Predicate(content="{thing} was original"), terms=directory
         )
         listings_original = Fact(
-            predicate=Predicate(content="$thing were original"), terms=listings
+            predicate=Predicate(content="{thing} were original"), terms=listings
         )
         assert directory_original.means(listings_original)
 
@@ -505,11 +504,11 @@ class TestImplication:
 
     def test_some_interchangeable_entities(self):
         hit = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
         )
         hit2 = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[
                 Entity(name="Joker"),
                 Entity(name="Batman"),
@@ -520,15 +519,15 @@ class TestImplication:
 
     def test_interchangeable_entities_in_group(self):
         fought = Fact(
-            predicate="$person1, $person2, and $person3 fought each other",
+            predicate="{person1}, {person2}, and {person3} fought each other",
             terms=[Entity(name="Larry"), Entity(name="Moe"), Entity(name="Curly")],
         )
         hit = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
         )
         fought2 = Fact(
-            predicate="$person1, $person2, and $person3 fought each other",
+            predicate="{person1}, {person2}, and {person3} fought each other",
             terms=[
                 Entity(name="Superman"),
                 Entity(name="Batman"),
@@ -536,7 +535,7 @@ class TestImplication:
             ],
         )
         hit2 = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[
                 Entity(name="Joker"),
                 Entity(name="Batman"),
@@ -610,19 +609,20 @@ class TestContradiction:
         )
 
     def test_false_does_not_contradict_absent(self):
-        absent_fact = Fact(
-            predicate=Predicate(
-                content="${rural_s_telephone_directory} was copyrightable", truth=True
-            ),
-            terms=(Entity(name="Rural's telephone directory")),
-            absent=True,
+        absent_fact = AbsenceOfFactor(
+            absent=Fact(
+                predicate=Predicate(
+                    content="{rural_s_telephone_directory} was copyrightable",
+                    truth=True,
+                ),
+                terms=(Entity(name="Rural's telephone directory")),
+            )
         )
         false_fact = Fact(
             predicate=Predicate(
-                content="${the_java_api} was copyrightable", truth=False
+                content="{the_java_api} was copyrightable", truth=False
             ),
             terms=(Entity(name="the Java API", generic=True, plural=False)),
-            absent=False,
         )
         assert not false_fact.contradicts(absent_fact)
         assert not absent_fact.contradicts(false_fact)
@@ -632,13 +632,13 @@ class TestContradiction:
         Alice and Bob are both generics. So it's possible to reach a
         contradiction if you assume they correspond to one another.
         """
-        p_small_weight = Comparison(
-            content="the amount of gold $person possessed was",
+        p_small_weight = Comparison.new(
+            content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
-        p_large_weight = Comparison(
-            content="the amount of gold $person possessed was",
+        p_large_weight = Comparison.new(
+            content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
@@ -654,20 +654,20 @@ class TestContradiction:
         Alice in the first context corresponds with Alice in the second.
         So there's no contradiction.
         """
-        p_small_weight = Comparison(
-            content="the amount of gold $person possessed was",
+        p_small_weight = Comparison.new(
+            content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
-        p_large_weight = Comparison(
-            content="the amount of gold $person possessed was",
+        p_large_weight = Comparison.new(
+            content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Fact(predicate=p_large_weight, terms=alice)
-        bob_poor = Fact(predicate=p_small_weight, terms=bob)
+        alice_rich = Fact(predicate=p_large_weight, terms=[alice])
+        bob_poor = Fact(predicate=p_small_weight, terms=[bob])
         register = ContextRegister()
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)
@@ -709,7 +709,6 @@ class TestContradiction:
         assert not any(register is not None for register in update)
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
-
         register = ContextRegister()
         register.insert_pair(make_entity["dan"], make_entity["dan"])
         update = make_factor["f_irrelevant_3"].update_context_register(

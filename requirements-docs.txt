@@ -1,6 +1,5 @@
 justopinion==0.4.0
 legislice~=0.8.1
-nettlesome==0.7.1
 pint>=0.15
 python-slugify
 requests

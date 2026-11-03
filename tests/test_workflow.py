@@ -25,22 +25,22 @@ class TestAddHoldings:
         offense_statute = CLIENT.read("/us/usc/t18/s1960/a")
         no_license = Fact(
             predicate=Predicate(
-                content="$business was licensed as a money transmitting business",
+                content="{business} was licensed as a money transmitting business",
                 truth=False,
             ),
             terms=Entity(name="Helix"),
         )
         operated = Fact(
-            predicate=Predicate(content="$person operated $business as a business"),
+            predicate=Predicate(content="{person} operated {business} as a business"),
             terms=[Entity(name="Harmon"), Entity(name="Helix")],
         )
         transmitting = Fact(
-            predicate=Predicate(content="$business was a money transmitting business"),
+            predicate=Predicate(content="{business} was a money transmitting business"),
             terms=Entity(name="Helix"),
         )
         offense = Fact(
             predicate=Predicate(
-                content="$person committed the offense of conducting an unlicensed money transmitting business"
+                content="{person} committed the offense of conducting an unlicensed money transmitting business"
             ),
             terms=Entity(name="Harmon"),
         )
@@ -53,7 +53,7 @@ class TestAddHoldings:
         definition_statute = CLIENT.read("/us/usc/t18/s1960/b/2")
         bitcoin = Fact(
             predicate=Predicate(
-                content="$business transferred bitcoin on behalf of the public"
+                content="{business} transferred bitcoin on behalf of the public"
             ),
             terms=Entity(name="Helix"),
         )

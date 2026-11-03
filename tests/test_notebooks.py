@@ -11,7 +11,7 @@ import pytest
 
 from justopinion.download import CourtListenerClient
 
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, AbsenceOfFactor
 
 from authorityspoke import Entity, Predicate, Comparison
 
@@ -63,8 +63,8 @@ class TestIntroduction:
         the original holding, are added later.
         """
         lotus_majority = make_opinion_with_holding["lotus_majority"]
-        assert lotus_majority.holdings[0].outputs[0].absent is False
-        assert lotus_majority.holdings[1].outputs[0].absent is True
+        assert isinstance(lotus_majority.holdings[0].outputs[0], Fact)
+        assert isinstance(lotus_majority.holdings[1].outputs[0], AbsenceOfFactor)
 
     def test_change_rule_replacing_enactment(
         self, fake_usc_client, make_opinion_with_holding
@@ -186,8 +186,8 @@ class TestTemplateStrings:
 
     def test_no_line_break_in_fact_string(self):
         elaine = Entity(name="Elaine", generic=True)
-        tax_rate_over_25 = Comparison(
-            content="${taxpayer}'s marginal income tax rate was",
+        tax_rate_over_25 = Comparison.new(
+            content="{taxpayer}'s marginal income tax rate was",
             sign=">",
             expression=0.25,
         )
@@ -197,7 +197,7 @@ class TestTemplateStrings:
     def test_changing_order_of_concrete_terms_changes_meaning(self):
         ann = Entity(name="Ann", generic=False)
         bob = Entity(name="Bob", generic=False)
-        parent_sentence = Predicate(content="$mother was ${child}'s parent")
+        parent_sentence = Predicate(content="{mother} was {child}'s parent")
         ann_parent = Fact(predicate=parent_sentence, terms=(ann, bob))
         bob_parent = Fact(predicate=parent_sentence, terms=(bob, ann))
         assert str(ann_parent).lower() == "the fact that Ann was Bob's parent".lower()

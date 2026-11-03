@@ -17,8 +17,9 @@ from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Union
 
 from legislice.enactments import Enactment
+from legislice.groups import EnactmentGroup
 
-from nettlesome.terms import (
+from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
@@ -28,11 +29,11 @@ from nettlesome.terms import (
     contradicts,
     new_context_helper,
 )
-from nettlesome.factors import Factor
-from nettlesome.formatting import indented, wrapped
-from nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented, wrapped
+from authorityspoke.groups import FactorGroup
 
-from pydantic import field_validator, model_validator, BaseModel, validator
+from pydantic import field_validator, model_validator, BaseModel
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule, RawRule
@@ -135,21 +136,24 @@ class Holding(Comparable, BaseModel):
         outputs: FactorGroup,
         inputs: Optional[FactorGroup] = None,
         despite: Optional[FactorGroup] = None,
-        enactments: Sequence[Enactment] = (),
-        enactments_despite: Sequence[Enactment] = (),
+        enactments: Optional[EnactmentGroup] = None,
+        enactments_despite: Optional[EnactmentGroup] = None,
         mandatory: bool = False,
         universal: bool = False,
         generic: bool = False,
         decided: bool = True,
         exclusive: bool = False,
-        absent: bool = False,
     ):
         """Create new Holding without an existing Rule or Procedure."""
-        procedure = Procedure(inputs=inputs, outputs=outputs, despite=despite)
+        procedure = Procedure(
+            inputs=inputs or FactorGroup(),
+            outputs=outputs,
+            despite=despite or FactorGroup(),
+        )
         rule = Rule(
             procedure=procedure,
-            enactments=enactments,
-            enactments_despite=enactments_despite,
+            enactments=enactments or EnactmentGroup(),
+            enactments_despite=enactments_despite or EnactmentGroup(),
             mandatory=mandatory,
             universal=universal,
         )
@@ -163,17 +167,17 @@ class Holding(Comparable, BaseModel):
     @property
     def despite(self):
         """Get Factors that specifically don't preclude application of the Holding."""
-        return self.rule.procedure.despite_group
+        return self.rule.procedure.despite
 
     @property
     def inputs(self):
         """Get inputs from Procedure."""
-        return self.rule.procedure.inputs_group
+        return self.rule.procedure.inputs
 
     @property
     def outputs(self):
         """Get outputs from Procedure."""
-        return self.rule.procedure.outputs_group
+        return self.rule.procedure.outputs
 
     @property
     def enactments(self):
@@ -206,7 +210,7 @@ class Holding(Comparable, BaseModel):
         """
         return self.rule.procedure.terms
 
-    def generic_terms_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> dict[str, Comparable]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -295,7 +299,7 @@ class Holding(Comparable, BaseModel):
                     yield explanation
 
     def explanations_contradiction(
-        self, other: Factor, context: ContextRegister = None
+        self, other: Comparable, context: ContextRegister | Explanation | None = None
     ) -> Iterator[Explanation]:
         r"""
         Find context matches that would result in a contradiction with other.
@@ -351,7 +355,7 @@ class Holding(Comparable, BaseModel):
                 )
 
     def _explanations_implies_if_not_exclusive(
-        self, other: Factor, context: Explanation
+        self, other: Holding, context: Explanation
     ) -> Iterator[Explanation]:
         if self.decided and other.decided:
             yield from self._implies_if_decided(other, context)
@@ -369,7 +373,7 @@ class Holding(Comparable, BaseModel):
                 self.explanations_same_meaning(other.negated(), context),
             )
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
+    def __ge__(self, other: Comparable | None) -> bool:
         return self.implies(other)
 
     def comparable_with(self, other: Any) -> bool:
@@ -379,7 +383,9 @@ class Holding(Comparable, BaseModel):
         return not isinstance(other, Factor)
 
     def implies(
-        self, other: Optional[Comparable], context: ContextRegister = None
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
         Test for implication.
@@ -432,7 +438,9 @@ class Holding(Comparable, BaseModel):
             )
 
     def implied_by(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable | None,
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
         Test if other implies self.
@@ -441,15 +449,20 @@ class Holding(Comparable, BaseModel):
         that don't know the structure of the :class:`Holding` class,
         such as :class:`.Fact` and :class:`.Rule`\.
         """
+        if other is None:
+            return False
         if context:
-            context = context.reversed()
+            if isinstance(context, Explanation):
+                context = context.reversed_context()
+            else:
+                context = context.reversed()
         if isinstance(other, Rule):
             return Holding(rule=other).implies(self, context=context)
         return other.implies(self, context=context)
 
     def _implies_if_decided(
-        self, other: Holding, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Holding, context: Optional[Explanation] = None
+    ) -> Iterator[Explanation]:
         r"""
         Test if ``self`` implies ``other`` if they're both decided.
 
@@ -503,8 +516,8 @@ class Holding(Comparable, BaseModel):
         return []
 
     def explanations_same_meaning(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation | ContextRegister | None = None
+    ) -> Iterator[Explanation]:
         """Yield contexts that would cause self and other to have same meaning."""
         if (
             isinstance(other, self.__class__)
@@ -666,15 +679,24 @@ class HoldingGroup(FactorGroup):
 
     term_class = Holding
 
-    def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
+    def __init__(
+        self,
+        holdings: Union[Sequence[Holding], Holding] = (),
+        *,
+        sequence: Optional[Union[Sequence[Holding], Holding]] = None,
+    ):
         """Validate that HoldingGroup is created from a sequence of Holdings."""
+        if sequence is not None:
+            if holdings != ():
+                raise TypeError("Use either 'holdings' or 'sequence', not both.")
+            holdings = sequence
         if isinstance(holdings, Iterable):
             holdings = tuple(holdings)
         else:
             holdings = (holdings,)
         if any(not isinstance(holding, Holding) for holding in holdings):
             raise TypeError("All objects in HoldingGroup must be type Holding.")
-        self.sequence = holdings
+        super().__init__(sequence=holdings)
 
     def _explanations_implication_of_holding(
         self, other: Holding, context: Explanation
@@ -688,7 +710,7 @@ class HoldingGroup(FactorGroup):
     def explanations_implication(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Generate contexts in which all Holdings in other are implied by self."""
         if isinstance(other, Rule):
@@ -698,7 +720,7 @@ class HoldingGroup(FactorGroup):
         )
         if isinstance(other, Holding):
             yield from self._explanations_implication_of_holding(
-                other=other, context=context
+                other=other, context=explanation
             )
         elif isinstance(other, self.__class__):
             yield from self.verbose_comparison(
