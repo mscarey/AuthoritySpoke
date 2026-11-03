@@ -14,7 +14,7 @@ from legislice.download import (
     InboundReference,
 )
 from legislice.enactments import CrossReference, Enactment
-from legislice.types import RawEnactment
+from legislice.models import RawEnactment
 
 from authorityspoke.io import filepaths
 

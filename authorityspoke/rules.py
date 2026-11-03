@@ -15,7 +15,7 @@ from pydantic import field_validator, BaseModel, Field, ValidationError
 
 from legislice.enactments import Enactment, EnactmentPassage
 from authorityspoke.groups import EnactmentGroup, consolidate_passages
-from legislice.types import RawEnactment
+from legislice.models import RawEnactment
 
 from authorityspoke.nettlesome.terms import (
     Comparable,
@@ -125,7 +125,7 @@ class Rule(Term, BaseModel):
 
         try:
             return enactment_group_type(passages=list(v))
-        except (TypeError, ValidationError):
+        except TypeError, ValidationError:
             return enactment_group_type(passages=[v])
 
     @field_validator("enactments", "enactments_despite")
