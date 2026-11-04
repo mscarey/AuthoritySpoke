@@ -166,19 +166,19 @@ class Comparable(ABC):
         return bool(self.implies(other) and not self.compare_keys(other))
 
     def _all_generic_terms_match(self, other: Self, context: ContextRegister) -> bool:
-        if all(
+        return bool(
             all(
-                context.assigns_same_value_to_key_factor(
-                    other=other_register, key_factor=generic
+                all(
+                    context.assigns_same_value_to_key_factor(
+                        other=other_register, key_factor=generic
+                    )
+                    for generic in self.generic_terms()
                 )
-                for generic in self.generic_terms()
+                for other_register in self._context_registers(
+                    other=other, comparison=means, context=context
+                )
             )
-            for other_register in self._context_registers(
-                other=other, comparison=means, context=context
-            )
-        ):
-            return True
-        return False
+        )
 
     def consistent_with(
         self, other: Comparable | None, context: ContextRegister | None = None
@@ -241,9 +241,10 @@ class Comparable(ABC):
         second ordering "<Bob> and <Ann> both were members of the same family".
         """
         for i, self_factor in enumerate(ordering):
-            if not (self_factor is other.term_sequence[i] is None):
-                if not (self_factor and relation(self_factor, other.term_sequence[i])):
-                    return False
+            if not (self_factor is other.term_sequence[i] is None) and not (
+                self_factor and relation(self_factor, other.term_sequence[i])
+            ):
+                return False
         return True
 
     def _context_registers(
