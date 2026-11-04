@@ -394,7 +394,7 @@ class FactorGroup(
         context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Generate explanations for how other may imply self."""
-        context = context = Explanation.from_context(
+        context = Explanation.from_context(
             context=context, current=self, incoming=other
         )
         yield from self._explanations_implied_by(other=other, explanation=context)

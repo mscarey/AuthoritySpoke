@@ -437,7 +437,7 @@ class Comparable(ABC):
             ``True`` if self and other can't both be true at
             the same time. Otherwise returns ``False``.
         """
-        context = context = Explanation.from_context(
+        context = Explanation.from_context(
             context=context, current=self, incoming=other
         )
         for new in self._explanations_consistent_with(other, explanation=context):
@@ -533,7 +533,7 @@ class Comparable(ABC):
         context: None | ContextRegister | Explanation = None,
     ) -> Iterator[Explanation]:
         """Generate explanations for how other may imply self."""
-        context = context = Explanation.from_context(
+        context = Explanation.from_context(
             context=context, current=self, incoming=other
         )
         for new in self._explanations_implied_by(other=other, explanation=context):
@@ -551,7 +551,7 @@ class Comparable(ABC):
         context: None | ContextRegister | Explanation = None,
     ) -> Iterator[Explanation]:
         """Generate ways to match contexts of self and other so they mean the same."""
-        context = context = Explanation.from_context(
+        context = Explanation.from_context(
             context=context, current=self, incoming=other
         )
         for new in self._explanations_same_meaning(other=other, explanation=context):
@@ -878,12 +878,12 @@ class Comparable(ABC):
         unused_self = [
             factor
             for factor in self.generic_terms()
-            if factor.short_string not in context.matches.keys()
+            if factor.short_string not in context.matches
         ]
         unused_other = [
             factor
             for factor in other.generic_terms()
-            if factor.short_string not in context.reverse_matches.keys()
+            if factor.short_string not in context.reverse_matches
         ]
         if not (unused_self and unused_other):
             yield context
@@ -1729,9 +1729,9 @@ class TermSequence(RootModel):
 # Type annotation of formats for describing the context of a comparison
 # between two Factors. All of these can be converted to a ContextRegister
 # using information from the Factors being compared.
-ContextMemo = Union[
-    ContextRegister,
-    Sequence[str | Term],
-    tuple[Sequence[str | Term], Sequence[str | Term]],
-    dict[str, str | Term],
-]
+ContextMemo = (
+    ContextRegister
+    | Sequence[str | Term]
+    | tuple[Sequence[str | Term], Sequence[str | Term]]
+    | dict[str, str | Term]
+)
