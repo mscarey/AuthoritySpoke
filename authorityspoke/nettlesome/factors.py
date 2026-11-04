@@ -1,7 +1,7 @@
 """Factors that can be included in FactorGroups."""
 
 from collections.abc import Iterator
-from typing import ClassVar, Tuple
+from typing import ClassVar
 
 from pydantic import BaseModel
 

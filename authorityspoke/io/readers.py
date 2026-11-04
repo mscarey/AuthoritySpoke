@@ -5,13 +5,11 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 
-from typing import Union
-
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import Allegation, Evidence, Exhibit, Fact, Pleading
 from authorityspoke.nettlesome.entities import Entity
 
-RawSelector = Union[str, dict[str, str]]
+RawSelector = str | dict[str, str]
 
 
 FACTOR_SUBCLASSES = {

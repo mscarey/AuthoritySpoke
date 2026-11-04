@@ -10,7 +10,6 @@ from copy import deepcopy
 from typing import (
     Any,
     ClassVar,
-    Generic,
     Self,
     TypeVar,
     cast,

@@ -130,9 +130,7 @@ class FakeClient(Client):
             selected_date = max(responses.keys())
         else:
             versions_not_later_than_query = [
-                version_date
-                for version_date in responses.keys()
-                if version_date <= date
+                version_date for version_date in responses if version_date <= date
             ]
             if not versions_not_later_than_query:
                 raise ValueError(

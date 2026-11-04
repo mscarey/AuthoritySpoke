@@ -7,3 +7,15 @@ from .quantities import Comparison, DateRange, DecimalRange, UnitRange
 from .statements import Assertion, Statement
 
 __version__ = "0.7.1"
+
+__all__ = [
+    "Assertion",
+    "Comparison",
+    "DateRange",
+    "DecimalRange",
+    "Entity",
+    "FactorGroup",
+    "Predicate",
+    "Statement",
+    "UnitRange",
+]
