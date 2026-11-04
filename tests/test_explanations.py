@@ -39,7 +39,9 @@ class TestContext:
         register = ContextRegister()
         register.insert_pair(Entity(name="Al"), Entity(name="Alice"))
         explanation = self.fact_al.explain_consistent_with(self.fact_alice, register)
-        assert "<the bull> is like <the cow>" in str(explanation.context)
+        assert explanation and "<the bull> is like <the cow>" in str(
+            explanation.context
+        )
 
 
 class TestExplainHoldings:

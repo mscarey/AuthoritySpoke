@@ -68,10 +68,7 @@ class TestFacts:
         )
         assert f2.terms == [e["watt"], e["trees"]]
 
-    def test_wrong_type_in_terms_in_init(
-        self, make_entity, make_predicate, watt_mentioned
-    ):
-        e = make_entity
+    def test_wrong_type_in_terms_in_init(self, make_predicate, watt_mentioned):
         with pytest.raises(TypeError):
             assert build_fact(
                 make_predicate["p1"],
