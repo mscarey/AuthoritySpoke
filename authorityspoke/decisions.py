@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import operator
 from collections.abc import Iterator, Sequence
-from typing import Dict, List, Optional, Tuple, Union
 
 from anchorpoint.textselectors import (
     TextPositionSelector,
@@ -87,7 +86,11 @@ class DecisionReading(BaseModel, Comparable):
 
     def select_text(
         self,
-        selector: bool | str | TextPositionSelector | TextQuoteSelector | Sequence[str | TextQuoteSelector | TextPositionSelector],
+        selector: bool
+        | str
+        | TextPositionSelector
+        | TextQuoteSelector
+        | Sequence[str | TextQuoteSelector | TextPositionSelector],
         opinion_type: str = "",
         opinion_author: str = "",
     ) -> TextSequence | None:
@@ -235,7 +238,11 @@ class DecisionReading(BaseModel, Comparable):
 
     def posit(
         self,
-        holdings: AnchoredHoldings | Holding | Rule | HoldingWithAnchors | list[HoldingWithAnchors | Holding | Rule],
+        holdings: AnchoredHoldings
+        | Holding
+        | Rule
+        | HoldingWithAnchors
+        | list[HoldingWithAnchors | Holding | Rule],
         holding_anchors: list[
             TextPositionSelector
             | TextQuoteSelector
@@ -323,9 +330,7 @@ class DecisionReading(BaseModel, Comparable):
             for self_holding in self.holdings
         )
 
-    def implies_rule(
-        self, other: Rule, context: ContextRegister | None = None
-    ) -> bool:
+    def implies_rule(self, other: Rule, context: ContextRegister | None = None) -> bool:
         """Check if a Holding of self implies a Holding made from other Rule."""
         return self.implies_holding(Holding(rule=other), context=context)
 

@@ -8,7 +8,6 @@ from copy import deepcopy
 from typing import (
     Any,
     ClassVar,
-    Union,
 )
 
 from pydantic import (
@@ -81,9 +80,7 @@ class Fact(Factor, BaseModel):
     """
 
     predicate: Predicate | Comparison
-    terms: list[
-        Entity | Fact | Allegation | Pleading | Exhibit | Evidence
-    ] = []
+    terms: list[Entity | Fact | Allegation | Pleading | Exhibit | Evidence] = []
     name: str = ""
     generic: bool = False
     standard_of_proof: str | None = None
@@ -676,4 +673,4 @@ class AbsenceOfFactor(AbsenceOf):
     absent: Fact | Evidence | Exhibit | Pleading | Allegation
 
 
-FactorOrAbsence = Union[Fact, AbsenceOfFactor, Exhibit, Pleading, Allegation, Evidence]
+FactorOrAbsence = Fact | AbsenceOfFactor | Exhibit | Pleading | Allegation | Evidence
