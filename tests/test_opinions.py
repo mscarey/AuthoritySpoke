@@ -219,7 +219,7 @@ class TestOpinionHoldings:
         holdings_to_posit = copy.deepcopy(watt_holdings().holdings)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
-        assert "proof of Wattenburg's guilt" in factors.keys()
+        assert "proof of Wattenburg's guilt" in factors
 
     def test_new_context_inferring_factors_to_change(self, make_opinion_with_holding):
         """
