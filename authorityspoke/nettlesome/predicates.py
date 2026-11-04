@@ -443,7 +443,7 @@ class PhraseABC(metaclass=ABCMeta):
         result: Dict[str, Set[int]] = {p: {i} for i, p in enumerate(without_duplicates)}
 
         for index, placeholder in enumerate(without_duplicates):
-            if placeholder[-1].isdigit:
+            if placeholder[-1].isdigit():
                 for k, v in result.items():
                     if k[-1].isdigit() and k[:-1] == placeholder[:-1]:
                         result[k].add(index)
