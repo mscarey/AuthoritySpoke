@@ -51,11 +51,7 @@ def unique_explanations(func: Callable):
     return wrapper
 
 
-class FactorGroup(
-    Comparable,
-    RootModel[tuple[FactorGroupItem, ...]],
-    Generic[FactorGroupItem],
-):
+class FactorGroup[FactorGroupItem](Comparable, RootModel[tuple[FactorGroupItem, ...]]):
     r"""Terms to be used together in a comparison."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)

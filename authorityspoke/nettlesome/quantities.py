@@ -33,9 +33,7 @@ def scale_interval(interval: Interval, scalar: float) -> Interval:
     )
 
 
-def scale_union_of_intervals(
-    ranges: sympy.Union, scalar: float
-) -> sympy.Union:
+def scale_union_of_intervals(ranges: sympy.Union, scalar: float) -> sympy.Union:
     """
     Scale up union of several intervals by multiplying by a scalar.
 
@@ -94,7 +92,7 @@ class QuantityRange(BaseModel):
     def check_sign(cls, v: str) -> str:
         if v in cls.normalized_comparisons:
             v = cls.normalized_comparisons[v]
-        if v not in cls.opposite_comparisons.keys():
+        if v not in cls.opposite_comparisons:
             raise ValueError(
                 f'"sign" string parameter must be one of {cls.opposite_comparisons.keys()}, not {v}.'
             )
@@ -240,7 +238,6 @@ class UnitRange(QuantityRange, BaseModel):
     @property
     def magnitude(self) -> Decimal | int:
         """Get magnitude of pint Quantity."""
-        super().magnitude  # for the coverage
         return self.q.magnitude
 
     def consistent_dimensionality(self, other: QuantityRange) -> bool:
