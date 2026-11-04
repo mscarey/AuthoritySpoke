@@ -642,24 +642,21 @@ class Procedure(Comparable, BaseModel):
         self, other: Procedure, context: Explanation
     ):
         def same_outputs(context: Explanation):
-            for explanation in self.outputs.explanations_same_meaning(
+            yield from self.outputs.explanations_same_meaning(
                 other=other.outputs, context=context
-            ):
-                yield explanation
+            )
 
         def same_inputs(contexts: Iterable[Explanation]):
-            for context in contexts:
-                for explanation in self.inputs.explanations_same_meaning(
-                    other=other.inputs, context=context
-                ):
-                    yield explanation
+            for inner_context in contexts:
+                yield from self.inputs.explanations_same_meaning(
+                    other=other.inputs, context=inner_context
+                )
 
         def same_despite(contexts: Iterable[Explanation]):
-            for context in contexts:
-                for explanation in self.despite.explanations_same_meaning(
-                    other=other.despite, context=context
-                ):
-                    yield explanation
+            for inner_context in contexts:
+                yield from self.despite.explanations_same_meaning(
+                    other=other.despite, context=inner_context
+                )
 
         yield from same_despite(same_inputs(same_outputs(context)))
 
