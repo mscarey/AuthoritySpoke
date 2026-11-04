@@ -73,9 +73,9 @@ class TestFacts:
     ):
         e = make_entity
         with pytest.raises(TypeError):
-            f2 = build_fact(
+            assert build_fact(
                 make_predicate["p1"],
-                indices=("nonsense"),
+                indices=("nonsense"),  # ty: ignore[invalid-argument-type]
                 case_factors=watt_mentioned,
             )
 

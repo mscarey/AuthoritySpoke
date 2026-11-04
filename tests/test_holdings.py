@@ -243,7 +243,6 @@ class TestImplication:
     def test_holding_implies_opinion_with_no_holdings(
         self, make_opinion_with_holding, make_opinion
     ):
-        lotus = make_opinion["lotus_majority"]
         reading = OpinionReading()
         holding = make_opinion_with_holding["oracle_majority"].holdings[0]
         context = ContextRegister()

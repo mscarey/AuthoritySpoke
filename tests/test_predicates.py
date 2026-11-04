@@ -120,7 +120,7 @@ class TestPredicates:
 
     def test_predicate_has_no_expression_comparison(self, make_predicate):
         with pytest.raises(AttributeError):
-            make_predicate["p1"].expression_comparison() == ""
+            assert make_predicate["p1"].expression_comparison() == ""
 
     def test_context_slots(self, make_predicate):
         assert len(make_predicate["p7"]) == 2
