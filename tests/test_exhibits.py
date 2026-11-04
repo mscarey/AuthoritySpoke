@@ -104,7 +104,7 @@ class TestExhibitsImplication:
             >= make_exhibit["reciprocal_declaration"]
         )
         assert (
-            not make_exhibit["reciprocal_testimony"]
+            not make_exhibit["reciprocal_testimony"]  # noqa: SIM201
             == make_exhibit["reciprocal_declaration"]
         )
 

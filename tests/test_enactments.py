@@ -84,9 +84,9 @@ class TestEnactments:
         assert e_due_process_5.means(e_due_process_14)
 
     def test_not_gt_if_equal(self, e_search_clause):
-        assert e_search_clause == e_search_clause
+        assert e_search_clause == e_search_clause  # noqa: PLR0124
         assert e_search_clause.means(e_search_clause)
-        assert not e_search_clause > e_search_clause
+        assert not e_search_clause > e_search_clause  # noqa: PLR0124
 
     def test_enactment_subset_or_equal(self, e_due_process_5, e_due_process_14):
         assert e_due_process_5 >= e_due_process_14
@@ -101,7 +101,7 @@ class TestEnactments:
 
     def test_comparison_to_factor_false(self, e_due_process_5, watt_factor):
         f1 = watt_factor["f1"]
-        assert not e_due_process_5 == f1
+        assert e_due_process_5 != f1
 
     def test_implication_of_factor_fails(self, e_due_process_5, watt_factor):
         f1 = watt_factor["f1"]
