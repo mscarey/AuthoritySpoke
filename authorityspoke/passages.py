@@ -1,6 +1,6 @@
+from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
 from legislice.enactments import EnactmentPassage
-from anchorpoint.textselectors import TextQuoteSelector
 
 
 def passage_from_quotes(

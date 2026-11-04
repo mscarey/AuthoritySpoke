@@ -1,4 +1,3 @@
-from authorityspoke.opinions import TermWithAnchors
 
 
 class TestCollectAnchors:

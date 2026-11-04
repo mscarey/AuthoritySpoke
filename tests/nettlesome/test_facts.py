@@ -4,13 +4,18 @@ import operator
 
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister, DuplicateTermError
-from authorityspoke.nettlesome.terms import Explanation, TermSequence, means
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.factors import AbsenceOf
 from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.quantities import Q_, Comparison
 from authorityspoke.nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import (
+    ContextRegister,
+    DuplicateTermError,
+    Explanation,
+    TermSequence,
+    means,
+)
 
 
 class TestFacts:

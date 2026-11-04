@@ -4,24 +4,23 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import Dict, NoReturn, Optional, Union
+from typing import NoReturn
 
 from legislice.download import (
-    Client,
-    normalize_path,
-    LegislicePathError,
     CitingProvisionLocation,
+    Client,
     InboundReference,
+    LegislicePathError,
+    normalize_path,
 )
 from legislice.enactments import CrossReference, Enactment
 from legislice.models import PublicationCoverage, RawEnactment
 
 from authorityspoke.io import filepaths
 
-
 # A dict indexing responses by iso-format date strings.
-ResponsesByDate = Dict[str, RawEnactment]
-ResponsesByDateByPath = Dict[str, Dict[str, ResponsesByDate]]
+ResponsesByDate = dict[str, RawEnactment]
+ResponsesByDateByPath = dict[str, dict[str, ResponsesByDate]]
 
 
 class FakeClient(Client):
@@ -68,7 +67,7 @@ class FakeClient(Client):
             responses = json.load(f)
         return cls(responses)
 
-    def get_entry_closest_to_cited_path(self, path: str) -> Optional[ResponsesByDate]:
+    def get_entry_closest_to_cited_path(self, path: str) -> ResponsesByDate | None:
         """Get key from responses attribute that gets the closest to the given path."""
         path = normalize_path(path)
         if self.responses.get(path):
@@ -83,7 +82,7 @@ class FakeClient(Client):
 
     def search_tree_for_path(
         self, path: str, branch: RawEnactment
-    ) -> Optional[RawEnactment]:
+    ) -> RawEnactment | None:
         """Search responses attribute for keys that are partial paths to the given path."""
         path = normalize_path(path)
         if branch["node"] == path:
@@ -101,8 +100,8 @@ class FakeClient(Client):
 
     def fetch(
         self,
-        query: Union[str, CitingProvisionLocation, CrossReference, InboundReference],
-        date: Union[datetime.date, str] = "",
+        query: str | CitingProvisionLocation | CrossReference | InboundReference,
+        date: datetime.date | str = "",
     ) -> RawEnactment:
         """
         Fetch data about legislation at specified path and date from Client's assigned API root.
@@ -161,8 +160,8 @@ class FakeClient(Client):
 
     def read(
         self,
-        query: Union[str, CrossReference],
-        date: Union[datetime.date, str] = "",
+        query: str | CrossReference,
+        date: datetime.date | str = "",
     ) -> Enactment:
         """Use text expansion, unlike a real client."""
         raw_enactment = self.fetch(query=query, date=date)

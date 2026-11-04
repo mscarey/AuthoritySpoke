@@ -6,33 +6,32 @@ or specify the :class:`.Enactment`\s that might require them.
 """
 
 from __future__ import annotations
+
+from collections.abc import Iterable, Iterator, Sequence
 from copy import deepcopy
-
 from itertools import chain
+from typing import (
+    ClassVar,
+    Self,
+)
 
-from typing import ClassVar, Dict, Iterable, Iterator
-from typing import List, Optional, Self, Sequence, Tuple, Union
+from pydantic import BaseModel, Field, TypeAdapter, field_validator
 
-from pydantic import field_validator, model_validator, BaseModel, Field, TypeAdapter
-
+from authorityspoke.facts import AbsenceOfFactor, FactorOrAbsence, RawFactor
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
-    new_context_helper,
     Term,
     TermSequence,
+    new_context_helper,
 )
-from authorityspoke.nettlesome.factors import Factor
-from authorityspoke.groups import FactorGroup
-from authorityspoke.nettlesome.formatting import indented
 
-from authorityspoke.facts import FactorOrAbsence, AbsenceOfFactor
-from authorityspoke.facts import RawFactor
-
-
-RawProcedure = Dict[str, Sequence[RawFactor]]
-FACTOR_LIST_ADAPTER = TypeAdapter(List[FactorOrAbsence])
+RawProcedure = dict[str, Sequence[RawFactor]]
+FACTOR_LIST_ADAPTER = TypeAdapter(list[FactorOrAbsence])
 
 
 class Procedure(Comparable, BaseModel):
@@ -89,22 +88,16 @@ class Procedure(Comparable, BaseModel):
     name: str = ""
     absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("outputs", "inputs", "despite")
+    context_factor_names: ClassVar[tuple[str, ...]] = ("outputs", "inputs", "despite")
 
     @classmethod
     def _coerce_factor_group(
         cls,
-        v: Union[
-            Factor,
-            Dict,
-            Sequence[Factor | Dict],
-            FactorGroup[FactorOrAbsence],
-            None,
-        ],
+        v: Factor | dict | Sequence[Factor | dict] | FactorGroup[FactorOrAbsence] | None,
         *,
         require_nonempty: bool,
         group_name: str,
-    ) -> List[FactorOrAbsence]:
+    ) -> list[FactorOrAbsence]:
         if isinstance(v, str):
             if group_name == "outputs":
                 raise TypeError("outputs of Procedure cannot be type str")
@@ -113,11 +106,11 @@ class Procedure(Comparable, BaseModel):
             )
 
         if v is None:
-            values: List[FactorOrAbsence] = []
+            values: list[FactorOrAbsence] = []
         elif isinstance(v, FactorGroup):
             values = list(v)
         else:
-            items = [v] if isinstance(v, (Factor, Dict)) else list(v)
+            items = [v] if isinstance(v, (Factor, dict)) else list(v)
             values = FACTOR_LIST_ADAPTER.validate_python(items)
 
         if require_nonempty and not values:
@@ -125,7 +118,7 @@ class Procedure(Comparable, BaseModel):
         return values
 
     @property
-    def groups(self) -> List[FactorGroup[FactorOrAbsence]]:
+    def groups(self) -> list[FactorGroup[FactorOrAbsence]]:
         """Get input, output, and despite Factors as FactorGroups."""
         return [self.outputs, self.inputs, self.despite]
 
@@ -133,34 +126,23 @@ class Procedure(Comparable, BaseModel):
     @classmethod
     def _validate_outputs(
         cls,
-        v: Union[
-            Factor,
-            Dict,
-            Sequence[Factor | Dict],
-            FactorGroup[FactorOrAbsence],
-        ],
-    ) -> List[FactorOrAbsence]:
+        v: Factor | dict | Sequence[Factor | dict] | FactorGroup[FactorOrAbsence],
+    ) -> list[FactorOrAbsence]:
         return cls._coerce_factor_group(v, require_nonempty=True, group_name="outputs")
 
     @field_validator("inputs", "despite", mode="before")
     @classmethod
     def _validate_factor_groups(
         cls,
-        v: Union[
-            Factor,
-            Dict,
-            Sequence[Factor | Dict],
-            FactorGroup[FactorOrAbsence],
-            None,
-        ],
-    ) -> List[FactorOrAbsence]:
+        v: Factor | dict | Sequence[Factor | dict] | FactorGroup[FactorOrAbsence] | None,
+    ) -> list[FactorOrAbsence]:
         return cls._coerce_factor_group(v, require_nonempty=False, group_name="inputs")
 
     def add(
         self,
         other: Factor | AbsenceOfFactor | Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
-    ) -> Optional[Procedure]:
+        context: ContextRegister | Explanation | None = None,
+    ) -> Procedure | None:
         """Show how first Procedure triggers the second if not both are universal."""
         if not isinstance(other, Procedure):
             return self.with_factor(other)
@@ -170,13 +152,13 @@ class Procedure(Comparable, BaseModel):
                 return added
         return None
 
-    def __add__(self, other: Procedure) -> Optional[Procedure]:
+    def __add__(self, other: Procedure) -> Procedure | None:
         """Show how first Procedure triggers the second if not both are universal."""
         return self.add(other)
 
     def _add_if_universal(
         self, other: Procedure, explanation: Explanation
-    ) -> Optional[Procedure]:
+    ) -> Procedure | None:
         """Show how first Procedure triggers the second if both are universal."""
         self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
         other_input = list(other.inputs)
@@ -215,7 +197,7 @@ class Procedure(Comparable, BaseModel):
         return result
 
     def _explanations_union_partial(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+        self, other: Procedure, context: ContextRegister | None = None
     ) -> Iterable[ContextRegister]:
         """Yield as much of the context as seems likely correct based on this Procedure."""
         yield from self.likely_contexts(other, context)
@@ -223,7 +205,7 @@ class Procedure(Comparable, BaseModel):
     def explanations_union(
         self,
         other: Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[ContextRegister]:
         """Yield explanations of contexts that allow combining these Procedures."""
         if not isinstance(context, Explanation):
@@ -236,7 +218,7 @@ class Procedure(Comparable, BaseModel):
 
     def _union_from_explanation(
         self, other: Procedure, context: ContextRegister
-    ) -> Optional[Procedure]:
+    ) -> Procedure | None:
         r"""
         Combine two :class:`Procedure`\s into one.
 
@@ -287,7 +269,7 @@ class Procedure(Comparable, BaseModel):
         return text
 
     @property
-    def factors_all(self) -> List[Factor]:
+    def factors_all(self) -> list[Factor]:
         r"""
         Get :class:`.Factor`\s in ``inputs``, ``outputs``, and ``despite``.
 
@@ -300,7 +282,7 @@ class Procedure(Comparable, BaseModel):
         return [*self.outputs, *inputs, *despite]
 
     @property
-    def recursive_terms(self) -> Dict[str, Term]:
+    def recursive_terms(self) -> dict[str, Term]:
         r"""
         Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
@@ -308,7 +290,7 @@ class Procedure(Comparable, BaseModel):
             a :class:`dict` (instead of a :class:`set`,
             to preserve order) of :class:`Term`\s.
         """
-        answers: Dict[str, Term] = {}
+        answers: dict[str, Term] = {}
 
         for context in self.groups:
             if context:
@@ -325,7 +307,7 @@ class Procedure(Comparable, BaseModel):
             for whichever subclass of :class:`Factor` calls this method. These
             can be used for comparing objects using :meth:`consistent_with`
         """
-        result: List[Term] = []
+        result: list[Term] = []
         for group in (self.outputs, self.inputs, self.despite):
             for factor in group:
                 if isinstance(factor, Term):
@@ -366,7 +348,7 @@ class Procedure(Comparable, BaseModel):
         new_factors = self.inputs.add_or_raise_error(incoming)
         self.set_inputs(new_factors)
 
-    def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Optional[Procedure]:
+    def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Procedure | None:
         """
         Create new Procedure with added input :class:`.Factor`.
 
@@ -383,7 +365,7 @@ class Procedure(Comparable, BaseModel):
         result.set_inputs(new_factors)
         return result
 
-    def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
+    def contradicts(self, other, context: ContextRegister | None = None) -> bool:
         r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in some.
 
@@ -400,7 +382,7 @@ class Procedure(Comparable, BaseModel):
         )
 
     def contradicts_some_to_all(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+        self, other: Procedure, context: ContextRegister | None = None
     ) -> bool:
         r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in all.
@@ -443,7 +425,7 @@ class Procedure(Comparable, BaseModel):
     def explain_contradiction_some_to_all(
         self,
         other: Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Explain why ``other`` can't apply in all cases if ``self`` applies in some."""
         if not isinstance(context, Explanation):
@@ -475,7 +457,7 @@ class Procedure(Comparable, BaseModel):
         yield from self.explanations_same_meaning(other, context)
 
         def other_outputs_implied(
-            context: Optional[Explanation],
+            context: Explanation | None,
         ) -> Iterator[Explanation]:
             for explanation in self.outputs.explanations_implication(
                 other.outputs, context=context
@@ -505,7 +487,7 @@ class Procedure(Comparable, BaseModel):
             yield from self._explain_implication_all_to_all_of_procedure(other, context)
 
     def implies_all_to_all(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+        self, other: Procedure, context: ContextRegister | None = None
     ) -> bool:
         """
         Find if ``self`` applying in all cases implies ``other`` applies in all.
@@ -571,7 +553,7 @@ class Procedure(Comparable, BaseModel):
             )
 
     def implies_all_to_some(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+        self, other: Procedure, context: ContextRegister | None = None
     ) -> bool:
         r"""
         Find if ``self`` applying in all cases implies ``other`` applies in some.
@@ -750,7 +732,7 @@ class Procedure(Comparable, BaseModel):
     def triggers_next_procedure(
         self,
         other: Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         r"""
         Test if :class:`.Factor`\s from firing ``self`` would trigger ``other``.
@@ -782,13 +764,13 @@ class Procedure(Comparable, BaseModel):
                 other.despite, context=explanation_1
             )
 
-    def __or__(self, other: Comparable) -> Optional[Comparable]:
+    def __or__(self, other: Comparable) -> Comparable | None:
         return self.union(other)
 
     def union(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Procedure | None:
         """Get a procedure with all the inputs and outputs of self and other."""
         if not isinstance(context, Explanation):
@@ -825,4 +807,3 @@ class Procedure(Comparable, BaseModel):
                 + "with no 'input' Factors, since the 'exclusive' attribute "
                 + "asserts that the inputs are the only way to reach the output."
             )
-        return None

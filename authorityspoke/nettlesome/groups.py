@@ -2,24 +2,33 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 import functools
 import operator
 import textwrap
-from typing import Any, Callable, ClassVar, Dict, Generic, Iterator, List
-from typing import Optional, Sequence, Tuple, TypeVar, Union
-from typing import cast
-from typing import Self
+from collections.abc import Callable, Iterator, Sequence
+from copy import deepcopy
+from typing import (
+    Any,
+    ClassVar,
+    Generic,
+    Self,
+    TypeVar,
+    cast,
+)
+
 from pydantic import ConfigDict, RootModel, field_validator, model_validator
 
-from authorityspoke.nettlesome.factors import Factor, AbsenceOf
+from authorityspoke.nettlesome.factors import AbsenceOf, Factor
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextMemo,
     ContextRegister,
     DuplicateTermError,
+    Explanation,
+    Term,
+    contradicts,
+    means,
 )
-from authorityspoke.nettlesome.terms import Explanation, Term, contradicts, means
 
 FactorGroupItem = TypeVar("FactorGroupItem")
 
@@ -31,9 +40,9 @@ def unique_explanations(func: Callable):
     def wrapper(
         factor,
         other: Comparable,
-        context: Optional[Union[ContextMemo, Explanation]] = None,
+        context: ContextMemo | Explanation | None = None,
     ) -> Iterator[Explanation]:
-        seen: List[Explanation] = []
+        seen: list[Explanation] = []
         for explanation in func(factor, other, context):
             if not any(explanation.means(item) for item in seen):
                 seen.append(explanation)
@@ -44,7 +53,7 @@ def unique_explanations(func: Callable):
 
 class FactorGroup(
     Comparable,
-    RootModel[Tuple[FactorGroupItem, ...]],
+    RootModel[tuple[FactorGroupItem, ...]],
     Generic[FactorGroupItem],
 ):
     r"""Terms to be used together in a comparison."""
@@ -54,8 +63,8 @@ class FactorGroup(
     term_class: ClassVar[type] = Factor
     absence_class: ClassVar[type] = AbsenceOf
     generic: ClassVar[bool] = False  # pyright: ignore[reportIncompatibleVariableOverride]
-    context_factor_names: ClassVar[Tuple[str, ...]] = ()
-    root: Tuple[FactorGroupItem, ...] = ()
+    context_factor_names: ClassVar[tuple[str, ...]] = ()
+    root: tuple[FactorGroupItem, ...] = ()
 
     def __init__(self, /, *args, **kwargs):
         if "sequence" in kwargs:
@@ -102,7 +111,7 @@ class FactorGroup(
         return tuple(value)
 
     @property
-    def sequence(self) -> Tuple[FactorGroupItem, ...]:
+    def sequence(self) -> tuple[FactorGroupItem, ...]:
         return tuple(self.root)
 
     def append(self, value: FactorGroupItem) -> None:
@@ -115,7 +124,7 @@ class FactorGroup(
     def _at_index(self, key: int) -> FactorGroupItem:
         return self.sequence[key]
 
-    def __getitem__(self, key: Union[int, slice]) -> Union[FactorGroupItem, Self]:
+    def __getitem__(self, key: int | slice) -> FactorGroupItem | Self:
         if isinstance(key, slice):
             start, stop, step = key.indices(len(self))
             return self.__class__(
@@ -125,11 +134,8 @@ class FactorGroup(
 
     def __setitem__(
         self,
-        key: Union[int, slice],
-        value: Union[
-            Comparable,
-            Sequence[Comparable],
-        ],
+        key: int | slice,
+        value: Comparable | Sequence[Comparable],
     ) -> None:
         updated: list[Any] = list(self.sequence)
         if isinstance(key, slice):
@@ -150,7 +156,7 @@ class FactorGroup(
         return len(self.sequence)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(list(self.sequence))})"
+        return f"{self.__class__.__name__}({list(self.sequence)!r})"
 
     def __str__(self):
         result = "the group of Factors:"
@@ -165,8 +171,8 @@ class FactorGroup(
 
     def add(
         self,
-        other: Union[FactorGroup, Sequence[Factor | AbsenceOf], Factor | AbsenceOf],
-    ) -> Optional[FactorGroup]:
+        other: FactorGroup | Sequence[Factor | AbsenceOf] | (Factor | AbsenceOf),
+    ) -> FactorGroup | None:
         """Combine all Factors into a single FactorGroup."""
         try:
             return self.add_or_raise_error(other)
@@ -175,7 +181,7 @@ class FactorGroup(
 
     def add_or_raise_error(
         self,
-        other: Union[FactorGroup, Sequence[Factor | AbsenceOf], Factor | AbsenceOf],
+        other: FactorGroup | Sequence[Factor | AbsenceOf] | (Factor | AbsenceOf),
     ) -> FactorGroup:
         """Combine all Factors into a single FactorGroup."""
         if isinstance(other, self.__class__):
@@ -190,12 +196,12 @@ class FactorGroup(
         return added
 
     def __add__(
-        self, other: Union[FactorGroup, Sequence[Factor], Factor]
-    ) -> Optional[FactorGroup]:
+        self, other: FactorGroup | Sequence[Factor] | Factor
+    ) -> FactorGroup | None:
         return self.add(other)
 
     @property
-    def recursive_terms(self) -> Dict[str, Term]:
+    def recursive_terms(self) -> dict[str, Term]:
         r"""
         Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
@@ -203,12 +209,12 @@ class FactorGroup(
             a :class:`dict` (instead of a :class:`set`,
             to preserve order) of :class:`Factor`\s.
         """
-        result: Dict[str, Term] = {}
+        result: dict[str, Term] = {}
         for context in self:
             result.update(context.recursive_terms)
         return result
 
-    def __gt__(self, other: Optional[Comparable]) -> bool:
+    def __gt__(self, other: Comparable | None) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
         if other is None:
             return True
@@ -226,8 +232,8 @@ class FactorGroup(
 
     def consistent_with(
         self,
-        other: Optional[Comparable],
-        context: Optional[ContextRegister] = None,
+        other: Comparable | None,
+        context: ContextRegister | None = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
@@ -290,7 +296,7 @@ class FactorGroup(
     def explanations_contradiction(
         self,
         other: Comparable,
-        context: Optional[Union[ContextMemo, Explanation]] = None,
+        context: ContextMemo | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """
         Find contexts that would cause ``self`` to contradict ``other``.
@@ -329,8 +335,8 @@ class FactorGroup(
 
     def contradicts(
         self,
-        other: Optional[Comparable],
-        context: Optional[ContextRegister] = None,
+        other: Comparable | None,
+        context: ContextRegister | None = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be contradictory.
@@ -385,7 +391,7 @@ class FactorGroup(
     def explanations_implied_by(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Generate explanations for how other may imply self."""
         context = context = Explanation.from_context(
@@ -395,8 +401,8 @@ class FactorGroup(
 
     def explanations_union(
         self,
-        other: Union[Factor, FactorGroup],
-        context: Optional[ContextRegister] = None,
+        other: Factor | FactorGroup,
+        context: ContextRegister | None = None,
     ) -> Iterator[ContextRegister]:
         """Yield contexts that allow ``self`` and ``other`` to be combined with the union operation."""
         to_match = (
@@ -491,7 +497,7 @@ class FactorGroup(
     def explanations_implication(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Find contexts that would cause ``self`` to imply ``other``."""
         context = Explanation.from_context(
@@ -502,7 +508,7 @@ class FactorGroup(
     def _contexts_has_all_factors_of(
         self,
         other: FactorGroup,
-        context: Optional[ContextRegister] = None,
+        context: ContextRegister | None = None,
     ) -> Iterator[Explanation]:
         """Find contexts that would cause all of ``other``'s Factors to be in ``self``."""
         explanation = Explanation(
@@ -517,13 +523,13 @@ class FactorGroup(
 
     def generic_terms_by_str(self) -> dict[str, Term]:
         """Index Terms that can be replaced without changing ``self``'s meaning."""
-        generics: Dict[str, Term] = {}
+        generics: dict[str, Term] = {}
         for factor in self:
             generics.update(factor.generic_terms_by_str())
         return generics
 
     def has_all_factors_of(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: FactorGroup, context: ContextRegister | None = None
     ) -> bool:
         """Check if ``self`` has all Factors of ``other``."""
         return any(
@@ -532,7 +538,7 @@ class FactorGroup(
         )
 
     def _contexts_shares_all_factors_with(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: FactorGroup, context: ContextRegister | None = None
     ) -> Iterator[ContextRegister]:
         """Find context that would cause all of ``self``'s Factors to be in ``other``."""
         context = context or ContextRegister()
@@ -552,7 +558,7 @@ class FactorGroup(
         )
 
     def shares_all_factors_with(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: FactorGroup, context: ContextRegister | None = None
     ) -> bool:
         """Find whether all of ``self``'s Factors are in ``other``."""
         return any(
@@ -564,7 +570,7 @@ class FactorGroup(
 
     def from_comparable(
         self, value: Comparable | Sequence[Factor | AbsenceOf]
-    ) -> Optional[FactorGroup]:
+    ) -> FactorGroup | None:
         """Create a FactorGroup from a Factor or sequence of Factors."""
         if isinstance(value, FactorGroup):
             return value
@@ -579,7 +585,7 @@ class FactorGroup(
     def explanations_same_meaning(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Yield explanations for how ``self`` can have the same meaning as ``other``."""
         context = Explanation.from_context(
@@ -621,7 +627,7 @@ class FactorGroup(
     def likely_contexts(
         self,
         other: Comparable,
-        context: Optional[ContextRegister] = None,
+        context: ContextRegister | None = None,
     ) -> Iterator[ContextRegister]:
         """Yield likely contexts based on similar Factor meanings."""
         context = context or ContextRegister()
@@ -670,14 +676,14 @@ class FactorGroup(
         result = [factor.new_context(changes) for factor in self]
         return self.__class__(sequence=result)
 
-    def __or__(self, other: Union[FactorGroup, Factor]) -> Optional[FactorGroup]:
+    def __or__(self, other: FactorGroup | Factor) -> FactorGroup | None:
         return self.union(other, context=None)
 
     def union(
         self,
-        other: Union[FactorGroup, Factor],
-        context: Optional[ContextRegister] = None,
-    ) -> Optional[FactorGroup]:
+        other: FactorGroup | Factor,
+        context: ContextRegister | None = None,
+    ) -> FactorGroup | None:
         """Make new FactorGroup with the set of unique Factors from both ``self`` and ``other``."""
         context = context or ContextRegister()
         if not isinstance(other, self.__class__):
@@ -688,7 +694,7 @@ class FactorGroup(
 
     def _union(
         self, other: FactorGroup, context: ContextRegister
-    ) -> Optional[FactorGroup]:
+    ) -> FactorGroup | None:
         explanations = self.explanations_union(other, context)
         try:
             explanation = next(explanations)
@@ -698,7 +704,7 @@ class FactorGroup(
 
     def _union_from_explanation(
         self, other: FactorGroup, context: ContextRegister
-    ) -> Optional[FactorGroup]:
+    ) -> FactorGroup | None:
         result = self._union_from_explanation_allow_contradiction(other, context)
         if result is None:
             return None
@@ -710,7 +716,7 @@ class FactorGroup(
 
     def _union_from_explanation_allow_contradiction(
         self, other: FactorGroup, context: ContextRegister
-    ) -> Optional[FactorGroup]:
+    ) -> FactorGroup | None:
         updated_context = context.reversed()
         try:
             result = self + other.new_context(changes=updated_context)

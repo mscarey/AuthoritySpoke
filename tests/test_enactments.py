@@ -1,31 +1,27 @@
-from copy import deepcopy
-from authorityspoke.decisions import Decision, DecisionReading
 import datetime
 import os
+from copy import deepcopy
 
+import pytest
 from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
-from legislice.download import Client
-
 from legislice.citations import CodeLevel
+from legislice.download import Client
 from legislice.enactments import Enactment
-from authorityspoke.groups import EnactmentGroup
-
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.predicates import Predicate
-
 from pydantic import ValidationError
-import pytest
 
+from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.examples import oracle
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.examples.legislation import (
     STATE_MONEY_TRANSMITTING_LICENSE_PROVISION,
 )
 from authorityspoke.facts import Fact
+from authorityspoke.groups import EnactmentGroup
 from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
-
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
 
 load_dotenv()
 

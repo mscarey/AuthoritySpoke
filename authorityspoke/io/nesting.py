@@ -1,9 +1,9 @@
 """Nesting fields to prepare to load a dict with a Marshmallow schema."""
 
-from typing import Callable, Dict, List, Sequence, Union
+from collections.abc import Callable, Sequence
 
 
-def nest_fields(data: Dict, nest: str, eggs: List[str]):
+def nest_fields(data: dict, nest: str, eggs: list[str]):
     """Make sure specified fields are nested under "nest" key."""
     for egg_field in eggs:
         if egg_field in data:
@@ -14,8 +14,8 @@ def nest_fields(data: Dict, nest: str, eggs: List[str]):
 
 
 def walk_tree_and_modify(
-    obj: Union[Dict, List], func: Callable, ignore: Sequence[str] = ()
-) -> Union[Dict, List]:
+    obj: dict | list, func: Callable, ignore: Sequence[str] = ()
+) -> dict | list:
     """
     Traverse tree of dicts and lists, and modify each node.
 
@@ -28,13 +28,13 @@ def walk_tree_and_modify(
 
     :returns: a version of the tree with every node modified by `func`
     """
-    if isinstance(obj, List):
+    if isinstance(obj, list):
         return [walk_tree_and_modify(item, func, ignore) for item in obj]
-    if isinstance(obj, Dict):
-        obj_dict: Dict = func(obj)
+    if isinstance(obj, dict):
+        obj_dict: dict = func(obj)
 
         for key, value in obj_dict.items():
-            if isinstance(value, (Dict, List)) and key not in ignore:
+            if isinstance(value, (dict, list)) and key not in ignore:
                 obj_dict[key] = walk_tree_and_modify(value, func, ignore)
 
         return obj_dict

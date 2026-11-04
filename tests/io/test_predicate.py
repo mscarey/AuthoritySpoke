@@ -1,11 +1,10 @@
 from datetime import date
 from decimal import Decimal
 
-from authorityspoke.nettlesome.predicates import Predicate
-
 import pytest
 
-from authorityspoke.nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison
 
 
 class TestPredicateLoad:
@@ -61,7 +60,7 @@ class TestPredicateLoad:
 
     def test_make_comparison_when_absent(self):
         statement = Comparison.new(
-            **{"content": "{person}'s favorite number was", "expression": 42}
+            content="{person}'s favorite number was", expression=42
         )
         assert statement.sign == "=="
         assert "{person}'s favorite number was exactly equal to 42" in str(statement)
@@ -87,11 +86,11 @@ class TestPredicateDump:
             expression=Q_("35 feet"),
         )
         dumped = predicate.model_dump()
-        assert dumped["quantity_range"]["quantity_magnitude"] == Decimal("35")
+        assert dumped["quantity_range"]["quantity_magnitude"] == Decimal(35)
 
     def test_round_trip(self):
         statement = Comparison.new(
-            **{"content": "{}'s favorite number was", "expression": 42}
+            content="{}'s favorite number was", expression=42
         )
         dumped = statement.model_dump()
         new_statement = Comparison(**dumped)

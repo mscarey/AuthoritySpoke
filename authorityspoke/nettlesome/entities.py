@@ -1,15 +1,16 @@
 """:class:`.Comparable` subclass for things that can be referenced in a Statement."""
 
 from __future__ import annotations
-from typing import ClassVar, Optional, Tuple
+
+from typing import ClassVar
 
 from pydantic import BaseModel
 
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
-    Term,
     Explanation,
+    Term,
 )
 
 
@@ -41,7 +42,7 @@ class Entity(Term, BaseModel, extra="forbid"):
     name: str
     generic: bool = True
     plural: bool = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = ()
+    context_factor_names: ClassVar[tuple[str, ...]] = ()
 
     def __str__(self):
         if self.generic:
@@ -60,7 +61,7 @@ class Entity(Term, BaseModel, extra="forbid"):
 
     def implies(
         self,
-        other: Optional[Comparable],
+        other: Comparable | None,
         context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """
@@ -79,7 +80,7 @@ class Entity(Term, BaseModel, extra="forbid"):
 
     def means(
         self,
-        other: Optional[Comparable],
+        other: Comparable | None,
         context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """

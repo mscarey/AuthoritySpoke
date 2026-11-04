@@ -3,9 +3,13 @@ from decimal import Decimal
 from typing import Literal, TypedDict
 
 from anchorpoint.textselectors import TextQuoteSelector
+from legislice.enactments import EnactmentPassage
+from legislice.enactments import TextPositionSet as EnactmentTextPositionSet
+
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import SEARCH_CLAUSE
 from authorityspoke.facts import AbsenceOfFactor, Evidence, Exhibit
+from authorityspoke.groups import EnactmentGroup
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.opinions import (
     AnchoredHoldings,
@@ -13,9 +17,6 @@ from authorityspoke.opinions import (
     TextPositionSet,
 )
 from authorityspoke.procedures import Procedure
-from legislice.enactments import EnactmentPassage
-from legislice.enactments import TextPositionSet as EnactmentTextPositionSet
-from authorityspoke.groups import EnactmentGroup
 
 
 class FactSpec(TypedDict):
@@ -120,7 +121,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": "<=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal("35"),
+                "quantity_magnitude": Decimal(35),
                 "quantity_units": "foot",
             },
         },
@@ -134,7 +135,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": "<=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal("5"),
+                "quantity_magnitude": Decimal(5),
                 "quantity_units": "foot",
             },
         },
@@ -148,7 +149,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": ">=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal("20"),
+                "quantity_magnitude": Decimal(20),
                 "quantity_units": "foot",
             },
         },
@@ -202,7 +203,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": ">=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal("385"),
+                "quantity_magnitude": Decimal(385),
                 "quantity_units": "minute",
             },
         },
@@ -248,7 +249,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": ">=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal("20"),
+                "quantity_magnitude": Decimal(20),
                 "quantity_units": "foot",
             },
         },

@@ -1,25 +1,22 @@
-from authorityspoke.opinions import OpinionReading
+import os
 from copy import deepcopy
 from datetime import date
-import os
-from legislice.enactments import Enactment
 
 import pytest
-
 from dotenv import load_dotenv
 from legislice.download import Client
+from legislice.enactments import Enactment
 
 from authorityspoke.facts import Fact
-from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
+from authorityspoke.groups import FactorGroup
 from authorityspoke.holdings import Holding
-
-from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
 from authorityspoke.nettlesome.statements import Statement
-from authorityspoke.groups import FactorGroup
-
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
+from authorityspoke.opinions import OpinionReading
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 
 load_dotenv()
 

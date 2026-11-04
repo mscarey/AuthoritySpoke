@@ -1,12 +1,17 @@
 from datetime import date
 from decimal import Decimal
 
-from pint import Quantity
 import pytest
+from pint import Quantity
 from sympy import S, oo
 
 from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.quantities import UnitRange, DateRange, DecimalRange, Comparison
+from authorityspoke.nettlesome.quantities import (
+    Comparison,
+    DateRange,
+    DecimalRange,
+    UnitRange,
+)
 from authorityspoke.nettlesome.statements import Statement
 
 
@@ -15,7 +20,7 @@ class TestQuantities:
         left = UnitRange(quantity_magnitude=20, quantity_units="meter", sign=">")
         right = make_comparison["meters"].quantity_range
         assert left.implies(right)
-        assert left.quantity == Quantity(Decimal("20"), "meter")
+        assert left.quantity == Quantity(Decimal(20), "meter")
 
     def test_quantity_from_string(self):
         left = UnitRange(quantity_magnitude=2000, quantity_units="day", sign="<")

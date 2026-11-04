@@ -1,4 +1,10 @@
-from authorityspoke.nettlesome import Comparison, Entity, FactorGroup, Predicate, Statement
+from authorityspoke.nettlesome import (
+    Comparison,
+    Entity,
+    FactorGroup,
+    Predicate,
+    Statement,
+)
 
 
 def test_context_guide_statements_can_have_same_meaning():

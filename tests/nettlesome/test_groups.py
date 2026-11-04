@@ -1,17 +1,17 @@
 import pytest
 
-from authorityspoke.nettlesome.terms import (
-    ContextRegister,
-    consistent_with,
-    contradicts,
-    means,
-)
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.factors import AbsenceOf
 from authorityspoke.nettlesome.groups import FactorGroup
 from authorityspoke.nettlesome.predicates import Predicate
 from authorityspoke.nettlesome.quantities import Comparison
 from authorityspoke.nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import (
+    ContextRegister,
+    consistent_with,
+    contradicts,
+    means,
+)
 
 
 class TestMakeGroup:

@@ -1,21 +1,19 @@
-from copy import deepcopy
 import logging
 import os
+from copy import deepcopy
 
-
+import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
-from authorityspoke.groups import EnactmentGroup
-from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.groups import FactorGroup
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_, UnitRange
-from authorityspoke.nettlesome.statements import Statement
-import pytest
 
 from authorityspoke.facts import Exhibit, Fact
+from authorityspoke.groups import EnactmentGroup, FactorGroup
 from authorityspoke.holdings import Holding
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison, UnitRange
+from authorityspoke.nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

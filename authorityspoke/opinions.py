@@ -2,40 +2,29 @@ r""":class:`Court` documents that decide litigation and posit :class:`.Rule`\s."
 
 from __future__ import annotations
 
-from itertools import zip_longest
-from typing import Any, Dict, Iterator, List
-from typing import Optional, Sequence, Union
-
 import logging
+from collections.abc import Iterator, Sequence
+from itertools import zip_longest
+from typing import Any
 
 from anchorpoint.textselectors import (
-    TextQuoteSelector,
-    TextPositionSet,
     TextPositionSelector,
+    TextPositionSet,
+    TextQuoteSelector,
 )
 from legislice.enactments import EnactmentPassage
+from pydantic import BaseModel, field_validator
+
+from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.nettlesome.factors import Factor
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
     Term,
 )
-from authorityspoke.nettlesome.factors import Factor
-from pydantic import field_validator, BaseModel
-
-from authorityspoke.facts import (
-    AbsenceOfFactor,
-    Entity,
-    Fact,
-    Allegation,
-    Pleading,
-    Exhibit,
-    Evidence,
-)
-from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-
 
 logger = logging.getLogger(__name__)
 
@@ -90,11 +79,11 @@ class HoldingWithAnchors(BaseModel):
 class AnchoredHoldings(BaseModel):
     """Holdings with objects storing the Holdings' links to Opinion text."""
 
-    holdings: List[HoldingWithAnchors] = []
-    named_anchors: List[TermWithAnchors] = []
-    enactment_anchors: List[EnactmentWithAnchors] = []
+    holdings: list[HoldingWithAnchors] = []
+    named_anchors: list[TermWithAnchors] = []
+    enactment_anchors: list[EnactmentWithAnchors] = []
 
-    def find_term_index(self, term: Term) -> Optional[int]:
+    def find_term_index(self, term: Term) -> int | None:
         """Find the index of a term in the holdings."""
         key = term.key
         for index, term_with_anchors in enumerate(self.named_anchors):
@@ -117,7 +106,7 @@ class AnchoredHoldings(BaseModel):
                 return item.anchors
         raise KeyError(f"Term with key '{key}' not found")
 
-    def find_enactment_index(self, enactment: EnactmentPassage) -> Optional[int]:
+    def find_enactment_index(self, enactment: EnactmentPassage) -> int | None:
         """Find the index of a term in the holdings."""
         key = str(enactment)
         for index, enactment_with_anchors in enumerate(self.enactment_anchors):
@@ -159,24 +148,24 @@ class OpinionReading(Comparable, BaseModel):
         return HoldingGroup([item.holding for item in self.anchored_holdings.holdings])
 
     @property
-    def holding_anchors(self) -> List[TextPositionSet]:
+    def holding_anchors(self) -> list[TextPositionSet]:
         """Get Holdings with corresponding anchors for the Opinion."""
         return [item.anchors for item in self.anchored_holdings.holdings]
 
     @property
-    def anchored_factors(self) -> List[TermWithAnchors]:
+    def anchored_factors(self) -> list[TermWithAnchors]:
         """Get Factors with corresponding anchors for the Opinion."""
         return self.anchored_holdings.named_anchors
 
     @property
-    def anchored_enactments(self) -> List[EnactmentWithAnchors]:
+    def anchored_enactments(self) -> list[EnactmentWithAnchors]:
         """Get Enactment passages with corresponding anchors for the Opinion."""
         return self.anchored_holdings.enactment_anchors
 
     def __str__(self):
         return super().__str__()
 
-    def factors(self) -> List[Factor]:
+    def factors(self) -> list[Factor]:
         """Get all factors from the Holdings of the Opinion, without duplication."""
         factors_by_name = self.factors_by_name()
         return list(factors_by_name.values())
@@ -206,7 +195,7 @@ class OpinionReading(Comparable, BaseModel):
     def explanations_contradiction(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in a contradiction between self and other."""
         if not self.comparable_with(other):
@@ -242,7 +231,7 @@ class OpinionReading(Comparable, BaseModel):
         return not isinstance(other, Factor)
 
     def contradicts(
-        self, other: Comparable | None, context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: ContextRegister | None = None
     ) -> bool:
         """Check if other contradicts one of self's Holdings."""
         if other is None:
@@ -259,7 +248,7 @@ class OpinionReading(Comparable, BaseModel):
 
     def implies(
         self,
-        other: Optional[Comparable],
+        other: Comparable | None,
         context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """Check if all of other's Holdings are implied by holdings of self."""
@@ -270,8 +259,8 @@ class OpinionReading(Comparable, BaseModel):
     def explain_implication(
         self,
         other: Comparable,
-        context: Optional[ContextRegister | Explanation] = None,
-    ) -> Optional[Explanation]:
+        context: ContextRegister | Explanation | None = None,
+    ) -> Explanation | None:
         """Get first Explanation of how one of self's Holdings implies other."""
         explanations = self.explanations_implication(other, context=context)
         try:
@@ -281,8 +270,8 @@ class OpinionReading(Comparable, BaseModel):
         return explanation
 
     def explain_contradiction(
-        self, other: Comparable, context: Optional[ContextRegister | Explanation] = None
-    ) -> Optional[Explanation]:
+        self, other: Comparable, context: ContextRegister | Explanation | None = None
+    ) -> Explanation | None:
         """Get first Explanation of how other contradicts one of self's Holdings."""
         explanations = self.explanations_contradiction(other, context=context)
         try:
@@ -294,7 +283,7 @@ class OpinionReading(Comparable, BaseModel):
     def explanations_implication(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in self implying other."""
         if not self.comparable_with(other):
@@ -329,13 +318,13 @@ class OpinionReading(Comparable, BaseModel):
             of ``self``, with guaranteed order, including each
             generic :class:`.Factor` only once.
         """
-        generics: Dict[str, Term] = {}
+        generics: dict[str, Term] = {}
         for holding in self.holdings:
             for generic in holding.generic_terms():
                 generics[str(generic)] = generic
         return generics
 
-    def get_term_by_name(self, name: str) -> Optional[Term]:
+    def get_term_by_name(self, name: str) -> Term | None:
         """
         Search recursively in holdings of ``self`` for :class:`.Term` with ``name``.
 
@@ -355,11 +344,11 @@ class OpinionReading(Comparable, BaseModel):
                 return term
         return None
 
-    def get_term_by_str(self, query: str) -> Optional[Term]:
+    def get_term_by_str(self, query: str) -> Term | None:
         r"""Search recursively for :class:`.Term` in holdings of self."""
         return self.holdings.get_term_by_str(query)
 
-    def get_matching_holding(self, holding: Holding) -> Optional[HoldingWithAnchors]:
+    def get_matching_holding(self, holding: Holding) -> HoldingWithAnchors | None:
         """Check self's Holdings for a Holding with the same meaning."""
         for anchored_holding in self.anchored_holdings.holdings:
             if anchored_holding.holding.means(holding):
@@ -368,15 +357,15 @@ class OpinionReading(Comparable, BaseModel):
 
     def posit_holding(
         self,
-        holding: Union[Holding, Rule, HoldingWithAnchors],
+        holding: Holding | Rule | HoldingWithAnchors,
         holding_anchors: TextPositionSelector
         | TextQuoteSelector
         | TextPositionSet
-        | List[TextPositionSelector | TextQuoteSelector]
+        | list[TextPositionSelector | TextQuoteSelector]
         | None = None,
-        named_anchors: Optional[List[TermWithAnchors]] = None,
-        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
-        context: Optional[Sequence[Factor]] = None,
+        named_anchors: list[TermWithAnchors] | None = None,
+        enactment_anchors: list[EnactmentWithAnchors] | None = None,
+        context: Sequence[Factor] | None = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
         named_anchors = named_anchors or []
@@ -449,19 +438,17 @@ class OpinionReading(Comparable, BaseModel):
 
     def posit_holdings(
         self,
-        holdings: Union[
-            AnchoredHoldings, List[Union[HoldingWithAnchors, Holding, Rule]]
-        ],
-        holding_anchors: List[
+        holdings: AnchoredHoldings | list[HoldingWithAnchors | Holding | Rule],
+        holding_anchors: list[
             TextPositionSelector
             | TextQuoteSelector
             | TextPositionSet
-            | List[TextPositionSelector | TextQuoteSelector]
+            | list[TextPositionSelector | TextQuoteSelector]
         ]
         | None = None,
-        named_anchors: Optional[List[TermWithAnchors]] = None,
-        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
-        context: Optional[Sequence[Factor]] = None,
+        named_anchors: list[TermWithAnchors] | None = None,
+        enactment_anchors: list[EnactmentWithAnchors] | None = None,
+        context: Sequence[Factor] | None = None,
     ):
         r"""
         Add :class:`.Holding`\s to this ``OpinionReading`` from a sequence.
@@ -500,21 +487,15 @@ class OpinionReading(Comparable, BaseModel):
 
     def posit(
         self,
-        holdings: Union[
-            AnchoredHoldings,
-            Holding,
-            Rule,
-            HoldingWithAnchors,
-            List[Union[HoldingWithAnchors, Holding, Rule]],
-        ],
+        holdings: AnchoredHoldings | Holding | Rule | HoldingWithAnchors | list[HoldingWithAnchors | Holding | Rule],
         holding_anchors: TextPositionSelector
         | TextQuoteSelector
         | TextPositionSet
-        | List[TextPositionSelector | TextQuoteSelector]
+        | list[TextPositionSelector | TextQuoteSelector]
         | None = None,
-        named_anchors: Optional[List[TermWithAnchors]] = None,
-        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
-        context: Optional[Sequence[Factor]] = None,
+        named_anchors: list[TermWithAnchors] | None = None,
+        enactment_anchors: list[EnactmentWithAnchors] | None = None,
+        context: Sequence[Factor] | None = None,
     ) -> None:
         r"""
         Add one or more :class:`.Holding`\s to this ``OpinionReading``.
@@ -570,7 +551,7 @@ class OpinionReading(Comparable, BaseModel):
     def implied_by(
         self,
         other: Comparable | None,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> bool:
         """Determine if other implies all the Holdings of self."""
         if not isinstance(context, Explanation):
@@ -583,7 +564,7 @@ class OpinionReading(Comparable, BaseModel):
             return False
         return other.implies(self, context=context.reversed_context())
 
-    def __ge__(self, other: Optional[Comparable]) -> bool:
+    def __ge__(self, other: Comparable | None) -> bool:
         """
         Find whether ``self``'s holdings imply all the holdings of ``other``.
 
@@ -594,7 +575,7 @@ class OpinionReading(Comparable, BaseModel):
         """
         return self.implies(other)
 
-    def __gt__(self, other: Optional[Comparable]) -> bool:
+    def __gt__(self, other: Comparable | None) -> bool:
         """
         Find whether ``self``\'s holdings imply ``other``\'s but self != other.
 
@@ -607,7 +588,7 @@ class OpinionReading(Comparable, BaseModel):
         return (self >= other) and (self != other)
 
 
-class FactorIndex(Dict[str, Factor]):
+class FactorIndex(dict[str, Factor]):
     r"""Index of :class:`.Factor`/s that may share common anchors."""
 
     def insert_by_name(self, value: Factor) -> None:
@@ -618,7 +599,7 @@ class FactorIndex(Dict[str, Factor]):
         """
         if value.name:
             self.insert(key=value.name, value=value)
-            return None
+            return
         key = str(value)
         self.insert(key=key, value=value)
 
@@ -630,7 +611,7 @@ class FactorIndex(Dict[str, Factor]):
                     self[key].name = value.name
                 if value.name != self[key].name:
                     raise NameError(
-                        f"{type(value)} objects with identical representation ({str(value)}) "
+                        f"{type(value)} objects with identical representation ({value!s}) "
                         f"have differing names: '{value.name}' and '{self[key].name}'"
                     )
         else:

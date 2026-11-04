@@ -1,7 +1,6 @@
 import copy
 
 import pytest
-
 from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
@@ -9,21 +8,20 @@ from anchorpoint.textselectors import (
     TextSelectionError,
 )
 
-from authorityspoke.nettlesome.entities import Entity
-
-from authorityspoke.facts import Fact, Predicate
 from authorityspoke.examples.brad import anchored_holdings as brad_holdings
 from authorityspoke.examples.watt import anchored_holdings as watt_holdings
+from authorityspoke.facts import Fact, Predicate
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.terms import ContextRegister
-from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
 from authorityspoke.opinions import (
     AnchoredHoldings,
     HoldingWithAnchors,
     OpinionReading,
     TermWithAnchors,
 )
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 
 
 class TestAnchor:

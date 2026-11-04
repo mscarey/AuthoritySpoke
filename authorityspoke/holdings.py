@@ -9,16 +9,22 @@ should be considered undecided.
 """
 
 from __future__ import annotations
-from copy import deepcopy
 
-from itertools import chain
 import operator
-from typing import Any, Callable, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Union
+from collections.abc import Callable, Iterable, Iterator, Sequence
+from copy import deepcopy
+from itertools import chain
+from typing import (
+    Any,
+)
 
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
+from pydantic import BaseModel, field_validator, model_validator
 
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented, wrapped
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
@@ -29,16 +35,10 @@ from authorityspoke.nettlesome.terms import (
     contradicts,
     new_context_helper,
 )
-from authorityspoke.nettlesome.factors import Factor
-from authorityspoke.nettlesome.formatting import indented, wrapped
-from authorityspoke.groups import FactorGroup
-
-from pydantic import field_validator, model_validator, BaseModel
-
 from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule, RawRule
+from authorityspoke.rules import RawRule, Rule
 
-RawHolding = Dict[str, Union[RawRule, str, bool]]
+RawHolding = dict[str, RawRule | str | bool]
 
 
 class Holding(Comparable, BaseModel):
@@ -134,10 +134,10 @@ class Holding(Comparable, BaseModel):
     def from_factors(
         self,
         outputs: FactorGroup,
-        inputs: Optional[FactorGroup] = None,
-        despite: Optional[FactorGroup] = None,
-        enactments: Optional[EnactmentGroup] = None,
-        enactments_despite: Optional[EnactmentGroup] = None,
+        inputs: FactorGroup | None = None,
+        despite: FactorGroup | None = None,
+        enactments: EnactmentGroup | None = None,
+        enactments_despite: EnactmentGroup | None = None,
         mandatory: bool = False,
         universal: bool = False,
         generic: bool = False,
@@ -190,7 +190,7 @@ class Holding(Comparable, BaseModel):
         return self.rule.enactments_despite
 
     @property
-    def recursive_terms(self) -> Dict[str, Term]:
+    def recursive_terms(self) -> dict[str, Term]:
         r"""
         Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
@@ -229,7 +229,7 @@ class Holding(Comparable, BaseModel):
         """Whether holding is applicable in "ALL" cases where inputs are present."""
         return self.rule.universal
 
-    def add_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
+    def add_if_not_exclusive(self, other: Holding) -> Holding | None:
         """Show how first Holding triggers second, assumed not to be "exclusive" way to reach result."""
         new_rule = self.rule + other.rule
         if new_rule is None:
@@ -246,7 +246,7 @@ class Holding(Comparable, BaseModel):
         """Add "despite" enactment and sort self's "despite" Enactments."""
         self.rule.add_enactment_despite(enactment)
 
-    def add_holding(self, other: Holding) -> Optional[Holding]:
+    def add_holding(self, other: Holding) -> Holding | None:
         """Show how first Holding triggers the second."""
         if not (self.decided and other.decided):
             raise NotImplementedError(
@@ -263,7 +263,7 @@ class Holding(Comparable, BaseModel):
                     return added
         return None
 
-    def __add__(self, other: Comparable) -> Optional[Union[Rule, Holding]]:
+    def __add__(self, other: Comparable) -> Rule | Holding | None:
         """
         Create new Holding combining self and other into a single step, if possible.
 
@@ -384,7 +384,7 @@ class Holding(Comparable, BaseModel):
 
     def implies(
         self,
-        other: Optional[Comparable],
+        other: Comparable | None,
         context: ContextRegister | Explanation | None = None,
     ) -> bool:
         r"""
@@ -412,7 +412,7 @@ class Holding(Comparable, BaseModel):
     def explanations_implication(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: ContextRegister | Explanation | None = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would cause self and other to have same meaning."""
         if not self.comparable_with(other):
@@ -461,7 +461,7 @@ class Holding(Comparable, BaseModel):
         return other.implies(self, context=context)
 
     def _implies_if_decided(
-        self, other: Holding, context: Optional[Explanation] = None
+        self, other: Holding, context: Explanation | None = None
     ) -> Iterator[Explanation]:
         r"""
         Test if ``self`` implies ``other`` if they're both decided.
@@ -502,7 +502,7 @@ class Holding(Comparable, BaseModel):
         return len(self.rule.procedure)
 
     @property
-    def inferred_from_exclusive(self) -> List[Holding]:
+    def inferred_from_exclusive(self) -> list[Holding]:
         r"""
         Yield :class:`Holding`\s that can be inferred from the "exclusive" flag.
 
@@ -579,7 +579,7 @@ class Holding(Comparable, BaseModel):
 
     def _union_if_not_exclusive(
         self, other: Holding, context: ContextRegister
-    ) -> Optional[Holding]:
+    ) -> Holding | None:
         if self.decided is other.decided is False:
             if self.rule.implies(other.rule, context=context):
                 return other
@@ -612,7 +612,7 @@ class Holding(Comparable, BaseModel):
 
     def _union_with_holding(
         self, other: Holding, context: ContextRegister
-    ) -> Optional[Holding]:
+    ) -> Holding | None:
         for self_holding in self.nonexclusive_holdings:
             for other_holding in other.nonexclusive_holdings:
                 united = self_holding._union_if_not_exclusive(
@@ -623,8 +623,8 @@ class Holding(Comparable, BaseModel):
         return None
 
     def union(
-        self, other: Union[Rule, Holding], context: Optional[ContextRegister] = None
-    ) -> Optional[Holding]:
+        self, other: Rule | Holding, context: ContextRegister | None = None
+    ) -> Holding | None:
         """
         Infer a Holding from all inputs and outputs of self and other, in context.
 
@@ -647,7 +647,7 @@ class Holding(Comparable, BaseModel):
             raise TypeError
         return self._union_with_holding(other, context=context)
 
-    def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
+    def __or__(self, other: Rule | Holding) -> Holding | None:
         """Infer a Holding from all inputs and outputs of self and other."""
         return self.union(other)
 
@@ -681,9 +681,9 @@ class HoldingGroup(FactorGroup):
 
     def __init__(
         self,
-        holdings: Union[Sequence[Holding], Holding] = (),
+        holdings: Sequence[Holding] | Holding = (),
         *,
-        sequence: Optional[Union[Sequence[Holding], Holding]] = None,
+        sequence: Sequence[Holding] | Holding | None = None,
     ):
         """Validate that HoldingGroup is created from a sequence of Holdings."""
         if sequence is not None:

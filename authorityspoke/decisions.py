@@ -10,36 +10,34 @@ to multiple :class:`.authorityspoke.opinion.OpinionReading`\s.
 from __future__ import annotations
 
 import operator
-from typing import Dict, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
+from collections.abc import Iterator, Sequence
+from typing import Dict, List, Optional, Tuple, Union
 
 from anchorpoint.textselectors import (
-    TextQuoteSelector,
     TextPositionSelector,
-    TextSequence,
     TextPositionSet,
+    TextQuoteSelector,
+    TextSequence,
 )
-from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
 from justopinion.citations import CAPCitation
-
-from authorityspoke.nettlesome.terms import Comparable, ContextRegister, Explanation
-from authorityspoke.nettlesome.factors import Factor
+from justopinion.decisions import CaseBody, CaseData, Decision, Opinion
 from pydantic import BaseModel
 
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.terms import Comparable, ContextRegister, Explanation
 from authorityspoke.opinions import (
+    AnchoredHoldings,
+    EnactmentWithAnchors,
+    HoldingWithAnchors,
     OpinionReading,
     TermWithAnchors,
-    AnchoredHoldings,
-    HoldingWithAnchors,
-    EnactmentWithAnchors,
 )
 from authorityspoke.rules import Rule
 
-
-RawCAPCitation = Dict[str, str]
-RawOpinion = Dict[str, str]
-RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
+RawCAPCitation = dict[str, str]
+RawOpinion = dict[str, str]
+RawDecision = dict[str, str | int | Sequence[RawOpinion] | Sequence[RawCAPCitation]]
 
 
 class DecisionReading(BaseModel, Comparable):
@@ -47,7 +45,7 @@ class DecisionReading(BaseModel, Comparable):
 
     decision: Decision
     generic: bool = False
-    opinion_readings: List[OpinionReading] = []
+    opinion_readings: list[OpinionReading] = []
 
     def __str__(self):
         citation = self.decision.citations[0].cite if self.decision.citations else ""
@@ -55,7 +53,7 @@ class DecisionReading(BaseModel, Comparable):
         return f"Reading for {name}, {citation} ({self.decision.decision_date})"
 
     @property
-    def majority(self) -> Optional[OpinionReading]:
+    def majority(self) -> OpinionReading | None:
         """Return the majority OpinionReading, or None if it doesn't exist."""
         for reading in self.opinion_readings:
             if reading.opinion_type == "majority":
@@ -63,7 +61,7 @@ class DecisionReading(BaseModel, Comparable):
         return None
 
     @property
-    def opinions(self) -> List[Opinion]:
+    def opinions(self) -> list[Opinion]:
         """Get the Opinions for this DecisionReading's Decision."""
         return self.decision.opinions
 
@@ -71,7 +69,7 @@ class DecisionReading(BaseModel, Comparable):
         self,
         opinion_type: str = "",
         opinion_author: str = "",
-    ) -> Optional[Opinion]:
+    ) -> Opinion | None:
         """Find an Opinion described by the given attributes."""
         return self.decision.find_matching_opinion(
             opinion_type=opinion_type, opinion_author=opinion_author
@@ -80,7 +78,7 @@ class DecisionReading(BaseModel, Comparable):
     def find_opinion_matching_reading(
         self,
         opinion_reading: OpinionReading,
-    ) -> Optional[Opinion]:
+    ) -> Opinion | None:
         """Find the Opinion corresponding to an OpinionReading."""
         return self.find_matching_opinion(
             opinion_type=opinion_reading.opinion_type,
@@ -89,16 +87,10 @@ class DecisionReading(BaseModel, Comparable):
 
     def select_text(
         self,
-        selector: Union[
-            bool,
-            str,
-            TextPositionSelector,
-            TextQuoteSelector,
-            Sequence[Union[str, TextQuoteSelector, TextPositionSelector]],
-        ],
+        selector: bool | str | TextPositionSelector | TextQuoteSelector | Sequence[str | TextQuoteSelector | TextPositionSelector],
         opinion_type: str = "",
         opinion_author: str = "",
-    ) -> Optional[TextSequence]:
+    ) -> TextSequence | None:
         r"""
         Get text using a :class:`.TextQuoteSelector`.
 
@@ -124,7 +116,7 @@ class DecisionReading(BaseModel, Comparable):
             )
         self.opinion_readings.append(opinion_reading)
 
-    def get_majority(self) -> Optional[OpinionReading]:
+    def get_majority(self) -> OpinionReading | None:
         """Return the majority OpinionReading, creating it if needed."""
         majority = self.majority
         if majority:
@@ -156,7 +148,7 @@ class DecisionReading(BaseModel, Comparable):
     def contradicts(
         self,
         other: Comparable | None,
-        context: Optional[ContextRegister] = None,
+        context: ContextRegister | None = None,
     ) -> bool:
         """Check if a holding attributed to this decision contradicts a holding attributed in "other"."""
         if isinstance(other, DecisionReading):
@@ -172,8 +164,8 @@ class DecisionReading(BaseModel, Comparable):
     def explain_contradiction(
         self,
         other: Comparable | None,
-        context: Optional[ContextRegister] = None,
-    ) -> Optional[Explanation]:
+        context: ContextRegister | None = None,
+    ) -> Explanation | None:
         """Get the first generated explanation of how a Holding of self contradicts a Holding of other."""
         explanations = self.explanations_contradiction(other, context=context)
         try:
@@ -208,7 +200,7 @@ class DecisionReading(BaseModel, Comparable):
         self,
         other: Comparable | None,
         context: ContextRegister | Explanation | None = None,
-    ) -> Optional[Explanation]:
+    ) -> Explanation | None:
         """Get the first generated explanation of how a Holding of self implies a Holding of other."""
         explanations = self.explanations_implication(other, context=context)
         try:
@@ -243,23 +235,17 @@ class DecisionReading(BaseModel, Comparable):
 
     def posit(
         self,
-        holdings: Union[
-            AnchoredHoldings,
-            Holding,
-            Rule,
-            HoldingWithAnchors,
-            List[Union[HoldingWithAnchors, Holding, Rule]],
-        ],
-        holding_anchors: List[
+        holdings: AnchoredHoldings | Holding | Rule | HoldingWithAnchors | list[HoldingWithAnchors | Holding | Rule],
+        holding_anchors: list[
             TextPositionSelector
             | TextQuoteSelector
             | TextPositionSet
-            | List[TextPositionSelector | TextQuoteSelector]
+            | list[TextPositionSelector | TextQuoteSelector]
         ]
         | None = None,
-        named_anchors: Optional[List[TermWithAnchors]] = None,
-        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
-        context: Optional[Sequence[Factor]] = None,
+        named_anchors: list[TermWithAnchors] | None = None,
+        enactment_anchors: list[EnactmentWithAnchors] | None = None,
+        context: Sequence[Factor] | None = None,
     ) -> None:
         """Add one or more Holdings to the majority Opinion of this Decision."""
         majority = self.get_majority()
@@ -292,7 +278,7 @@ class DecisionReading(BaseModel, Comparable):
         return self.implies(other) and self != other
 
     def implied_by_holding(
-        self, other: Holding, context: Optional[ContextRegister] = None
+        self, other: Holding, context: ContextRegister | None = None
     ) -> Iterator[Explanation]:
         """Check if a Holding implies all the Holdings of self."""
         if all(
@@ -305,7 +291,7 @@ class DecisionReading(BaseModel, Comparable):
             )
 
     def explanations_implied_by(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: ContextRegister | None = None
     ) -> Iterator[Explanation]:
         """Generate explanation of how other can imply all the Holdings of self."""
         context = context or ContextRegister()
@@ -321,7 +307,7 @@ class DecisionReading(BaseModel, Comparable):
             yield from self.implied_by_holding(other, context)
 
     def implied_by(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: ContextRegister | None = None
     ) -> bool:
         """Check if other implies all the Holdings of self."""
         if other is None:
@@ -329,7 +315,7 @@ class DecisionReading(BaseModel, Comparable):
         return any(self.explanations_implied_by(other, context))
 
     def implies_holding(
-        self, other: Holding, context: Optional[ContextRegister] = None
+        self, other: Holding, context: ContextRegister | None = None
     ) -> bool:
         """Check if a Holding of self implies a Holding made from other."""
         return any(
@@ -338,12 +324,12 @@ class DecisionReading(BaseModel, Comparable):
         )
 
     def implies_rule(
-        self, other: Rule, context: Optional[ContextRegister] = None
+        self, other: Rule, context: ContextRegister | None = None
     ) -> bool:
         """Check if a Holding of self implies a Holding made from other Rule."""
         return self.implies_holding(Holding(rule=other), context=context)
 
-    def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
+    def implies(self, other, context: ContextRegister | None = None) -> bool:
         """Check if the Holdings of self imply other."""
         if isinstance(other, (DecisionReading, OpinionReading)):
             return self.holdings.implies(other.holdings)

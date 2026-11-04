@@ -1,45 +1,43 @@
 import datetime
 import json
 import os
-from typing import Dict, List, Tuple
-from authorityspoke.opinions import HoldingWithAnchors
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
+
+import pytest
+from anchorpoint.textselectors import TextPositionSet, TextQuoteSelector
 from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
 from legislice.enactments import Enactment
 
-from authorityspoke.nettlesome.terms import ContextRegister
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.factors import Factor
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_
-import pytest
-
 from authorityspoke.decisions import DecisionReading
 from authorityspoke.examples.beard_act import rules as beard_act_rules
+from authorityspoke.examples.brad import anchored_holdings as brad_holdings
+from authorityspoke.examples.cardenas import anchored_holdings as cardenas_holdings
 from authorityspoke.examples.feist import anchored_holdings as feist_holdings
 from authorityspoke.examples.lotus import anchored_holdings as lotus_holdings
 from authorityspoke.examples.mazza import anchored_holdings as mazza_holdings
 from authorityspoke.examples.oracle import anchored_holdings as oracle_holdings
-from authorityspoke.examples.brad import anchored_holdings as brad_holdings
-from authorityspoke.examples.cardenas import anchored_holdings as cardenas_holdings
 from authorityspoke.examples.watt import anchored_holdings as watt_holdings
 from authorityspoke.facts import (
     AbsenceOfFactor,
     Allegation,
-    Fact,
-    build_fact,
     Evidence,
+    Exhibit,
+    Fact,
+    Pleading,
     RawFactor,
+    build_fact,
 )
-from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding
-from authorityspoke.opinions import OpinionReading
-from authorityspoke.rules import Procedure, Rule
-
 from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison
+from authorityspoke.nettlesome.terms import ContextRegister
+from authorityspoke.opinions import HoldingWithAnchors, OpinionReading
+from authorityspoke.rules import Procedure, Rule
 
 load_dotenv()
 
@@ -227,7 +225,7 @@ def fifth_a():
 
 
 @pytest.fixture(scope="class")
-def make_entity() -> Dict[str, Entity]:
+def make_entity() -> dict[str, Entity]:
     return {
         "motel": Entity(name="Hideaway Lodge"),
         "motel_specific": Entity(name="Hideaway Lodge", generic=False),
@@ -247,7 +245,7 @@ def make_entity() -> Dict[str, Entity]:
 
 
 @pytest.fixture(scope="class")
-def make_predicate() -> Dict[str, Predicate]:
+def make_predicate() -> dict[str, Predicate]:
     return {
         "p1": Predicate(content="{place} was a motel"),
         "p1_again": Predicate(content="{place} was a motel"),
@@ -433,13 +431,13 @@ def make_predicate() -> Dict[str, Predicate]:
 
 
 @pytest.fixture(scope="class")
-def watt_mentioned(make_entity) -> Tuple[Entity, ...]:
+def watt_mentioned(make_entity) -> tuple[Entity, ...]:
     e = make_entity
     return (e["motel"], e["watt"], e["trees"], e["tree_search"], e["motel_specific"])
 
 
 @pytest.fixture(scope="class")
-def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor]:
+def watt_factor(make_predicate, make_entity, watt_mentioned) -> dict[str, Factor]:
     p = make_predicate
 
     c = watt_mentioned
@@ -532,7 +530,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
 
 
 @pytest.fixture(scope="class")
-def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
+def make_factor(make_predicate, make_entity) -> dict[str, Factor]:
     p = make_predicate
     e = make_entity
 
@@ -596,7 +594,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
 @pytest.fixture(scope="class")
 def make_exhibit(
     make_entity, make_predicate, make_factor, watt_factor, make_complex_fact
-) -> Dict[str, Exhibit | AbsenceOfFactor]:
+) -> dict[str, Exhibit | AbsenceOfFactor]:
     e = make_entity
     f = make_factor
     w = watt_factor
@@ -723,7 +721,7 @@ def make_exhibit(
 
 
 @pytest.fixture(scope="class")
-def make_complex_fact(make_predicate, make_factor) -> Dict[str, Fact]:
+def make_complex_fact(make_predicate, make_factor) -> dict[str, Fact]:
     p = make_predicate
     f = make_factor
 
@@ -763,7 +761,7 @@ def make_complex_fact(make_predicate, make_factor) -> Dict[str, Fact]:
 
 
 @pytest.fixture(scope="class")
-def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]:
+def make_fact_about_exhibit(make_predicate, make_exhibit) -> dict[str, Evidence]:
     p = make_predicate
     e = make_exhibit
     return {
@@ -779,7 +777,7 @@ def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]
 @pytest.fixture(scope="class")
 def make_complex_rule(
     make_factor, make_exhibit, make_complex_fact, make_fact_about_exhibit
-) -> Dict[str, Rule]:
+) -> dict[str, Rule]:
     return {
         "accept_relevance_testimony": Rule(
             procedure=Procedure(
@@ -845,7 +843,7 @@ def make_complex_rule(
 @pytest.fixture(scope="class")
 def make_evidence(
     make_predicate, make_factor, watt_factor, make_exhibit
-) -> Dict[str, Evidence | AbsenceOfFactor]:
+) -> dict[str, Evidence | AbsenceOfFactor]:
     p = make_predicate
     f = make_factor
     w = watt_factor
@@ -903,12 +901,12 @@ def make_evidence(
 
 
 @pytest.fixture(scope="class")
-def make_pleading(make_entity) -> Dict[str, Dict[str, Pleading]]:
+def make_pleading(make_entity) -> dict[str, dict[str, Pleading]]:
     return {"craig": Pleading(filer=make_entity["craig"])}
 
 
 @pytest.fixture(scope="class")
-def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegation]]:
+def make_allegation(make_pleading, make_factor) -> dict[str, dict[str, Allegation]]:
     return {
         "shooting": Allegation(
             fact=make_factor["f_shooting"], pleading=make_pleading["craig"]
@@ -917,7 +915,7 @@ def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegatio
 
 
 @pytest.fixture(scope="module")
-def make_selector() -> Dict[str, TextQuoteSelector]:
+def make_selector() -> dict[str, TextQuoteSelector]:
     return {
         "bad_selector": TextQuoteSelector(exact="text that doesn't exist in the code"),
         "preexisting material": TextQuoteSelector(
@@ -935,7 +933,7 @@ def make_selector() -> Dict[str, TextQuoteSelector]:
 
 
 @pytest.fixture(scope="module")
-def make_response() -> Dict[str, Dict]:
+def make_response() -> dict[str, dict]:
     """Mock api responses"""
     this_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(this_directory)
@@ -1101,7 +1099,7 @@ def e_preexisting_material(make_response):
 @pytest.fixture(scope="class")
 def make_problem_procedure(
     make_evidence, make_factor, watt_factor
-) -> Dict[str, Procedure]:
+) -> dict[str, Procedure]:
     e = make_evidence
     f = watt_factor
     m = make_factor
@@ -1121,7 +1119,7 @@ def make_problem_procedure(
 
 
 @pytest.fixture(scope="class")
-def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedure]:
+def make_procedure(make_evidence, make_factor, watt_factor) -> dict[str, Procedure]:
     e = make_evidence
     f = watt_factor
     m = make_factor
@@ -1283,7 +1281,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
 @pytest.fixture(scope="class")
 def real_holding(
     make_procedure, make_problem_procedure, e_search_clause
-) -> Dict[str, Rule]:
+) -> dict[str, Rule]:
     """These holdings can be changed in case they don't accurately reflect
     what's in real cases, or in case there are API improvements that
     allow them to become more accurate. I'll try not to write any tests
@@ -1314,7 +1312,7 @@ def real_holding(
 @pytest.fixture(scope="class")
 def make_rule(
     make_procedure, make_problem_procedure, e_fourth_a, e_search_clause, e_due_process_5
-) -> Dict[str, Rule]:
+) -> dict[str, Rule]:
     c = make_procedure
 
     return {
@@ -1520,20 +1518,20 @@ def make_rule(
 
 
 @pytest.fixture(scope="class")
-def make_beard_rule() -> List[Rule]:
+def make_beard_rule() -> list[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
     return beard_act_rules()
 
 
 @pytest.fixture(scope="class")
-def make_beard_rule_with_python() -> List[Rule]:
+def make_beard_rule_with_python() -> list[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
     return beard_act_rules()
 
 
 @pytest.fixture(scope="class")
-def make_holding(make_rule) -> Dict[str, Holding]:
-    holdings: Dict[str, Holding] = {}
+def make_holding(make_rule) -> dict[str, Holding]:
+    holdings: dict[str, Holding] = {}
     for name, rule in make_rule.items():
         holdings[name] = Holding(rule=rule)
 
@@ -1633,7 +1631,7 @@ def make_decision_with_holding(make_response, make_decision, make_anchored_holdi
 
 
 @pytest.fixture(scope="class")
-def make_opinion(make_decision) -> Dict[str, Opinion]:
+def make_opinion(make_decision) -> dict[str, Opinion]:
     opinions = {}
     for case in TEST_CASES:
         for opinion in make_decision[case].opinions:
@@ -1642,7 +1640,7 @@ def make_opinion(make_decision) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
+def make_opinion_with_holding(make_decision_with_holding) -> dict[str, Opinion]:
     opinions = {}
     for case in TEST_CASES:
         for reading in make_decision_with_holding[case].opinion_readings:
@@ -1651,7 +1649,7 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_analysis() -> Dict[str, List[HoldingWithAnchors]]:
+def make_analysis() -> dict[str, list[HoldingWithAnchors]]:
     """Example user analysis data."""
     return {
         "minimal": [

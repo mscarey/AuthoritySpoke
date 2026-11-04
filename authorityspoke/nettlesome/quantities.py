@@ -3,24 +3,23 @@
 from abc import abstractmethod
 from datetime import date
 from decimal import Decimal
-from typing import Any, ClassVar, Dict, Optional, Self, Union
+from typing import Any, ClassVar, Self
 
-from pint import UnitRegistry, Quantity
+import sympy
+from pint import Quantity, UnitRegistry
 from pint.facets.plain import PlainQuantity
 from pydantic import BaseModel, field_validator, model_validator
-import sympy
-from sympy import Eq, Interval, Mul, oo, S
-from sympy.sets import EmptySet, FiniteSet
+from sympy import Eq, Interval, Mul, S, oo
 from sympy.physics.units import Quantity as SympyQuantity
+from sympy.sets import EmptySet, FiniteSet
 
 from authorityspoke.nettlesome.predicates import PhraseABC
-
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
-def scale_interval(interval: Interval, scalar: Union[int, float]) -> Interval:
+def scale_interval(interval: Interval, scalar: float) -> Interval:
     """
     Scale up one interval by multiplying by a scalar.
 
@@ -35,7 +34,7 @@ def scale_interval(interval: Interval, scalar: Union[int, float]) -> Interval:
 
 
 def scale_union_of_intervals(
-    ranges: sympy.Union, scalar: Union[int, float]
+    ranges: sympy.Union, scalar: float
 ) -> sympy.Union:
     """
     Scale up union of several intervals by multiplying by a scalar.
@@ -48,7 +47,7 @@ def scale_union_of_intervals(
     return sympy.Union(*scaled_intervals)
 
 
-def scale_finiteset(elements: FiniteSet[int | float], scalar: int | float) -> FiniteSet:
+def scale_finiteset(elements: FiniteSet[int | float], scalar: float) -> FiniteSet:
     """
     Scale up set of finite numbers by multiplying by a scalar.
 
@@ -59,8 +58,8 @@ def scale_finiteset(elements: FiniteSet[int | float], scalar: int | float) -> Fi
 
 
 def scale_ranges(
-    ranges: Union[Interval, FiniteSet, sympy.Union], scalar: Union[int, float]
-) -> Union[Interval, FiniteSet, sympy.Union]:
+    ranges: Interval | FiniteSet | sympy.Union, scalar: float
+) -> Interval | FiniteSet | sympy.Union:
     """
     Scale up set of interval ranges by multiplying by a scalar.
 
@@ -77,9 +76,9 @@ class QuantityRange(BaseModel):
     """Base class for ranges that can be assigned to Predicates."""
 
     sign: str = ""
-    include_negatives: Optional[bool] = None
+    include_negatives: bool | None = None
 
-    opposite_comparisons: ClassVar[Dict[str, str]] = {
+    opposite_comparisons: ClassVar[dict[str, str]] = {
         ">=": "<",
         "==": "!=",
         "!=": "=",
@@ -89,7 +88,7 @@ class QuantityRange(BaseModel):
         ">": "<=",
         "<": ">=",
     }
-    normalized_comparisons: ClassVar[Dict[str, str]] = {"=": "==", "<>": "!="}
+    normalized_comparisons: ClassVar[dict[str, str]] = {"=": "==", "<>": "!="}
 
     @field_validator("sign", mode="after")
     def check_sign(cls, v: str) -> str:
@@ -133,7 +132,7 @@ class QuantityRange(BaseModel):
         return f"{expand[self.sign]} {self._quantity_string()}"
 
     @property
-    def interval(self) -> Union[FiniteSet, Interval, sympy.Union]:
+    def interval(self) -> FiniteSet | Interval | sympy.Union:
         """Get the range that the Comparison may refer to."""
         if self.sign == "==":
             return FiniteSet(self.magnitude)
@@ -158,9 +157,8 @@ class QuantityRange(BaseModel):
 
     @property
     @abstractmethod
-    def magnitude(self) -> Union[Decimal, int, float]:
+    def magnitude(self) -> Decimal | int | float:
         """Get amount of max or minimum of the quantity range, without a unit."""
-        pass
 
     def consistent_dimensionality(self, other: Self) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
@@ -179,14 +177,14 @@ class QuantityRange(BaseModel):
         return self._implies_quantity_interval(other.interval)
 
     def _excludes_quantity_interval(
-        self, other_interval: Union[sympy.Union, Interval, FiniteSet]
+        self, other_interval: sympy.Union | Interval | FiniteSet
     ) -> bool:
         """Test if quantity ranges in self and other are non-overlapping."""
         combined_interval = self.interval.intersect(other_interval)
         return combined_interval == EmptySet
 
     def _implies_quantity_interval(
-        self, other_interval: Union[sympy.Union, Interval, FiniteSet]
+        self, other_interval: sympy.Union | Interval | FiniteSet
     ) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
 
@@ -224,7 +222,7 @@ class UnitRange(QuantityRange, BaseModel):
     quantity_magnitude: Decimal | int
     quantity_units: str
     sign: str = "=="
-    include_negatives: Optional[bool] = None
+    include_negatives: bool | None = None
 
     @property
     def q(self) -> PlainQuantity[Decimal | int]:
@@ -288,7 +286,7 @@ class UnitRange(QuantityRange, BaseModel):
 
     def get_unit_converted_interval(
         self, other: Self
-    ) -> Union[Interval, FiniteSet, sympy.Union]:
+    ) -> Interval | FiniteSet | sympy.Union:
         """Get ``other``'s interval if it was denominated in ``self``'s units."""
         if not isinstance(other, UnitRange):
             raise TypeError(
@@ -317,7 +315,7 @@ class DateRange(QuantityRange, BaseModel):
 
     quantity: date
     sign: str = "=="
-    include_negatives: Optional[bool] = None
+    include_negatives: bool | None = None
 
     @property
     def domain(self) -> sympy.Set:
@@ -325,7 +323,7 @@ class DateRange(QuantityRange, BaseModel):
         return S.Naturals
 
     @property
-    def magnitude(self) -> Union[int, float]:
+    def magnitude(self) -> int | float:
         """Map dates to integers while preserving the order of the dates."""
         return int(self.quantity.strftime("%Y%m%d"))
 
@@ -342,10 +340,10 @@ class DecimalRange(QuantityRange, BaseModel):
 
     quantity: Decimal
     sign: str = "=="
-    include_negatives: Optional[bool] = None
+    include_negatives: bool | None = None
 
     @field_validator("quantity", mode="before")
-    def convert_to_decimal(cls, value: Union[int, float, Decimal]) -> Decimal:
+    def convert_to_decimal(cls, value: float | Decimal) -> Decimal:
         """Convert int or float to Decimal."""
         if isinstance(value, Decimal):
             return value
@@ -435,14 +433,14 @@ class Comparison(BaseModel, PhraseABC):
     """
 
     content: str
-    quantity_range: Union[DecimalRange, UnitRange, DateRange]
-    truth: Optional[bool] = True
+    quantity_range: DecimalRange | UnitRange | DateRange
+    truth: bool | None = True
 
     @classmethod
     def new(
         cls,
         content: str,
-        expression: str | int | float | date | Decimal | SympyQuantity | PlainQuantity,
+        expression: str | float | date | Decimal | SympyQuantity | PlainQuantity,
         sign: str = "==",
         include_negatives: bool | None = None,
         truth: bool | None = True,
@@ -523,7 +521,7 @@ class Comparison(BaseModel, PhraseABC):
 
     @classmethod
     def expression_to_quantity(
-        cls, value: str | int | float | date | Decimal | SympyQuantity | PlainQuantity
+        cls, value: str | float | date | Decimal | SympyQuantity | PlainQuantity
     ) -> date | Decimal | str:
         r"""
         Create numeric expression from text for Comparison class.
@@ -566,7 +564,7 @@ class Comparison(BaseModel, PhraseABC):
         return str(Q_(quantity))
 
     @property
-    def interval(self) -> Union[FiniteSet, Interval, sympy.Union]:
+    def interval(self) -> FiniteSet | Interval | sympy.Union:
         """
         Get the range of numbers covered by the UnitInterval.
 
@@ -581,7 +579,7 @@ class Comparison(BaseModel, PhraseABC):
         return self.quantity_range.interval
 
     @property
-    def quantity(self) -> Union[Decimal, date, PlainQuantity[Decimal | int]]:
+    def quantity(self) -> Decimal | date | PlainQuantity[Decimal | int]:
         """
         Get the maximum or minimum of the range.
 

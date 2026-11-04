@@ -1,12 +1,13 @@
 from datetime import date
 from decimal import Decimal
-from pint import Quantity
+
 import pytest
 import sympy
+from pint import Quantity
 from sympy import Interval, oo
 
 from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, DecimalRange, Q_
+from authorityspoke.nettlesome.quantities import Q_, Comparison, DecimalRange
 from authorityspoke.nettlesome.statements import Statement
 
 

@@ -1,8 +1,7 @@
 import logging
 
+from authorityspoke.facts import Exhibit, Fact, Predicate
 from authorityspoke.nettlesome import Entity
-
-from authorityspoke.facts import Fact, Predicate, Exhibit
 
 
 class TestExhibits:

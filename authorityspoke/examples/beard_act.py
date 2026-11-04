@@ -1,20 +1,18 @@
 import json
 from pathlib import Path
 
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Evidence,
+    Exhibit,
+    Fact,
+)
+from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
 from authorityspoke.nettlesome.quantities import Comparison, UnitRange
-
-from authorityspoke.facts import (
-    AbsenceOfFactor,
-    Fact,
-    Evidence,
-)
-from authorityspoke.facts import Exhibit
 from authorityspoke.passages import passage_from_quotes
 from authorityspoke.rules import Procedure, Rule
-
-from authorityspoke.io.fake_enactments import FakeClient
 
 
 def beard_response() -> dict[str, dict]:

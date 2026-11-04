@@ -1,16 +1,15 @@
-from copy import deepcopy
 import logging
-import pytest
+from copy import deepcopy
 
+import pytest
 from pydantic import ValidationError
 
-from authorityspoke.nettlesome.terms import ContextRegister, Explanation, TermSequence
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.groups import FactorGroup
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_
-
 from authorityspoke.facts import AbsenceOfFactor, Fact
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison
+from authorityspoke.nettlesome.terms import ContextRegister, Explanation, TermSequence
 from authorityspoke.procedures import Procedure
 
 

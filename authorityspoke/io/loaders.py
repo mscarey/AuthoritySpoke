@@ -7,22 +7,18 @@ Will usually hand off data to the io.readers module to create authorityspoke obj
 import json
 import pathlib
 
-from typing import List, Optional
-
 import yaml
-
 
 from authorityspoke.decisions import DecisionReading, RawDecision
 from authorityspoke.holdings import RawHolding
-
 from authorityspoke.io import filepaths, readers
 
 
 def load_holdings(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-) -> List[RawHolding]:
+    filename: str | None = None,
+    directory: pathlib.Path | None = None,
+    filepath: pathlib.Path | None = None,
+) -> list[RawHolding]:
     r"""
     Load list of records from YAML or JSON to create :class:`.Holding`\s with text selectors.
 
@@ -57,9 +53,9 @@ def load_holdings(
 
 
 def load_decision(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
+    filename: str | None = None,
+    directory: pathlib.Path | None = None,
+    filepath: pathlib.Path | None = None,
 ) -> RawDecision:
     r"""
     Load file containing a judicial decision with one or more opinions.
@@ -87,9 +83,9 @@ def load_decision(
 
 
 def load_decision_as_reading(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
+    filename: str | None = None,
+    directory: pathlib.Path | None = None,
+    filepath: pathlib.Path | None = None,
 ) -> DecisionReading:
     r"""
     Load file containing a judicial decision with one or more opinions.

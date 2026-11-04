@@ -2,11 +2,10 @@ import operator
 
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister, means
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.groups import FactorGroup
-
 from authorityspoke.facts import Fact
+from authorityspoke.groups import FactorGroup
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister, means
 
 
 class TestContextRegisters:

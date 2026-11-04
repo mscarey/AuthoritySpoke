@@ -2,24 +2,24 @@
 
 from __future__ import annotations
 
-from authorityspoke.nettlesome.groups import FactorGroup, unique_explanations
-
 from legislice.groups import (
+    ConsolidatablePassage,
     EnactmentGroup,
     EnactmentGroupItem,
     SortablePassage,
-    ConsolidatablePassage,
     consolidate_passages,
     sort_passages,
 )
 
+from authorityspoke.nettlesome.groups import FactorGroup, unique_explanations
+
 __all__ = [
-    "FactorGroup",
-    "unique_explanations",
+    "ConsolidatablePassage",
     "EnactmentGroup",
     "EnactmentGroupItem",
+    "FactorGroup",
     "SortablePassage",
-    "ConsolidatablePassage",
     "consolidate_passages",
     "sort_passages",
+    "unique_explanations",
 ]

@@ -1,27 +1,26 @@
 import copy
-
 import os
-import pytest
 
+import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
-from authorityspoke.nettlesome.terms import ContextRegister
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.predicates import Predicate
 
 from authorityspoke.examples import brad as brad_example
 from authorityspoke.examples import feist as feist_example
 from authorityspoke.examples import lotus as lotus_example
 from authorityspoke.examples import watt as watt_example
-from authorityspoke.facts import Fact, AbsenceOfFactor
+from authorityspoke.facts import AbsenceOfFactor, Fact
 from authorityspoke.holdings import Holding
+from authorityspoke.io.loaders import load_holdings
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.terms import ContextRegister
 from authorityspoke.opinions import (
+    AnchoredHoldings,
     HoldingWithAnchors,
     OpinionReading,
-    AnchoredHoldings,
 )
 from authorityspoke.procedures import Procedure
-from authorityspoke.io.loaders import load_holdings
 from authorityspoke.rules import Rule
 
 load_dotenv()

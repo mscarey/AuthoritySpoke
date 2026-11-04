@@ -5,15 +5,13 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 
-from typing import Dict, Union
-
-
-from authorityspoke.nettlesome.entities import Entity
+from typing import Union
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
-from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
+from authorityspoke.facts import Allegation, Evidence, Exhibit, Fact, Pleading
+from authorityspoke.nettlesome.entities import Entity
 
-RawSelector = Union[str, Dict[str, str]]
+RawSelector = Union[str, dict[str, str]]
 
 
 FACTOR_SUBCLASSES = {
@@ -22,7 +20,7 @@ FACTOR_SUBCLASSES = {
 }
 
 
-def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
+def read_decision(decision: RawDecision | Decision) -> DecisionReading:
     r"""
     Create and return a :class:`~authorityspoke.decisions.Decision` from a dict API response.
 

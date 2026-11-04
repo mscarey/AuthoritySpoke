@@ -1,14 +1,12 @@
 import os
 
 from dotenv import load_dotenv
-
 from justopinion import CAPClient
 
 from authorityspoke import Opinion
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.io import loaders, readers
 from authorityspoke.opinions import AnchoredHoldings, OpinionReading
-
 
 load_dotenv()
 

@@ -1,23 +1,29 @@
 """Create models of assertions accepted as factual by courts."""
 
 from __future__ import annotations
-from copy import deepcopy
+
 import operator
-from typing import Any, ClassVar, Dict, Iterator, List
-from typing import Mapping, Optional, Sequence, Tuple, Union
+from collections.abc import Iterator, Mapping, Sequence
+from copy import deepcopy
+from typing import (
+    Any,
+    ClassVar,
+    Union,
+)
 
 from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationInfo,
     field_validator,
     model_validator,
-    ConfigDict,
-    BaseModel,
-    ValidationInfo,
 )
 from slugify import slugify
 
-from authorityspoke.nettlesome.factors import Entity, Factor, AbsenceOf
+from authorityspoke.nettlesome.factors import AbsenceOf, Entity, Factor
 from authorityspoke.nettlesome.formatting import indented, wrapped
-from authorityspoke.nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison, QuantityRange
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
@@ -26,12 +32,9 @@ from authorityspoke.nettlesome.terms import (
     TermSequence,
     new_context_helper,
 )
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, QuantityRange
 
-
-RawPredicate = Dict[str, Union[str, bool]]
-RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
+RawPredicate = dict[str, str | bool]
+RawFactor = dict[str, RawPredicate | Sequence[Any] | str | bool]
 
 
 class Fact(Factor, BaseModel):
@@ -77,14 +80,14 @@ class Fact(Factor, BaseModel):
             approach of hard-coding their names and order will have to change.
     """
 
-    predicate: Union[Predicate, Comparison]
-    terms: List[
-        Union[Entity, "Fact", "Allegation", "Pleading", "Exhibit", "Evidence"]
+    predicate: Predicate | Comparison
+    terms: list[
+        Entity | Fact | Allegation | Pleading | Exhibit | Evidence
     ] = []
     name: str = ""
     generic: bool = False
-    standard_of_proof: Optional[str] = None
-    standards_of_proof: ClassVar[Tuple[str, ...]] = (
+    standard_of_proof: str | None = None
+    standards_of_proof: ClassVar[tuple[str, ...]] = (
         "scintilla of evidence",
         "substantial evidence",
         "preponderance of evidence",
@@ -180,7 +183,7 @@ class Fact(Factor, BaseModel):
         return text
 
     @property
-    def truth(self) -> Optional[bool]:
+    def truth(self) -> bool | None:
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
@@ -215,7 +218,7 @@ class Fact(Factor, BaseModel):
 
     @field_validator("standard_of_proof")
     @classmethod
-    def validate_standard_of_proof(cls, v: Optional[str]) -> Optional[str]:
+    def validate_standard_of_proof(cls, v: str | None) -> str | None:
         """
         Validate that standard of proof is one of the allowable values.
 
@@ -310,7 +313,7 @@ class Fact(Factor, BaseModel):
         return result
 
     @new_context_helper
-    def new_context(self, changes: Dict[Comparable, Comparable]) -> Comparable:
+    def new_context(self, changes: dict[Comparable, Comparable]) -> Comparable:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
@@ -343,7 +346,7 @@ class Fact(Factor, BaseModel):
         yield matches
         gen = self.term_permutations()
         _ = next(gen)  # unchanged permutation
-        already_returned: List[ContextRegister] = [matches]
+        already_returned: list[ContextRegister] = [matches]
 
         for term_permutation in gen:
             left = [term for term in self.terms if term is not None]
@@ -365,10 +368,10 @@ class Fact(Factor, BaseModel):
 
 def build_fact(
     predicate: Predicate,
-    indices: Optional[Union[int, Sequence[int]]] = None,
-    case_factors: Optional[Union[Factor, Sequence[Factor]]] = None,
-    name: Optional[str] = None,
-    standard_of_proof: Optional[str] = None,
+    indices: int | Sequence[int] | None = None,
+    case_factors: Factor | Sequence[Factor] | None = None,
+    name: str | None = None,
+    standard_of_proof: str | None = None,
     absent: bool = False,
     generic: bool = False,
 ) -> Fact | AbsenceOfFactor:
@@ -473,12 +476,12 @@ class Exhibit(Factor, BaseModel):
     """
 
     offered_by: Entity
-    form: Optional[str] = None
-    statement: Optional[Fact] = None
-    statement_attribution: Optional[Entity] = None
-    name: Optional[str] = None
+    form: str | None = None
+    statement: Fact | None = None
+    statement_attribution: Entity | None = None
+    name: str | None = None
     generic: bool = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = (
+    context_factor_names: ClassVar[tuple[str, ...]] = (
         "statement",
         "statement_attribution",
     )
@@ -554,11 +557,11 @@ class Evidence(Factor, BaseModel):
         the evidence is being referenced.
     """
 
-    exhibit: Optional[Exhibit] = None
-    to_effect: Optional[Fact] = None
-    name: Optional[str] = None
+    exhibit: Exhibit | None = None
+    to_effect: Fact | None = None
+    name: str | None = None
     generic: bool = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
+    context_factor_names: ClassVar[tuple[str, ...]] = ("exhibit", "to_effect")
     model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="before")
@@ -585,7 +588,7 @@ class Evidence(Factor, BaseModel):
         if self.exhibit:
             text += "\n" + indented("OF:")
             factor_text = indented(self.exhibit.wrapped_string, tabs=2)
-            text += f"\n{str(factor_text)}"
+            text += f"\n{factor_text!s}"
         if self.to_effect:
             text += "\n" + indented("INDICATING:")
             factor_text = indented(self.to_effect.wrapped_string, tabs=2)
@@ -609,9 +612,9 @@ class Pleading(Factor, BaseModel):
     """
 
     filer: Entity
-    name: Optional[str] = None
+    name: str | None = None
     generic: bool = False
-    context_factor_names: ClassVar[Tuple[str]] = ("filer",)
+    context_factor_names: ClassVar[tuple[str]] = ("filer",)
 
     def __str__(self):
         string = f"{('filed by ' + self.filer.short_string if self.filer else '')}"
@@ -639,10 +642,10 @@ class Allegation(Factor, BaseModel):
     """
 
     fact: Fact
-    pleading: Optional[Pleading] = None
-    name: Optional[str] = None
+    pleading: Pleading | None = None
+    name: str | None = None
     generic: bool = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("fact", "pleading")
+    context_factor_names: ClassVar[tuple[str, ...]] = ("fact", "pleading")
 
     @property
     def wrapped_string(self):
@@ -651,7 +654,7 @@ class Allegation(Factor, BaseModel):
         if self.fact:
             text += "\n" + indented("OF:")
             factor_text = indented(self.fact.wrapped_string, tabs=2)
-            text += f"\n{str(factor_text)}"
+            text += f"\n{factor_text!s}"
         if self.pleading:
             text += "\n" + indented("FOUND IN:")
             factor_text = indented(str(self.pleading), tabs=2)

@@ -1,8 +1,7 @@
-from authorityspoke.nettlesome.terms import ContextRegister, means
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome import Predicate
-
 from authorityspoke import Fact
+from authorityspoke.nettlesome import Predicate
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister, means
 
 
 class TestContext:

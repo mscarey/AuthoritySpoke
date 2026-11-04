@@ -6,17 +6,19 @@ may describe procedural moves available in litigation.
 """
 
 from __future__ import annotations
+
+from collections.abc import Iterator, Sequence
 from copy import deepcopy
-
-from typing import Any, ClassVar, Dict, Iterator
-from typing import Optional, Sequence, Tuple, Union
-
-from pydantic import field_validator, BaseModel, Field, ValidationError
+from typing import Any, ClassVar
 
 from legislice.enactments import Enactment, EnactmentPassage
-from authorityspoke.groups import EnactmentGroup, consolidate_passages
 from legislice.models import RawEnactment
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
+from authorityspoke.facts import AbsenceOfFactor
+from authorityspoke.groups import EnactmentGroup, consolidate_passages
+from authorityspoke.nettlesome.factors import Factor
+from authorityspoke.nettlesome.formatting import indented
 from authorityspoke.nettlesome.terms import (
     Comparable,
     ContextRegister,
@@ -24,12 +26,9 @@ from authorityspoke.nettlesome.terms import (
     Term,
     TermSequence,
 )
-from authorityspoke.nettlesome.factors import Factor
-from authorityspoke.nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure, RawProcedure
-from authorityspoke.facts import AbsenceOfFactor
 
-RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
+RawRule = dict[str, RawProcedure | Sequence[RawEnactment] | str | bool]
 
 
 class Rule(Term, BaseModel):
@@ -89,9 +88,9 @@ class Rule(Term, BaseModel):
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
-    name: Optional[str] = None
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("procedure",)
-    enactment_attr_names: ClassVar[Tuple[str, ...]] = (
+    name: str | None = None
+    context_factor_names: ClassVar[tuple[str, ...]] = ("procedure",)
+    enactment_attr_names: ClassVar[tuple[str, ...]] = (
         "enactments",
         "enactments_despite",
     )
@@ -100,12 +99,7 @@ class Rule(Term, BaseModel):
     @classmethod
     def validate_enactment_groups(
         cls,
-        v: Union[
-            Dict,
-            EnactmentPassage,
-            Sequence[EnactmentPassage],
-            EnactmentGroup[EnactmentPassage],
-        ],
+        v: dict | EnactmentPassage | Sequence[EnactmentPassage] | EnactmentGroup[EnactmentPassage],
     ) -> EnactmentGroup[EnactmentPassage]:
         """Convert EnactmentPassage to EnactmentGroup."""
         enactment_group_type = EnactmentGroup[EnactmentPassage]
@@ -155,7 +149,7 @@ class Rule(Term, BaseModel):
         return self.procedure.outputs
 
     @property
-    def recursive_terms(self) -> Dict[str, Term]:
+    def recursive_terms(self) -> dict[str, Term]:
         r"""
         Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
@@ -169,7 +163,7 @@ class Rule(Term, BaseModel):
         self,
         other: Comparable,
         context: ContextRegister | Explanation | None = None,
-    ) -> Optional[Rule]:
+    ) -> Rule | None:
         """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
             if isinstance(other, (Factor, AbsenceOfFactor)):
@@ -201,7 +195,7 @@ class Rule(Term, BaseModel):
             return result
         return None
 
-    def __add__(self, other) -> Optional[Rule]:
+    def __add__(self, other) -> Rule | None:
         r"""
         Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``.
 
@@ -358,9 +352,8 @@ class Rule(Term, BaseModel):
             the new :class:`.Factor` to be added to input
         """
         self.procedure.add_factor(incoming)
-        return None
 
-    def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Optional[Rule]:
+    def with_factor(self, incoming: Factor | AbsenceOfFactor) -> Rule | None:
         """
         Make new version of ``self`` with an added input :class:`.Factor`.
 
@@ -386,7 +379,7 @@ class Rule(Term, BaseModel):
         return not isinstance(other, Factor)
 
     def contradicts(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+        self, other: Comparable | None, context: ContextRegister | None = None
     ) -> bool:
         """
         Test if ``self`` contradicts ``other``.
@@ -441,7 +434,7 @@ class Rule(Term, BaseModel):
             yield from other_to_self
 
     def explanations_contradiction(
-        self, other, context: Optional[Union[ContextRegister, Explanation]] = None
+        self, other, context: ContextRegister | Explanation | None = None
     ) -> Iterator[Explanation]:
         """Find context matches that would result in a contradiction with other."""
         if not isinstance(context, Explanation):
@@ -449,7 +442,7 @@ class Rule(Term, BaseModel):
 
         yield from self._explanations_contradiction(other=other, context=context)
 
-    def needs_subset_of_enactments(self, other: "Rule") -> bool:
+    def needs_subset_of_enactments(self, other: Rule) -> bool:
         r"""
         Test whether ``self``\'s :class:`.Enactment` support is a subset of ``other``\'s.
 
@@ -603,7 +596,7 @@ class Rule(Term, BaseModel):
             for explanation in self.explanations_same_meaning(other, context)
         )
 
-    def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
+    def _union_with_rule(self, other: Rule, context: ContextRegister) -> Rule | None:
         new_procedure = self.procedure.union(other.procedure, context=context)
         if new_procedure is None:
             return None
@@ -634,8 +627,8 @@ class Rule(Term, BaseModel):
         )
 
     def union(
-        self, other: Optional[Rule], context: Optional[ContextRegister] = None
-    ) -> Optional[Rule]:
+        self, other: Rule | None, context: ContextRegister | None = None
+    ) -> Rule | None:
         """Get new Rule with all the Factors of self and other."""
         if other is None:
             return self
@@ -646,7 +639,7 @@ class Rule(Term, BaseModel):
             return other.union(self, context=context.reversed())
         raise TypeError(f"Union operation not possible between Rule and {type(other)}.")
 
-    def __or__(self, other: Rule) -> Optional[Rule]:
+    def __or__(self, other: Rule) -> Rule | None:
         r"""
         Create new :class:`Rule` showing combined effect of all inputs of ``self`` and ``other``.
 

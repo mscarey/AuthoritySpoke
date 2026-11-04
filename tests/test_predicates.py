@@ -1,13 +1,13 @@
 from datetime import date
 from decimal import Decimal
+
 import pytest
 import sympy
 from sympy import Interval, oo
 
-
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_, Quantity
+from authorityspoke.nettlesome.quantities import Q_, Comparison, Quantity
 
 
 class TestComparisons:
@@ -25,7 +25,7 @@ class TestComparisons:
             sign=">",
             expression=Q_("20 miles"),
         )
-        assert comparison.interval == Interval(Decimal("20"), oo, left_open=True)
+        assert comparison.interval == Interval(Decimal(20), oo, left_open=True)
 
     def test_comparison_not_equal(self):
         comparison = Comparison.new(
@@ -34,7 +34,7 @@ class TestComparisons:
             expression=Q_("20 miles"),
         )
         assert comparison.interval == sympy.Union(
-            Interval.Ropen(0, Decimal("20")), Interval.open(Decimal("20"), oo)
+            Interval.Ropen(0, Decimal(20)), Interval.open(Decimal(20), oo)
         )
 
 

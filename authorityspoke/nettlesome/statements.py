@@ -1,32 +1,36 @@
 """Statements, similar to AuthoritySpoke Facts but without a "standard of proof"."""
 
-from copy import deepcopy
 import operator
-
-from typing import Any, ClassVar, Dict, Iterator, List, Mapping
-from typing import Optional, Self, Sequence, Tuple, Union, cast
+from collections.abc import Iterator, Mapping, Sequence
+from copy import deepcopy
+from typing import (
+    Any,
+    ClassVar,
+    Self,
+    cast,
+)
 
 from pydantic import (
     BaseModel,
+    field_serializer,
     field_validator,
     model_validator,
-    field_serializer,
 )
 from slugify import slugify
 
-from authorityspoke.nettlesome.terms import (
-    Comparable,
-    Explanation,
-    Term,
-    TermSequence,
-    ContextRegister,
-    new_context_helper,
-)
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.factors import Factor
 from authorityspoke.nettlesome.formatting import indented, wrapped
 from authorityspoke.nettlesome.predicates import Predicate
 from authorityspoke.nettlesome.quantities import Comparison
+from authorityspoke.nettlesome.terms import (
+    Comparable,
+    ContextRegister,
+    Explanation,
+    Term,
+    TermSequence,
+    new_context_helper,
+)
 
 
 class Statement(Factor, BaseModel):
@@ -54,7 +58,7 @@ class Statement(Factor, BaseModel):
         a new "truth" attribute for the "predicate", if needed.
     """
 
-    predicate: Union[Predicate, Comparison]
+    predicate: Predicate | Comparison
     terms: TermSequence = TermSequence()
     name: str = ""
     generic: bool = False
@@ -62,17 +66,11 @@ class Statement(Factor, BaseModel):
     @classmethod
     def new(
         cls,
-        predicate: Union[Predicate, Comparison, str],
-        terms: Optional[
-            Union[
-                TermSequence,
-                Mapping[str, Term],
-                Sequence[Term | None],
-            ]
-        ] = None,
-        truth: Optional[bool] = True,
+        predicate: Predicate | Comparison | str,
+        terms: TermSequence | Mapping[str, Term] | Sequence[Term | None] | None = None,
+        truth: bool | None = True,
         generic: bool = False,
-    ) -> "Statement":
+    ) -> Statement:
         """
         Create a Statement, allowing for a string to be passed as the predicate.
 
@@ -118,7 +116,7 @@ class Statement(Factor, BaseModel):
         return TermSequence(root=normalized)
 
     @classmethod
-    def _normalize_term(cls, term: Any) -> Union[Entity, "Statement", "Assertion"]:
+    def _normalize_term(cls, term: Any) -> Entity | Statement | Assertion:
         if isinstance(term, (Entity, Statement, Assertion)):
             return term
         if isinstance(term, Mapping):
@@ -203,7 +201,7 @@ class Statement(Factor, BaseModel):
             text += "\n" + indented("SPECIFIC CONTEXT:")
             for factor in concrete_context:
                 factor_text = indented(factor.wrapped_string, tabs=2)
-                text += f"\n{str(factor_text)}"
+                text += f"\n{factor_text!s}"
         return text
 
     def __str__(self):
@@ -213,7 +211,7 @@ class Statement(Factor, BaseModel):
         return super().__str__().format(unwrapped)
 
     @property
-    def truth(self) -> Optional[bool]:
+    def truth(self) -> bool | None:
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
@@ -257,7 +255,7 @@ class Statement(Factor, BaseModel):
                 yield explanation.with_context(register)
 
     @new_context_helper
-    def new_context(self, changes: Dict[Comparable, Comparable]) -> Comparable:
+    def new_context(self, changes: dict[Comparable, Comparable]) -> Comparable:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
@@ -290,7 +288,7 @@ class Statement(Factor, BaseModel):
         yield matches
         gen = self.term_permutations()
         _ = next(gen)  # unchanged permutation
-        already_returned: List[ContextRegister] = [matches]
+        already_returned: list[ContextRegister] = [matches]
 
         for term_permutation in gen:
             left = [term for term in self.terms if term is not None]
@@ -313,11 +311,11 @@ class Statement(Factor, BaseModel):
 class Assertion(Factor, BaseModel):
     """A Statement identified with the authority of a speaker or endorser."""
 
-    statement: "Statement"
-    authority: Optional[Entity] = None
+    statement: Statement
+    authority: Entity | None = None
     name: str = ""
     generic: bool = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("statement", "authority")
+    context_factor_names: ClassVar[tuple[str, ...]] = ("statement", "authority")
 
     def base_string(self):
         text = f"the {self.__class__.__name__.lower()}" + " {}"

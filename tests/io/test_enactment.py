@@ -1,10 +1,8 @@
 import os
 
+import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
-import pytest
-
-
 
 load_dotenv()
 

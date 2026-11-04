@@ -3,17 +3,15 @@ Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
 
-from copy import deepcopy
 import os
+from copy import deepcopy
 
-from dotenv import load_dotenv
 import pytest
-
+from dotenv import load_dotenv
 from justopinion.download import CourtListenerClient
 
-from authorityspoke.facts import Fact, AbsenceOfFactor
-
-from authorityspoke import Entity, Predicate, Comparison
+from authorityspoke import Comparison, Entity, Predicate
+from authorityspoke.facts import AbsenceOfFactor, Fact
 
 load_dotenv()
 

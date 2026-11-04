@@ -1,11 +1,10 @@
 import os
-from dotenv import load_dotenv
 
 import pytest
-
+from dotenv import load_dotenv
 from legislice.download import Client
-from authorityspoke import Entity, Fact, Predicate, Holding
 
+from authorityspoke import Entity, Fact, Holding, Predicate
 
 load_dotenv()
 LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")

@@ -1,9 +1,7 @@
 import os
 
-
 from authorityspoke import LegisClient
 from authorityspoke.io import filepaths, loaders
-
 
 LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 

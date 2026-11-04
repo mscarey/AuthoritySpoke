@@ -2,6 +2,7 @@ import copy
 from typing import Literal, NotRequired, TypedDict, cast
 
 from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import (
     COPYRIGHTABILITY_REQUIREMENT,
@@ -9,6 +10,7 @@ from authorityspoke.examples.legislation import (
     SHORT_PHRASES_EXCLUSION_RULE,
 )
 from authorityspoke.facts import AbsenceOfFactor
+from authorityspoke.groups import EnactmentGroup
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.opinions import (
     AnchoredHoldings,
@@ -18,7 +20,6 @@ from authorityspoke.opinions import (
     TextPositionSet,
 )
 from authorityspoke.procedures import Procedure
-from authorityspoke.groups import EnactmentGroup
 
 ENTITIES: dict[str, Entity] = {
     "the_java_api": Entity(name="the Java API", generic=True, plural=False),

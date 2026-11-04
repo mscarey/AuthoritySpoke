@@ -1,12 +1,12 @@
 from datetime import date
 from decimal import Decimal
 
-from pydantic import ValidationError
 import pytest
+from pydantic import ValidationError
 
-from authorityspoke.nettlesome.predicates import Predicate
 from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison
 from authorityspoke.nettlesome.statements import Assertion
 
 
@@ -52,12 +52,12 @@ class TestPredicateDump:
             expression=Q_("35 feet"),
         )
         dumped = predicate.model_dump()
-        assert dumped["quantity_range"]["quantity_magnitude"] == Decimal("35")
+        assert dumped["quantity_range"]["quantity_magnitude"] == Decimal(35)
         assert dumped["quantity_range"]["quantity_units"] == "foot"
 
     def test_round_trip(self):
         predicate = Comparison.new(
-            **{"content": "{}'s favorite number was", "sign": "==", "expression": 42}
+            content="{}'s favorite number was", sign="==", expression=42
         )
         dumped = predicate.model_dump()
         new_statement = Comparison(**dumped)

@@ -7,19 +7,17 @@ the `pint <https://pint.readthedocs.io/en/>`_ library).
 """
 
 from __future__ import annotations
-from abc import ABCMeta
-import re
 
+import re
+from abc import ABCMeta
+from collections.abc import Mapping, Sequence
 from itertools import product
 from string import templatelib
-from typing import Any, Dict, Mapping
-from typing import List, Optional, Sequence, Set, Tuple
+from typing import Any
 
 from pydantic import BaseModel
 
-from authorityspoke.nettlesome.terms import Comparable, TermSequence
-from authorityspoke.nettlesome.terms import Term
-
+from authorityspoke.nettlesome.terms import Comparable, Term, TermSequence
 
 Interpolation = templatelib.Interpolation
 TStringTemplate = templatelib.Template
@@ -60,8 +58,8 @@ class StatementTemplate:
             whether "were" after a placeholder should be converted to
             singular "was"
         """
-        self._placeholders: List[str] = []
-        self._placeholder_tokens: List[str] = []
+        self._placeholders: list[str] = []
+        self._placeholder_tokens: list[str] = []
         self._t_template = TStringTemplate(template)
         self._refresh_parsed_template(template)
 
@@ -78,7 +76,7 @@ class StatementTemplate:
             if strings[idx].startswith(" were"):
                 strings[idx] = " was" + strings[idx][5:]
 
-        fragments: List[str | Interpolation] = [strings[0]]
+        fragments: list[str | Interpolation] = [strings[0]]
         for idx, token in enumerate(self._placeholder_tokens):
             placeholder_name = token[1:-1]
             fragments.append(
@@ -86,13 +84,12 @@ class StatementTemplate:
             )
             fragments.append(strings[idx + 1])
         self._t_template = TStringTemplate(*fragments)
-        return None
 
     def _refresh_parsed_template(self, template_text: str) -> None:
         """Parse {placeholders} into a templatelib.Template-backed representation."""
-        fragments: List[str | Interpolation] = []
-        placeholders_in_order: List[str] = []
-        placeholder_tokens: List[str] = []
+        fragments: list[str | Interpolation] = []
+        placeholders_in_order: list[str] = []
+        placeholder_tokens: list[str] = []
         start = 0
 
         for match in self._PLACEHOLDER_PATTERN.finditer(template_text):
@@ -114,22 +111,22 @@ class StatementTemplate:
     def template(self) -> str:
         """Text representation reconstructed from the stored t-template."""
         strings = self._t_template.strings
-        rebuilt_template: List[str] = [strings[0]]
+        rebuilt_template: list[str] = [strings[0]]
         for idx, token in enumerate(self._placeholder_tokens):
             rebuilt_template.append(token)
             rebuilt_template.append(strings[idx + 1])
         return "".join(rebuilt_template)
 
     def substitute(
-        self, mapping: Optional[Mapping[str, Any]] = None, /, **kwargs: Any
+        self, mapping: Mapping[str, Any] | None = None, /, **kwargs: Any
     ) -> str:
         """Substitute placeholders in template text with values from mapping and kwargs."""
-        substitutions: Dict[str, Any] = {}
+        substitutions: dict[str, Any] = {}
         if mapping is not None:
             substitutions.update(mapping)
         substitutions.update(kwargs)
 
-        chunks: List[str] = []
+        chunks: list[str] = []
         for chunk in self._t_template:
             if isinstance(chunk, str):
                 chunks.append(chunk)
@@ -157,19 +154,19 @@ class StatementTemplate:
             ):
                 strings[idx + 1] = " were" + strings[idx + 1][4:]
 
-        rebuilt_template: List[str] = [strings[0]]
+        rebuilt_template: list[str] = [strings[0]]
         for idx, token in enumerate(self._placeholder_tokens):
             rebuilt_template.append(token)
             rebuilt_template.append(strings[idx + 1])
         return "".join(rebuilt_template)
 
     @property
-    def placeholders(self) -> List[str]:
+    def placeholders(self) -> list[str]:
         """List substrings of template text marked as placeholders."""
         return self._placeholders
 
     @property
-    def text_fragments(self) -> Tuple[str, ...]:
+    def text_fragments(self) -> tuple[str, ...]:
         """Literal text segments between placeholders in the parsed template."""
         return self._t_template.strings
 
@@ -182,18 +179,17 @@ class StatementTemplate:
         return TermSequence(root=tuple(result))
 
     def _check_number_of_terms(
-        self, placeholders: List[str], context: Sequence[Term]
+        self, placeholders: list[str], context: Sequence[Term]
     ) -> None:
         if len(set(placeholders)) != len(context):
             raise ValueError(
                 f"The number of terms passed in 'context' ({len(context)}) must be equal to the "
                 f"number of placeholders in the StatementTemplate ({len(placeholders)})."
             )
-        return None
 
     def mapping_placeholder_to_term(
         self, context: Sequence[Term]
-    ) -> Dict[str, Comparable]:
+    ) -> dict[str, Comparable]:
         """
         Get a mapping of template placeholders to context terms.
 
@@ -206,7 +202,7 @@ class StatementTemplate:
 
     def mapping_placeholder_to_term_name(
         self, context: Sequence[Term]
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Get a mapping of template placeholders to the names of their context terms.
 
@@ -240,7 +236,7 @@ class PhraseABC(metaclass=ABCMeta):
     r"""Abstract base class for phrases that can be compared like Predicates."""
 
     content: str
-    truth: Optional[bool]
+    truth: bool | None
 
     def contradicts(self, other: Any) -> bool:
         r"""
@@ -431,7 +427,7 @@ class PhraseABC(metaclass=ABCMeta):
 
         return self.same_term_positions(other)
 
-    def term_positions(self) -> Dict[str, Set[int]]:
+    def term_positions(self) -> dict[str, set[int]]:
         """
         Create list of positions that each term could take without changing Predicate's meaning.
 
@@ -439,17 +435,17 @@ class PhraseABC(metaclass=ABCMeta):
         they've been labeled as interchangeable with one another.
         """
 
-        without_duplicates: List[str] = self.template.placeholders
-        result: Dict[str, Set[int]] = {p: {i} for i, p in enumerate(without_duplicates)}
+        without_duplicates: list[str] = self.template.placeholders
+        result: dict[str, set[int]] = {p: {i} for i, p in enumerate(without_duplicates)}
 
         for index, placeholder in enumerate(without_duplicates):
             if placeholder[-1].isdigit():
                 for k, v in result.items():
                     if k[-1].isdigit() and k[:-1] == placeholder[:-1]:
-                        result[k].add(index)
+                        v.add(index)
         return result
 
-    def term_index_permutations(self) -> List[Tuple[int, ...]]:
+    def term_index_permutations(self) -> list[tuple[int, ...]]:
         """Get the arrangements of all this Predicate's terms that preserve the same meaning."""
         product_of_positions = product(*self.term_positions().values())
         return [x for x in product_of_positions if len(set(x)) == len(x)]
@@ -508,7 +504,7 @@ class Predicate(PhraseABC, BaseModel, extra="forbid"):
     """
 
     content: str
-    truth: Optional[bool] = True
+    truth: bool | None = True
 
     def negated(self) -> Predicate:
         """Copy ``self``, with the opposite truth value."""

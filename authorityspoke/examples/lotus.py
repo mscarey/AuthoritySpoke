@@ -1,25 +1,24 @@
 import copy
 
 from anchorpoint.textselectors import TextQuoteSelector
+
+from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import (
-    COPYRIGHTABILITY_REQUIREMENT,
     COPYRIGHT_REGISTRATION_EVIDENCE_RULE,
+    COPYRIGHTABILITY_REQUIREMENT,
     IDEA_EXPRESSION_RULE,
 )
-from authorityspoke.opinions import (
-    AnchoredHoldings,
-    HoldingWithAnchors,
-    TextPositionSet,
-)
-
-
-from authorityspoke.groups import EnactmentGroup
-from authorityspoke import Entity, Fact, Holding, Predicate, Rule
-from authorityspoke.holdings import HoldingGroup
 from authorityspoke.facts import (
     AbsenceOfFactor,
     Evidence,
     Exhibit,
+)
+from authorityspoke.groups import EnactmentGroup
+from authorityspoke.holdings import HoldingGroup
+from authorityspoke.opinions import (
+    AnchoredHoldings,
+    HoldingWithAnchors,
+    TextPositionSet,
 )
 from authorityspoke.procedures import Procedure
 
