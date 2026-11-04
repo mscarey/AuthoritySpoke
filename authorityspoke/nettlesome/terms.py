@@ -1020,9 +1020,7 @@ def contradicts(left: Comparable, right: Comparable) -> bool:
     return left.contradicts(right)
 
 
-def expand_string_from_source(
-    term: str | Term, source: Comparable | None
-) -> Term:
+def expand_string_from_source(term: str | Term, source: Comparable | None) -> Term:
     """Replace ``term`` with the real term it references, if ``term`` is a string reference."""
     if isinstance(term, str):
         if source is not None:
@@ -1060,6 +1058,9 @@ class ContextRegister:
         """Index Comparables on each side by names of Comparables on the other side."""
         self._bd: bidict.bidict = bidict.bidict()
         self._terms: dict[str, Term] = {}
+
+    def __contains__(self, item: str) -> bool:
+        return item in self.matches
 
     def __getitem__(self, item: str) -> Term:
         return self._terms[self._bd[item]]
@@ -1306,9 +1307,7 @@ class ContextRegister:
         new._terms = self._terms.copy()
         return new
 
-    def merged_with(
-        self, incoming_mapping: ContextRegister
-    ) -> ContextRegister | None:
+    def merged_with(self, incoming_mapping: ContextRegister) -> ContextRegister | None:
         r"""
         Create a new merged :class:`ContextRegister`\.
 
@@ -1501,9 +1500,7 @@ class Term(Comparable, BaseModel):
     def __bool__(self) -> bool:
         return True
 
-    def add(
-        self, other: Self, context: ContextRegister | None = None
-    ) -> Self | None:
+    def add(self, other: Self, context: ContextRegister | None = None) -> Self | None:
         """
         Get a term that combines the meaning of self and other, if possible.
 
@@ -1639,7 +1636,6 @@ class DuplicateTermError(Exception):
     """Error indicating a TermSequence contains the same Term more than once."""
 
 
-
 class TermSequence(RootModel):
     """A sequence of Terms that can be compared in order."""
 
@@ -1658,9 +1654,7 @@ class TermSequence(RootModel):
 
     @field_validator("root")
     @classmethod
-    def validate_terms(
-        cls, value: Sequence[Term | None]
-    ) -> tuple[Term | None, ...]:
+    def validate_terms(cls, value: Sequence[Term | None]) -> tuple[Term | None, ...]:
         seen: list[str] = []
         for term in value:
             if term is not None:
