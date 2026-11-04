@@ -467,23 +467,20 @@ class Procedure(Comparable, BaseModel):
         def other_outputs_implied(
             context: Explanation | None,
         ) -> Iterator[Explanation]:
-            for explanation in self.outputs.explanations_implication(
+            yield from self.outputs.explanations_implication(
                 other.outputs, context=context
-            ):
-                yield explanation
+            )
 
         def self_inputs_implied(explanations: Iterable[Explanation]):
             for explanation in explanations:
-                for result in other.inputs.explanations_implication(
+                yield from other.inputs.explanations_implication(
                     self.inputs, context=explanation
-                ):
-                    yield result
+                )
 
         for explanation in self_inputs_implied(other_outputs_implied(context)):
-            for result in self.inputs.explanations_consistent_with(
+            yield from self.inputs.explanations_consistent_with(
                 other=other.despite, context=explanation
-            ):
-                yield result
+            )
 
     def explain_implication_all_to_all(
         self, other: Self, context: Explanation | ContextRegister | None = None
@@ -527,19 +524,17 @@ class Procedure(Comparable, BaseModel):
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
         def other_outputs_implied(context: Explanation) -> Iterator[Explanation]:
-            for explanation in self.outputs.explanations_implication(
+            yield from self.outputs.explanations_implication(
                 other.outputs, context=context
-            ):
-                yield explanation
+            )
 
         def other_despite_implied(
             explanations: Iterator[Explanation],
         ) -> Iterator[Explanation]:
             for explanation in explanations:
-                for result in self_despite_or_input.explanations_implication(
+                yield from self_despite_or_input.explanations_implication(
                     other.despite, context=explanation
-                ):
-                    yield result
+                )
 
         for explanation in other_despite_implied(other_outputs_implied(context)):
             if self.inputs.consistent_with(
@@ -608,8 +603,7 @@ class Procedure(Comparable, BaseModel):
 
         for outputs_explanation in other_outputs_implied(context):
             for inputs_explanation in other_inputs_implied(outputs_explanation):
-                for despite_explanation in other_despite_implied(inputs_explanation):
-                    yield despite_explanation
+                yield from other_despite_implied(inputs_explanation)
 
     def _implies_if_present(
         self, other: Comparable, context: Explanation
