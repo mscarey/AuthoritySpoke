@@ -73,7 +73,7 @@ class FakeClient(Client):
         if self.responses.get(path):
             return self.responses[path]
         branches_that_start_path = [
-            entry for entry in self.responses.keys() if path.startswith(entry)
+            entry for entry in self.responses if path.startswith(entry)
         ]
         if not branches_that_start_path:
             return None

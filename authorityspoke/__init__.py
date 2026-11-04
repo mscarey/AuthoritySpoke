@@ -1,7 +1,8 @@
 """AuthoritySpoke: Reading the law for the last time."""
 
-from justopinion import CAPClient, Opinion
+from justopinion import Opinion
 from justopinion.decisions import Decision
+from justopinion.download import CAPClient, CourtListenerClient
 from legislice import Enactment
 from legislice.download import Client as LegisClient
 
@@ -21,6 +22,7 @@ __all__ = [
     "Allegation",
     "CAPClient",
     "Comparison",
+    "CourtListenerClient",
     "Decision",
     "DecisionReading",
     "Enactment",
