@@ -137,7 +137,7 @@ class TestExhibitsImplication:
         vague_testimony = make_exhibit["small_weight_testimony"]
         assert specific_testimony >= vague_testimony
 
-    def test_implication_fact_with_quantity(self, make_fact_about_exhibit):
+    def test_implication_fact_with_weight(self, make_fact_about_exhibit):
         specific_testimony_reliable = make_fact_about_exhibit["f_reliable_large_weight"]
         vague_testimony_reliable = make_fact_about_exhibit["f_reliable_small_weight"]
         assert specific_testimony_reliable >= vague_testimony_reliable
