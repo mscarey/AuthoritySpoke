@@ -99,7 +99,10 @@ class Rule(Term, BaseModel):
     @classmethod
     def validate_enactment_groups(
         cls,
-        v: dict | EnactmentPassage | Sequence[EnactmentPassage] | EnactmentGroup[EnactmentPassage],
+        v: dict
+        | EnactmentPassage
+        | Sequence[EnactmentPassage]
+        | EnactmentGroup[EnactmentPassage],
     ) -> EnactmentGroup[EnactmentPassage]:
         """Convert EnactmentPassage to EnactmentGroup."""
         enactment_group_type = EnactmentGroup[EnactmentPassage]
@@ -457,12 +460,10 @@ class Rule(Term, BaseModel):
         ):
             return False
 
-        if not all(
+        return all(
             any(e >= other_d for e in self.enactments + self.enactments_despite)
             for other_d in other.enactments_despite
-        ):
-            return False
-        return True
+        )
 
     def explanations_implication(
         self, other: Comparable, context: ContextRegister | Explanation | None = None
