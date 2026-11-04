@@ -93,7 +93,11 @@ class Procedure(Comparable, BaseModel):
     @classmethod
     def _coerce_factor_group(
         cls,
-        v: Factor | dict | Sequence[Factor | dict] | FactorGroup[FactorOrAbsence] | None,
+        v: Factor
+        | dict
+        | Sequence[Factor | dict]
+        | FactorGroup[FactorOrAbsence]
+        | None,
         *,
         require_nonempty: bool,
         group_name: str,
@@ -134,7 +138,11 @@ class Procedure(Comparable, BaseModel):
     @classmethod
     def _validate_factor_groups(
         cls,
-        v: Factor | dict | Sequence[Factor | dict] | FactorGroup[FactorOrAbsence] | None,
+        v: Factor
+        | dict
+        | Sequence[Factor | dict]
+        | FactorGroup[FactorOrAbsence]
+        | None,
     ) -> list[FactorOrAbsence]:
         return cls._coerce_factor_group(v, require_nonempty=False, group_name="inputs")
 
@@ -795,7 +803,7 @@ class Procedure(Comparable, BaseModel):
                 + "for each output."
             )
         if isinstance(self.outputs[0], AbsenceOfFactor):
-            raise ValueError(
+            raise TypeError(
                 "The 'exclusive' attribute is not allowed for Holdings "
                 + "with an 'absent' 'output' Factor. This would indicate "
                 + "that the output can or must be present in every litigation "
