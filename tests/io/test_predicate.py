@@ -86,7 +86,7 @@ class TestPredicateDump:
             expression=Q_("35 feet"),
         )
         dumped = predicate.model_dump()
-        assert dumped["quantity_range"]["quantity_magnitude"] == Decimal(35)
+        assert dumped["quantity_range"]["quantity"].magnitude == Decimal(35)
 
     def test_round_trip(self):
         statement = Comparison.new(

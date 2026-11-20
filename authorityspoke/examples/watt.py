@@ -121,8 +121,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": "<=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal(35),
-                "quantity_units": "foot",
+                "quantity": {"magnitude": Decimal(35), "units": "foot"},
             },
         },
         "terms": ["the_stockpile_of_trees", "hideaway_lodge"],
@@ -135,8 +134,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": "<=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal(5),
-                "quantity_units": "foot",
+                "quantity": {"magnitude": Decimal(5), "units": "foot"},
             },
         },
         "terms": ["the_stockpile_of_trees", "hideaway_lodge"],
@@ -149,8 +147,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": ">=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal(20),
-                "quantity_units": "foot",
+                "quantity": {"magnitude": Decimal(20), "units": "foot"},
             },
         },
         "terms": ["the_stockpile_of_trees", "hideaway_lodge"],
@@ -203,8 +200,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": ">=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal(385),
-                "quantity_units": "minute",
+                "quantity": {"magnitude": Decimal(385), "units": "minute"},
             },
         },
         "terms": ["officers_search_of_the_stockpile"],
@@ -249,8 +245,7 @@ FACT_SPECS: list[FactSpec] = [
             "quantity_range": {
                 "sign": ">=",
                 "include_negatives": None,
-                "quantity_magnitude": Decimal(20),
-                "quantity_units": "foot",
+                "quantity": {"magnitude": Decimal(20), "units": "foot"},
             },
         },
         "terms": ["the_stockpile_of_trees", "hideaway_lodge"],

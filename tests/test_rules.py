@@ -1074,8 +1074,7 @@ class TestStatuteRules:
                         content="the length of {the_suspected_beard} was",
                         quantity_range=UnitRange(
                             sign="==",
-                            quantity_magnitude=8,
-                            quantity_units="millimetres",
+                            quantity=Q_(8, "millimetres"),
                         ),
                     ),
                     terms=[Entity(name="the suspected beard")],
@@ -1094,7 +1093,7 @@ class TestStatuteRules:
             predicate=Comparison(
                 content="the length of {the_suspected_beard} was",
                 quantity_range=UnitRange(
-                    sign=">=", quantity_magnitude=12, quantity_units="inches"
+                    sign=">=", quantity=Q_(12, "inches")
                 ),
             ),
             terms=[Entity(name="the suspected beard")],
@@ -1113,7 +1112,7 @@ class TestStatuteRules:
                     predicate=Comparison(
                         content="the length of {the_suspected_beard} was",
                         quantity_range=UnitRange(
-                            sign=">=", quantity_magnitude=12, quantity_units="inches"
+                            sign=">=", quantity=Q_(12, "inches")
                         ),
                     ),
                     terms=[Entity(name="the suspected beard")],

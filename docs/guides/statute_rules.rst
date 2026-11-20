@@ -144,7 +144,10 @@ we can determine that the original “chin rule”
 
   >>> longer_hair = [beard_holdings[0].model_copy(deep=True)]
   >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.sign = "=="
-  >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity_magnitude = 8
+  >>> from authorityspoke.nettlesome.quantities import Q_
+  >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity = Q_(
+  ...     8, "millimeters"
+  ... )
     >>> print(longer_hair[0])
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -169,7 +172,7 @@ library). And we can show that this new Rule contradicts a Rule that
 came from the Beard Tax Act.
 
     >>> from authorityspoke import Fact, Entity
-    >>> from authorityspoke.nettlesome.quantities import Comparison, UnitRange
+    >>> from authorityspoke.nettlesome.quantities import Q_, Comparison, UnitRange
     >>> changed_holdings = [Holding(rule=rule) for rule in beard_act.rules()]
     >>> long_means_not_beard = changed_holdings[1].rule
     >>> long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
@@ -178,7 +181,7 @@ came from the Beard Tax Act.
     ...         predicate=Comparison(
     ...             content="the length of {the_suspected_beard} was",
     ...             quantity_range=UnitRange(
-    ...                 sign=">=", quantity_magnitude=12, quantity_units="inches"
+    ...                 sign=">=", quantity=Q_(12, "inches")
     ...             ),
     ...         ),
     ...         terms=[Entity(name="the suspected beard")],

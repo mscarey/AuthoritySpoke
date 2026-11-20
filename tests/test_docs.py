@@ -1,5 +1,6 @@
 from authorityspoke import Holding
 from authorityspoke.examples import beard_act
+from authorityspoke.nettlesome.quantities import Q_
 
 
 class TestStatuteDocs:
@@ -10,7 +11,9 @@ class TestStatuteDocs:
     >>> chin_rule = beard_holdings[0].rule
     >>> longer_hair = [beard_holdings[0].model_copy(deep=True)]
     >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.sign = "=="
-    >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity_magnitude = 8
+    >>> longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity = Q_(
+    ...     8, "millimeters"
+    ... )
     >>> print(longer_hair[0])
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -34,6 +37,8 @@ class TestStatuteDocs:
         beard_holdings = [Holding(rule=rule) for rule in beard_act.rules()]
         longer_hair = [beard_holdings[0].model_copy(deep=True)]
         longer_hair[0].rule.inputs[1].predicate.quantity_range.sign = "=="
-        longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity_magnitude = 8
+        longer_hair[0].rule.inputs[1].predicate.quantity_range.quantity = Q_(
+            8, "millimeters"
+        )
         chin_rule = beard_holdings[0].rule
         assert chin_rule.implies(longer_hair[0])

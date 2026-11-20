@@ -10,6 +10,7 @@ from authorityspoke.nettlesome.quantities import (
     Comparison,
     DateRange,
     DecimalRange,
+    Q_,
     UnitRange,
 )
 from authorityspoke.nettlesome.statements import Statement
@@ -17,21 +18,26 @@ from authorityspoke.nettlesome.statements import Statement
 
 class TestQuantities:
     def test_unitregistry_imports_do_not_conflict(self, make_comparison):
-        left = UnitRange(quantity_magnitude=20, quantity_units="meter", sign=">")
+        left = UnitRange(quantity=Q_(20, "meter"), sign=">")
         right = make_comparison["meters"].quantity_range
         assert left.implies(right)
         assert left.quantity == Quantity(Decimal(20), "meter")
 
     def test_quantity_from_string(self):
-        left = UnitRange(quantity_magnitude=2000, quantity_units="day", sign="<")
+        left = UnitRange(quantity="2000 day", sign="<")
         assert left.magnitude == 2000
         assert left.domain == S.Reals
         assert left.interval.start == 0
 
+    def test_quantity_json_round_trip(self):
+        quantity_range = UnitRange(quantity=Q_(Decimal("20"), "mile"))
+        reloaded = UnitRange.model_validate_json(quantity_range.model_dump_json())
+        assert reloaded.quantity == quantity_range.quantity
+        assert isinstance(reloaded.quantity.magnitude, Decimal)
+
     def test_quantity_from_string_include_negatives(self):
         left = UnitRange(
-            quantity_magnitude=2000,
-            quantity_units="day",
+            quantity=Q_(2000, "day"),
             sign="<",
             include_negatives=True,
         )
@@ -39,9 +45,7 @@ class TestQuantities:
         assert left.interval.start == -oo
 
     def test_no_contradiction_between_classes(self):
-        left = UnitRange(
-            quantity_magnitude=Decimal(2000), quantity_units="day", sign="<"
-        )
+        left = UnitRange(quantity=Q_(Decimal(2000), "day"), sign="<")
         right = DecimalRange(quantity=2000, sign=">")
         assert right.q == 2000
         assert str(right) == "greater than 2000"

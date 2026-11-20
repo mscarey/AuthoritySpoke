@@ -20,6 +20,30 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
+class DecimalAwarePintQuantity(PydanticPintQuantity):
+    def serialize(
+        self, value: Quantity, info: Any = None, *, to_json: bool = False
+    ) -> Any:
+        json_mode = to_json or (info is not None and info.mode_is_json())
+        if (
+            json_mode
+            and self.ser_mode_json == "dict"
+            and isinstance(value.magnitude, Decimal)
+        ):
+            return {"magnitude": str(value.magnitude), "units": str(value.units)}
+        return super().serialize(value, info, to_json=to_json)
+
+    def validate(self, value: Any, info: Any = None) -> Quantity:
+        if isinstance(value, dict) and isinstance(value.get("magnitude"), str):
+            try:
+                magnitude = Decimal(value["magnitude"])
+            except InvalidOperation:
+                pass
+            else:
+                value = {**value, "magnitude": magnitude}
+        return super().validate(value, info)
+
+
 def scale_interval(interval: Interval, scalar: float) -> Interval:
     """
     Scale up one interval by multiplying by a scalar.
@@ -200,7 +224,7 @@ class QuantityRange(BaseModel):
         """
         Change self.sign in place to reverse the range of numbers covered.
 
-            >>> quantity_range = UnitRange(quantity_magnitude="100", quantity_units="meters", sign=">")
+            >>> quantity_range = UnitRange(quantity=Q_("100 meters"), sign=">")
             >>> str(quantity_range)
             'greater than 100 meter'
             >>> quantity_range.reverse_meaning()
@@ -218,18 +242,16 @@ class QuantityRange(BaseModel):
 class UnitRange(QuantityRange, BaseModel):
     """A range defined relative to a pint Quantity."""
 
-    quantity_magnitude: Decimal | int
-    quantity_units: str
+    quantity: Annotated[
+        PlainQuantity[Decimal | int],
+        DecimalAwarePintQuantity(ureg=ureg, ser_mode_json="dict"),
+    ]
     sign: str = "=="
     include_negatives: bool | None = None
 
     @property
     def q(self) -> PlainQuantity[Decimal | int]:
-        return Quantity(self.quantity_magnitude, self.quantity_units)
-
-    @property
-    def quantity(self) -> PlainQuantity[Decimal | int]:
-        return self.q
+        return self.quantity
 
     @property
     def domain(self) -> sympy.Set:
@@ -239,7 +261,7 @@ class UnitRange(QuantityRange, BaseModel):
     @property
     def magnitude(self) -> Decimal | int:
         """Get magnitude of pint Quantity."""
-        return self.q.magnitude
+        return self.quantity.magnitude
 
     def consistent_dimensionality(self, other: QuantityRange) -> bool:
         """
@@ -347,7 +369,7 @@ class DecimalRange(QuantityRange, BaseModel):
             return value
         if isinstance(value, (int, float)):
             return Decimal(value)
-        raise TypeError(
+        raise ValueError(
             f"DecimalRange quantity must be an int, float, or Decimal, not {type(value)}."
         )
 
@@ -479,8 +501,7 @@ class Comparison(BaseModel, PhraseABC):
                 quantity = Q_(quantity)
             quantity_range = UnitRange(
                 sign=sign,
-                quantity_magnitude=Decimal(quantity.magnitude),
-                quantity_units=str(quantity.units),
+                quantity=Q_(Decimal(quantity.magnitude), str(quantity.units)),
                 include_negatives=include_negatives,
             )
         else:
