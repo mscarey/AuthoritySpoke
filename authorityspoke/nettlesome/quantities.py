@@ -2,13 +2,14 @@
 
 from abc import abstractmethod
 from datetime import date
-from decimal import Decimal
-from typing import Any, ClassVar, Self
+from decimal import Decimal, InvalidOperation
+from typing import Annotated, Any, ClassVar, Self, cast
 
 import sympy
 from pint import Quantity, UnitRegistry
 from pint.facets.plain import PlainQuantity
 from pydantic import BaseModel, field_validator, model_validator
+from pydantic_pint import PydanticPintQuantity
 from sympy import Eq, Interval, Mul, S, oo
 from sympy.physics.units import Quantity as SympyQuantity
 from sympy.sets import EmptySet, FiniteSet
