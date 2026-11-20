@@ -59,7 +59,7 @@ class Statement(Factor, BaseModel):
     """
 
     predicate: Predicate | Comparison
-    terms: TermSequence = TermSequence()
+    terms: TermSequence = TermSequence(root=())
     name: str = ""
     generic: bool = False
 
@@ -95,7 +95,9 @@ class Statement(Factor, BaseModel):
         if isinstance(terms, TermSequence):
             return cls(predicate=predicate, terms=terms, generic=generic)
         if terms is None:
-            return cls(predicate=predicate, terms=TermSequence(), generic=generic)
+            return cls(
+                predicate=predicate, terms=TermSequence(root=()), generic=generic
+            )
         return cls(
             predicate=predicate, terms=TermSequence(root=tuple(terms)), generic=generic
         )
@@ -107,7 +109,7 @@ class Statement(Factor, BaseModel):
         if isinstance(v, TermSequence):
             return v
         if v is None:
-            return TermSequence()
+            return TermSequence(root=())
 
         try:
             normalized = tuple(cls._normalize_term(term) for term in v)

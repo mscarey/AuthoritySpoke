@@ -1637,12 +1637,10 @@ class DuplicateTermError(Exception):
     """Error indicating a TermSequence contains the same Term more than once."""
 
 
-class TermSequence(RootModel):
+class TermSequence(RootModel[Sequence[Term | None]]):
     """A sequence of Terms that can be compared in order."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
-
-    root: Sequence[Term | None] = ()
 
     def __iter__(self):
         return iter(self.root)
