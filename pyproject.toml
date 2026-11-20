@@ -20,6 +20,7 @@ dependencies = [
     "requests",
     "roman",
     "python-constraint2>=2.9.0",
+    "pydantic-pint>=0.7.0",
 ]
 
 [build-system]
