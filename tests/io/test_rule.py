@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 
-
 from authorityspoke.rules import Rule
 
 load_dotenv()

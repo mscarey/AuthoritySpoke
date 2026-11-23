@@ -1,7 +1,6 @@
-from authorityspoke.nettlesome.terms import TermSequence
-
-from authorityspoke.facts import Fact, build_fact, Evidence, Exhibit
 from authorityspoke import Entity
+from authorityspoke.facts import Evidence, Exhibit, Fact, build_fact
+from authorityspoke.nettlesome.terms import TermSequence
 
 
 class TestEvidence:

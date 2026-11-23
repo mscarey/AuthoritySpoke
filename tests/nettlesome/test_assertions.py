@@ -1,9 +1,9 @@
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.factors import AbsenceOf
-from authorityspoke.nettlesome.statements import Statement, Assertion
+from authorityspoke.nettlesome.statements import Assertion, Statement
+from authorityspoke.nettlesome.terms import ContextRegister
 
 
 class TestAssertion:

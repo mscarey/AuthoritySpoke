@@ -2,7 +2,6 @@
 
 import textwrap
 
-
 TAB_WIDTH = 2
 TEXT_WIDTH = 70
 

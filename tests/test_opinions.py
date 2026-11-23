@@ -1,7 +1,6 @@
 import copy
 
 import pytest
-
 from anchorpoint.textselectors import (
     TextPositionSelector,
     TextPositionSet,
@@ -9,21 +8,20 @@ from anchorpoint.textselectors import (
     TextSelectionError,
 )
 
-from authorityspoke.nettlesome.entities import Entity
-
-from authorityspoke.facts import Fact, Predicate
 from authorityspoke.examples.brad import anchored_holdings as brad_holdings
 from authorityspoke.examples.watt import anchored_holdings as watt_holdings
+from authorityspoke.facts import Fact, Predicate
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.terms import ContextRegister
-from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
 from authorityspoke.opinions import (
     AnchoredHoldings,
     HoldingWithAnchors,
     OpinionReading,
     TermWithAnchors,
 )
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 
 
 class TestAnchor:
@@ -221,7 +219,7 @@ class TestOpinionHoldings:
         holdings_to_posit = copy.deepcopy(watt_holdings().holdings)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
-        assert "proof of Wattenburg's guilt" in factors.keys()
+        assert "proof of Wattenburg's guilt" in factors
 
     def test_new_context_inferring_factors_to_change(self, make_opinion_with_holding):
         """

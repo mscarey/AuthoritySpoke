@@ -2,6 +2,11 @@ import operator
 
 import pytest
 
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.groups import FactorGroup
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Comparison
+from authorityspoke.nettlesome.statements import Statement
 from authorityspoke.nettlesome.terms import (
     ContextRegister,
     Explanation,
@@ -9,11 +14,6 @@ from authorityspoke.nettlesome.terms import (
     contradicts,
     means,
 )
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison
-from authorityspoke.nettlesome.statements import Statement
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.groups import FactorGroup
 
 
 class TestContext:

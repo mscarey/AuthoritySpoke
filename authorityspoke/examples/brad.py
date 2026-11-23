@@ -1,14 +1,13 @@
 import copy
 from typing import Any, cast
 
+from authorityspoke import Comparison, Entity, Fact, Holding, Predicate, Rule
+from authorityspoke.examples.legislation import DUE_PROCESS_CLAUSE, SEARCH_CLAUSE
+from authorityspoke.facts import AbsenceOfFactor, Evidence, Exhibit
 from authorityspoke.groups import EnactmentGroup
-
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
-from authorityspoke import Comparison, Entity, Fact, Holding, Predicate, Rule
-from authorityspoke.facts import AbsenceOfFactor, Evidence, Exhibit
 from authorityspoke.procedures import Procedure
-from authorityspoke.examples.legislation import DUE_PROCESS_CLAUSE, SEARCH_CLAUSE
 
 ENTITIES = {
     "bradley": Entity(

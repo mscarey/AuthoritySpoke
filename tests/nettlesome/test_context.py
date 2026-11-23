@@ -2,11 +2,11 @@ import operator
 
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister, Explanation, means
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.groups import FactorGroup
 from authorityspoke.nettlesome.predicates import Predicate
 from authorityspoke.nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import ContextRegister, Explanation, means
 
 
 class TestContextRegisters:

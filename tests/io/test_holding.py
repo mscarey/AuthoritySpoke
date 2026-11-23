@@ -1,27 +1,26 @@
 import copy
-
 import os
-import pytest
 
+import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
-from authorityspoke.nettlesome.terms import ContextRegister
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.predicates import Predicate
 
 from authorityspoke.examples import brad as brad_example
 from authorityspoke.examples import feist as feist_example
 from authorityspoke.examples import lotus as lotus_example
 from authorityspoke.examples import watt as watt_example
-from authorityspoke.facts import Fact, AbsenceOfFactor
+from authorityspoke.facts import AbsenceOfFactor, Fact
 from authorityspoke.holdings import Holding
+from authorityspoke.io.loaders import load_holdings
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.terms import ContextRegister
 from authorityspoke.opinions import (
+    AnchoredHoldings,
     HoldingWithAnchors,
     OpinionReading,
-    AnchoredHoldings,
 )
 from authorityspoke.procedures import Procedure
-from authorityspoke.io.loaders import load_holdings
 from authorityspoke.rules import Rule
 
 load_dotenv()
@@ -127,7 +126,7 @@ class TestTextAnchors:
     def test_fact_with_quantity(self, make_response):
         holdings = copy.deepcopy(list(watt_example.HOLDINGS))
         new_fact = holdings[1].inputs[3]
-        assert "was no more than 35 foot" in str(new_fact)
+        assert "was no more than 35.0 foot" in str(new_fact)
 
     def test_use_int_not_pint_without_dimension(self, make_response):
         loaded_holdings = copy.deepcopy(list(brad_example.HOLDINGS))

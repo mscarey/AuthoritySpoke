@@ -2,13 +2,11 @@
 
 import pathlib
 
-from typing import Optional
-
 
 def make_filepath(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
+    filename: str | None = None,
+    directory: pathlib.Path | None = None,
+    filepath: pathlib.Path | None = None,
     default_folder: str = "holdings",
 ):
     """

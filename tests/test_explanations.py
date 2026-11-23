@@ -1,8 +1,7 @@
-from authorityspoke.nettlesome.terms import ContextRegister, means
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome import Predicate
-
 from authorityspoke import Fact
+from authorityspoke.nettlesome import Predicate
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister, means
 
 
 class TestContext:
@@ -34,13 +33,15 @@ class TestContext:
         register = ContextRegister()
         register.insert_pair(Entity(name="Al"), Entity(name="Alice"))
         answers = self.fact_al.update_context_register(self.fact_alice, register, means)
-        assert Entity(name="the bull").key in next(answers).keys()
+        assert Entity(name="the bull").key in next(answers)
 
     def test_explain_consistency(self):
         register = ContextRegister()
         register.insert_pair(Entity(name="Al"), Entity(name="Alice"))
         explanation = self.fact_al.explain_consistent_with(self.fact_alice, register)
-        assert "<the bull> is like <the cow>" in str(explanation.context)
+        assert explanation and "<the bull> is like <the cow>" in str(
+            explanation.context
+        )
 
 
 class TestExplainHoldings:

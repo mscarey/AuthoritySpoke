@@ -2,17 +2,15 @@
 
 import pathlib
 
-from typing import Optional, Union
-
 from authorityspoke.decisions import Decision
 from authorityspoke.io import filepaths
 
 
 def case_to_file(
-    case: Union[Decision, Decision],
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
+    case: Decision,
+    filename: str | None = None,
+    directory: pathlib.Path | None = None,
+    filepath: pathlib.Path | None = None,
 ) -> None:
     r"""
     Save one case from an API response as a JSON file.

@@ -1,7 +1,6 @@
 from authorityspoke.procedures import Procedure
 
 
-
 class TestProcedureDump:
     def test_dump_procedure(self, make_procedure):
         procedure = make_procedure["c2"]

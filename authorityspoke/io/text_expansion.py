@@ -1,8 +1,9 @@
 """For expanding text in input JSON into a format Marshmallow can load."""
 
+from collections.abc import Sequence
 from re import findall
 from string import Template
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 from slugify import slugify
 
@@ -18,8 +19,8 @@ def collapse_name_in_content(content: str, name: str):
 
 
 def add_found_context_with_brackets(
-    content: str, terms: List[Dict], factor: Dict, placeholder="{}"
-) -> Tuple[str, List[Dict[str, Any]]]:
+    content: str, terms: list[dict], factor: dict, placeholder="{}"
+) -> tuple[str, list[dict[str, Any]]]:
     """
     Remove bracketed mentions of factor with placeholder and list replacements.
 
@@ -38,8 +39,8 @@ def add_found_context_with_brackets(
 
 
 def add_found_context(
-    content: str, terms: List[Dict], factor: Dict
-) -> Tuple[str, List[Dict[str, Any]]]:
+    content: str, terms: list[dict], factor: dict
+) -> tuple[str, list[dict[str, Any]]]:
     """
     Replace mentions of factor with placeholder and list replacements.
 
@@ -71,8 +72,8 @@ def add_found_context(
 
 
 def get_references_from_string(
-    content: str, terms: Optional[List[Dict]]
-) -> Tuple[str, Sequence[Dict]]:
+    content: str, terms: list[dict] | None
+) -> tuple[str, Sequence[dict]]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
 
@@ -107,7 +108,7 @@ def get_references_from_string(
     return content, terms
 
 
-def wrap_single_element_in_list(data: Dict, many_element: str):
+def wrap_single_element_in_list(data: dict, many_element: str):
     """Make a specified field a list if it isn't already a list."""
     if not isinstance(data[many_element], list):
         data[many_element] = [data[many_element]]

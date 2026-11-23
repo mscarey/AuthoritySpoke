@@ -2,13 +2,12 @@ import operator
 
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister, TermSequence, means
+from authorityspoke.facts import AbsenceOfFactor, Fact
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_
+from authorityspoke.nettlesome.quantities import Q_, Comparison
 from authorityspoke.nettlesome.statements import Statement
-
-from authorityspoke.facts import Fact, AbsenceOfFactor
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence, means
 
 
 class TestStatements:

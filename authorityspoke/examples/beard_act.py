@@ -1,20 +1,18 @@
 import json
 from pathlib import Path
 
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, UnitRange
-
 from authorityspoke.facts import (
     AbsenceOfFactor,
-    Fact,
     Evidence,
+    Exhibit,
+    Fact,
 )
-from authorityspoke.facts import Exhibit
+from authorityspoke.io.fake_enactments import FakeClient
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison, UnitRange
 from authorityspoke.passages import passage_from_quotes
 from authorityspoke.rules import Procedure, Rule
-
-from authorityspoke.io.fake_enactments import FakeClient
 
 
 def beard_response() -> dict[str, dict]:
@@ -49,7 +47,7 @@ def rules() -> list[Rule]:
         predicate=Comparison(
             content="the length of {the_suspected_beard} was",
             quantity_range=UnitRange(
-                sign=">=", quantity_magnitude=5, quantity_units="millimetres"
+                sign=">=", quantity=Q_(5, "millimetres")
             ),
         ),
         terms=[suspected_beard],

@@ -1,21 +1,19 @@
 import copy
 
+from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import (
     COMPILATION_COPYRIGHT_RULE,
-    COPYRIGHTABILITY_REQUIREMENT,
     COPYRIGHT_CLAUSE,
+    COPYRIGHTABILITY_REQUIREMENT,
     IDEA_EXPRESSION_RULE,
 )
+from authorityspoke.groups import EnactmentGroup
+from authorityspoke.holdings import HoldingGroup
 from authorityspoke.opinions import (
     AnchoredHoldings,
     HoldingWithAnchors,
     TextPositionSet,
 )
-
-
-from authorityspoke.groups import EnactmentGroup
-from authorityspoke import Entity, Fact, Holding, Predicate, Rule
-from authorityspoke.holdings import HoldingGroup
 from authorityspoke.procedures import Procedure
 
 HOLDINGS = HoldingGroup(holdings=[])

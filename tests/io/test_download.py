@@ -1,13 +1,12 @@
-from dotenv import load_dotenv
 import pytest
-
+from dotenv import load_dotenv
 from justopinion import CAPClient
 from justopinion.download import CaseAccessProjectAPIError
 
 from authorityspoke import DecisionReading
 from authorityspoke.decisions import Decision
-from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers
+from authorityspoke.io.loaders import load_decision
 from tests.test_notebooks import CAP_API_KEY
 
 load_dotenv()

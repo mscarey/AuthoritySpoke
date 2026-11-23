@@ -1,17 +1,16 @@
-from typing import Dict
 
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister
+from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.factors import AbsenceOf
 from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_
-from authorityspoke.nettlesome.statements import Statement, Assertion
-from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.quantities import Q_, Comparison
+from authorityspoke.nettlesome.statements import Assertion, Statement
+from authorityspoke.nettlesome.terms import ContextRegister
 
 
 @pytest.fixture(scope="class")
-def make_predicate() -> Dict[str, Predicate]:
+def make_predicate() -> dict[str, Predicate]:
     return {
         "make_predicate": Predicate(content="{person} committed a crime"),
         "murder": Predicate(content="{shooter} murdered {victim}"),
@@ -46,7 +45,7 @@ def make_predicate() -> Dict[str, Predicate]:
 
 
 @pytest.fixture(scope="class")
-def make_comparison() -> Dict[str, Predicate | Comparison]:
+def make_comparison() -> dict[str, Predicate | Comparison]:
     return {
         "small_weight": Comparison.new(
             content="the amount of gold {person} possessed was",
@@ -150,7 +149,7 @@ def make_comparison() -> Dict[str, Predicate | Comparison]:
 
 
 @pytest.fixture(scope="class")
-def make_statement(make_predicate, make_comparison) -> Dict[str, Statement | AbsenceOf]:
+def make_statement(make_predicate, make_comparison) -> dict[str, Statement | AbsenceOf]:
     p = make_predicate
     c = make_comparison
     return {
@@ -329,7 +328,7 @@ def make_statement(make_predicate, make_comparison) -> Dict[str, Statement | Abs
 
 
 @pytest.fixture(scope="class")
-def make_complex_fact(make_predicate, make_statement) -> Dict[str, Statement]:
+def make_complex_fact(make_predicate, make_statement) -> dict[str, Statement]:
     p = make_predicate
     f = make_statement
 
@@ -372,7 +371,7 @@ def make_complex_fact(make_predicate, make_statement) -> Dict[str, Statement]:
 
 
 @pytest.fixture(scope="class")
-def make_assertion(make_complex_fact, make_statement) -> Dict[str, Assertion]:
+def make_assertion(make_complex_fact, make_statement) -> dict[str, Assertion]:
     return {
         "generic_authority": Assertion(
             statement=make_complex_fact["relevant_plotted_murder"],

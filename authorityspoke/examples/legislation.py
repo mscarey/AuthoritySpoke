@@ -3,10 +3,10 @@ from datetime import date
 from legislice.enactments import (
     Enactment,
     EnactmentPassage,
-    TextPositionSet,
-    TextVersion,
-    TextQuoteSelector,
     TextPositionSelector,
+    TextPositionSet,
+    TextQuoteSelector,
+    TextVersion,
 )
 
 SEARCH_CLAUSE = EnactmentPassage(

@@ -1,17 +1,18 @@
-from authorityspoke.holdings import HoldingGroup
-from authorityspoke.opinions import OpinionReading
+import datetime
 from copy import deepcopy
 from datetime import date
-import datetime
-from pydantic import ValidationError
-import pytest
 
+import pytest
+from pydantic import ValidationError
+
+from authorityspoke import Entity
 from authorityspoke.decisions import Decision, DecisionReading, Opinion
 from authorityspoke.examples.feist import HOLDINGS as FEIST_HOLDINGS
 from authorityspoke.examples.oracle import HOLDINGS as ORACLE_HOLDINGS
-from authorityspoke import Entity
 from authorityspoke.facts import Fact, Predicate
+from authorityspoke.holdings import HoldingGroup
 from authorityspoke.nettlesome.terms import ContextRegister, Explanation
+from authorityspoke.opinions import OpinionReading
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

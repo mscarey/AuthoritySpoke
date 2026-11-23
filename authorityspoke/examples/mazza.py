@@ -1,6 +1,15 @@
 import copy
 
+from legislice.enactments import (
+    EnactmentPassage,
+)
+
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
+from authorityspoke.examples.legislation import (
+    DOMESTIC_FINANCIAL_INSTITUTION_PROVISION,
+    STATE_MONEY_TRANSMITTING_LICENSE_PROVISION,
+)
+from authorityspoke.groups import EnactmentGroup
 from authorityspoke.opinions import (
     AnchoredHoldings,
     EnactmentWithAnchors,
@@ -8,15 +17,7 @@ from authorityspoke.opinions import (
     TermWithAnchors,
     TextPositionSet,
 )
-from authorityspoke.examples.legislation import (
-    DOMESTIC_FINANCIAL_INSTITUTION_PROVISION,
-    STATE_MONEY_TRANSMITTING_LICENSE_PROVISION,
-)
 from authorityspoke.procedures import Procedure
-from legislice.enactments import (
-    EnactmentPassage,
-)
-from authorityspoke.groups import EnactmentGroup
 
 ENTITIES: dict[str, Entity] = {
     "mazza_alaluf": Entity(name="Mazza-Alaluf", generic=True, plural=False),

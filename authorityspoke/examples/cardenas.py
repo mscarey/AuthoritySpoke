@@ -1,14 +1,5 @@
 import copy
 
-from authorityspoke.holdings import HoldingGroup
-from authorityspoke.opinions import (
-    AnchoredHoldings,
-    HoldingWithAnchors,
-    TextPositionSet,
-)
-
-from authorityspoke.groups import EnactmentGroup
-
 from authorityspoke import Entity, Fact, Holding, Predicate, Rule
 from authorityspoke.examples.legislation import (
     ATTEMPT_STATUTE,
@@ -22,6 +13,13 @@ from authorityspoke.facts import (
     Evidence,
     Exhibit,
     Pleading,
+)
+from authorityspoke.groups import EnactmentGroup
+from authorityspoke.holdings import HoldingGroup
+from authorityspoke.opinions import (
+    AnchoredHoldings,
+    HoldingWithAnchors,
+    TextPositionSet,
 )
 from authorityspoke.procedures import Procedure
 

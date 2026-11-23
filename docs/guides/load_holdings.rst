@@ -43,7 +43,7 @@ decisions, which means to fetch them and then
 convert them into AuthoritySpoke :class:`~justopinion.decisions.Decision` objects. Since we know the
 citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.CAPClient.read_cite` method.
 
-    >>> from authorityspoke.io import CAPClient
+    >>> from authorityspoke import CAPClient
     >>> from authorityspoke.decisions import DecisionReading, Decision, Opinion, CAPCitation
     >>> if USE_REAL_CASE_API:
     ...     client = CAPClient(api_token=CAP_API_KEY)

@@ -1,21 +1,19 @@
-from copy import deepcopy
 import logging
 import os
+from copy import deepcopy
 
-
+import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
-from authorityspoke.groups import EnactmentGroup
-from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.groups import FactorGroup
-from authorityspoke.nettlesome.predicates import Predicate
-from authorityspoke.nettlesome.quantities import Comparison, Q_, UnitRange
-from authorityspoke.nettlesome.statements import Statement
-import pytest
 
 from authorityspoke.facts import Exhibit, Fact
+from authorityspoke.groups import EnactmentGroup, FactorGroup
 from authorityspoke.holdings import Holding
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.predicates import Predicate
+from authorityspoke.nettlesome.quantities import Q_, Comparison, UnitRange
+from authorityspoke.nettlesome.statements import Statement
+from authorityspoke.nettlesome.terms import ContextRegister, TermSequence
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -1076,8 +1074,7 @@ class TestStatuteRules:
                         content="the length of {the_suspected_beard} was",
                         quantity_range=UnitRange(
                             sign="==",
-                            quantity_magnitude=8,
-                            quantity_units="millimetres",
+                            quantity=Q_(8, "millimetres"),
                         ),
                     ),
                     terms=[Entity(name="the suspected beard")],
@@ -1096,7 +1093,7 @@ class TestStatuteRules:
             predicate=Comparison(
                 content="the length of {the_suspected_beard} was",
                 quantity_range=UnitRange(
-                    sign=">=", quantity_magnitude=12, quantity_units="inches"
+                    sign=">=", quantity=Q_(12, "inches")
                 ),
             ),
             terms=[Entity(name="the suspected beard")],
@@ -1115,7 +1112,7 @@ class TestStatuteRules:
                     predicate=Comparison(
                         content="the length of {the_suspected_beard} was",
                         quantity_range=UnitRange(
-                            sign=">=", quantity_magnitude=12, quantity_units="inches"
+                            sign=">=", quantity=Q_(12, "inches")
                         ),
                     ),
                     terms=[Entity(name="the suspected beard")],

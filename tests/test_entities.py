@@ -1,10 +1,9 @@
 import pytest
 
-from authorityspoke.nettlesome.terms import ContextRegister
-from authorityspoke.nettlesome.entities import Entity
-
-from authorityspoke.facts import Fact
 from authorityspoke.examples.watt import ENTITIES as WATT_ENTITIES
+from authorityspoke.facts import Fact
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.terms import ContextRegister
 
 
 class TestMakeEntities:
@@ -45,12 +44,12 @@ class TestSameMeaning:
         motel = e["motel_specific"]
         motel_b = motel.make_generic()
         assert motel is not motel_b
-        assert not motel == motel_b
+        assert not motel == motel_b  # noqa: SIM201
 
     def test_equality_generic_entities(self, make_entity):
         e = make_entity
         assert e["motel"].means(e["trees"])
-        assert not e["motel"] == e["trees"]
+        assert not e["motel"] == e["trees"]  # noqa: SIM201
 
     def test_entity_does_not_mean_statement(self):
         entity = Entity(name="Bob")

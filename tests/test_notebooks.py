@@ -3,17 +3,15 @@ Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
 
-from copy import deepcopy
 import os
+from copy import deepcopy
 
-from dotenv import load_dotenv
 import pytest
-
+from dotenv import load_dotenv
 from justopinion.download import CourtListenerClient
 
-from authorityspoke.facts import Fact, AbsenceOfFactor
-
-from authorityspoke import Entity, Predicate, Comparison
+from authorityspoke import Comparison, Entity, Predicate
+from authorityspoke.facts import AbsenceOfFactor, Fact
 
 load_dotenv()
 
@@ -154,7 +152,6 @@ class TestIntroduction:
         listings_not_copyrightable = (
             listings_not_original + unoriginal_not_copyrightable
         )
-        not_copyrightable = unoriginal_not_copyrightable.outputs[0]
         assert listings_not_copyrightable.outputs[1].short_string == (
             "absence of the fact that <Rural's telephone listings> were copyrightable"
         )
@@ -175,10 +172,10 @@ class TestIntroduction:
         oracle = make_opinion_with_holding["oracle_majority"]
 
         gen = lotus.holdings[6].explanations_contradiction(oracle.holdings[10])
-        first_explanation = next(gen)
+        next(gen)
 
         with pytest.raises(StopIteration):
-            second_explanation = next(gen)
+            next(gen)
 
 
 class TestTemplateStrings:

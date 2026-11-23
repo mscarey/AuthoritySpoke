@@ -1,14 +1,12 @@
 import datetime
 import os
-from legislice.enactments import EnactmentPassage
 
 import pytest
-
 from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 from dotenv import load_dotenv
-
 from legislice.citations import CodeLevel
 from legislice.download import Client, LegislicePathError
+from legislice.enactments import EnactmentPassage
 
 from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient

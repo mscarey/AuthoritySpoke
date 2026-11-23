@@ -1,20 +1,18 @@
 import copy
-from decimal import Decimal
 import os
 import pathlib
-
-from pydantic import ValidationError
-from authorityspoke.nettlesome.entities import Entity
-from authorityspoke.nettlesome.terms import TermSequence
-from authorityspoke.nettlesome.quantities import Comparison, UnitRange
+from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
-from authorityspoke.facts import Fact, Exhibit, Evidence
 from authorityspoke.examples import cardenas as cardenas_example
-
-from authorityspoke.io.loaders import load_holdings
+from authorityspoke.facts import Evidence, Exhibit, Fact
 from authorityspoke.io import filepaths
+from authorityspoke.io.loaders import load_holdings
+from authorityspoke.nettlesome.entities import Entity
+from authorityspoke.nettlesome.quantities import Q_, Comparison, UnitRange
+from authorityspoke.nettlesome.terms import TermSequence
 
 
 class TestFactorFileLoad:
@@ -94,10 +92,9 @@ class TestFactorLoad:
 class TestFactDump:
     def test_dump_with_quantity(self, watt_factor):
         f8_dict = watt_factor["f8"].model_dump()
-        assert f8_dict["predicate"]["quantity_range"]["quantity_units"] == "foot"
-        assert f8_dict["predicate"]["quantity_range"]["quantity_magnitude"] == Decimal(
-            "20"
-        )
+        quantity = f8_dict["predicate"]["quantity_range"]["quantity"]
+        assert quantity.magnitude == Decimal(20)
+        assert str(quantity.units) == "foot"
 
     def test_dump_complex_fact(self, make_complex_fact):
         relevant_fact = make_complex_fact["f_relevant_murder"]
@@ -112,7 +109,7 @@ class TestExhibitLoad:
             predicate=Comparison(
                 content="the distance that {officer} pursued {suspect} was",
                 quantity_range=UnitRange(
-                    quantity_magnitude=Decimal("5"), quantity_units="mile", sign=">="
+                    quantity=Q_(Decimal(5), "mile"), sign=">="
                 ),
             ),
             terms=TermSequence(root=[Entity(name="Officer Lin"), Entity(name="Al")]),
