@@ -222,6 +222,14 @@ class UnitRange(QuantityRange, BaseModel):
     sign: str = "=="
     include_negatives: bool | None = None
 
+    @field_validator("quantity", mode="before")
+    @classmethod
+    def use_local_unit_registry(cls, value: Any) -> Any:
+        """Normalize Pint quantities to the registry used by this model."""
+        if isinstance(value, Quantity):
+            return Q_(value.magnitude, str(value.units))
+        return value
+
     @property
     def q(self) -> PlainQuantity[Decimal | int]:
         return self.quantity
@@ -295,9 +303,7 @@ class UnitRange(QuantityRange, BaseModel):
         if not self.consistent_dimensionality(other):
             return False
         other_interval = self.get_unit_converted_interval(other)
-        if not self.interval.is_subset(other_interval):
-            return False
-        return other_interval.is_subset(self.interval)
+        return self.interval.symmetric_difference(other_interval) == EmptySet
 
     def _quantity_string(self) -> str:
         return super()._quantity_string() + str(self.q)

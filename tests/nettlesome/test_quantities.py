@@ -80,6 +80,17 @@ class TestCompareQuantities:
             make_comparison["int_distance"].quantity_range.q
         )
 
+    def test_means_decimal_to_int_with_units(self):
+        left = UnitRange(
+            sign="<=",
+            include_negatives=False,
+            quantity=Quantity(Decimal("5.0"), "foot"),
+        )
+        right = UnitRange(
+            sign="<=", include_negatives=False, quantity=Quantity(5, "foot")
+        )
+        assert left.means(right)
+
     def test_context_slots(self, make_comparison):
         assert len(make_comparison["meters"]) == 2
 
