@@ -2,7 +2,7 @@
 
 from abc import abstractmethod
 from datetime import date
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Annotated, Any, ClassVar, Self
 
 import sympy
@@ -46,7 +46,7 @@ def scale_union_of_intervals(ranges: sympy.Union, scalar: float) -> sympy.Union:
     return sympy.Union(*scaled_intervals)
 
 
-def scale_finiteset(elements: FiniteSet[int | float], scalar: float) -> FiniteSet:
+def scale_finiteset(elements: FiniteSet[int | float], scalar: float) -> FiniteSet:  # ty: ignore[invalid-type-form]
     """
     Scale up set of finite numbers by multiplying by a scalar.
 
