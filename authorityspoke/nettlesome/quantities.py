@@ -3,7 +3,7 @@
 from abc import abstractmethod
 from datetime import date
 from decimal import Decimal, InvalidOperation
-from typing import Annotated, Any, ClassVar, Self, cast
+from typing import Annotated, Any, ClassVar, Self
 
 import sympy
 from pint import Quantity, UnitRegistry
@@ -18,30 +18,6 @@ from authorityspoke.nettlesome.predicates import PhraseABC
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
-
-
-class DecimalAwarePintQuantity(PydanticPintQuantity):
-    def serialize(
-        self, value: Quantity, info: Any = None, *, to_json: bool = False
-    ) -> Any:
-        json_mode = to_json or (info is not None and info.mode_is_json())
-        if (
-            json_mode
-            and self.ser_mode_json == "dict"
-            and isinstance(value.magnitude, Decimal)
-        ):
-            return {"magnitude": str(value.magnitude), "units": str(value.units)}
-        return super().serialize(value, info, to_json=to_json)
-
-    def validate(self, value: Any, info: Any = None) -> Quantity:
-        if isinstance(value, dict) and isinstance(value.get("magnitude"), str):
-            try:
-                magnitude = Decimal(value["magnitude"])
-            except InvalidOperation:
-                pass
-            else:
-                value = {**value, "magnitude": magnitude}
-        return super().validate(value, info)
 
 
 def scale_interval(interval: Interval, scalar: float) -> Interval:
@@ -242,10 +218,7 @@ class QuantityRange(BaseModel):
 class UnitRange(QuantityRange, BaseModel):
     """A range defined relative to a pint Quantity."""
 
-    quantity: Annotated[
-        PlainQuantity[Decimal | int],
-        DecimalAwarePintQuantity(ureg=ureg, ser_mode_json="dict"),
-    ]
+    quantity: Annotated[PlainQuantity[Decimal | int], PydanticPintQuantity(ureg=ureg)]
     sign: str = "=="
     include_negatives: bool | None = None
 
@@ -314,8 +287,8 @@ class UnitRange(QuantityRange, BaseModel):
             )
         if other.q.units == self.q.units:
             return other.interval
-        ratio_of_units = other.q.units / self.q.units
-        return scale_ranges(other.interval, ratio_of_units)
+        conversion_factor = (1 * other.q.units).to(self.q.units).magnitude
+        return scale_ranges(other.interval, conversion_factor)
 
     def means(self, other: Any) -> bool:
         """Whether ``self`` and ``other`` represent the same quantity range."""
@@ -570,6 +543,7 @@ class Comparison(BaseModel, PhraseABC):
 
         try:
             return date.fromisoformat(value)
+
         except ValueError:
             pass
 
