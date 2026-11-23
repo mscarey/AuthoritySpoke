@@ -126,7 +126,7 @@ class TestTextAnchors:
     def test_fact_with_quantity(self, make_response):
         holdings = copy.deepcopy(list(watt_example.HOLDINGS))
         new_fact = holdings[1].inputs[3]
-        assert "was no more than 35 foot" in str(new_fact)
+        assert "was no more than 35.0 foot" in str(new_fact)
 
     def test_use_int_not_pint_without_dimension(self, make_response):
         loaded_holdings = copy.deepcopy(list(brad_example.HOLDINGS))
