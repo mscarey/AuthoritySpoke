@@ -13,14 +13,14 @@ dependencies = [
     "lxml>=4.9.1",
     "pint>=0.25.3",
     "pydantic>=2.13.3",
+    "python-constraint2>=2.9.0",
     "python-dotenv",
+    "pydantic-pint>=0.7.0",
     "python-ranges>=0.2.1",
     "python-slugify>=8.0.4",
     "sympy>=1.14.0",
     "requests",
     "roman",
-    "python-constraint2>=2.9.0",
-    "pydantic-pint>=0.7.0",
 ]
 
 [build-system]

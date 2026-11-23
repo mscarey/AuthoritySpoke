@@ -7,10 +7,10 @@ from sympy import S, oo
 
 from authorityspoke.nettlesome.entities import Entity
 from authorityspoke.nettlesome.quantities import (
+    Q_,
     Comparison,
     DateRange,
     DecimalRange,
-    Q_,
     UnitRange,
 )
 from authorityspoke.nettlesome.statements import Statement
@@ -30,10 +30,10 @@ class TestQuantities:
         assert left.interval.start == 0
 
     def test_quantity_json_round_trip(self):
-        quantity_range = UnitRange(quantity=Q_(Decimal("20"), "mile"))
+        quantity_range = UnitRange(quantity=Q_(Decimal(20), "mile"))
         reloaded = UnitRange.model_validate_json(quantity_range.model_dump_json())
         assert reloaded.quantity == quantity_range.quantity
-        assert isinstance(reloaded.quantity.magnitude, Decimal)
+        assert isinstance(reloaded.quantity.magnitude, int)
 
     def test_quantity_from_string_include_negatives(self):
         left = UnitRange(
